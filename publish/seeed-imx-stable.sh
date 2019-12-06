@@ -10,7 +10,7 @@ branch=$(git describe --contains --all HEAD)
 server_dir="/home/public/share/imx6ull"
 this_name=$0
 
-export apt_proxy=localhost:3142/
+#export apt_proxy=localhost:3142/
 
 keep_net_alive () {
 	while : ; do
