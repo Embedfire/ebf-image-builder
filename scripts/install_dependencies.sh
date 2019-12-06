@@ -37,8 +37,15 @@ debootstrap_is_installed () {
 			#exit 2
 			dpkg -l | grep qemu-user-static >/dev/null || deb_pkgs="${deb_pkgs}qemu-user-static "
 			dpkg -l | grep $(dpkg --print-architecture) | grep -v "qemu-" | grep qemu >/dev/null || deb_pkgs="${deb_pkgs}qemu "
+			dpkg -l | grep git >/dev/null || deb_pkgs="${deb_pkgs}git "
+			dpkg -l | grep dosfstools >/dev/null || deb_pkgs="${deb_pkgs}dosfstools "
+			dpkg -l | grep kpartx >/dev/null || deb_pkgs="${deb_pkgs}kpartx "
+			dpkg -l | grep wget >/dev/null || deb_pkgs="${deb_pkgs}wget "
+			dpkg -l | grep parted >/dev/null || deb_pkgs="${deb_pkgs}parted "
 		fi
 	fi
+
+
 
 	if [ "${deb_pkgs}" ] ; then
 		echo "Installing: ${deb_pkgs}"
