@@ -1306,7 +1306,7 @@ populate_rootfs () {
 	fi
 
 	if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
-		git clone https://github.com/Embdefire/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1
+		git clone ${boot_scripts} ${TEMPDIR}/disk/opt/scripts/ --depth 1
 		sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
 	else
 		cd ${TEMPDIR}/disk/opt/scripts/
