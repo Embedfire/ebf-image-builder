@@ -55,14 +55,6 @@ build_and_upload_image () {
 
 			sync ; sync ; sleep 5
 
-			bmaptool create -o ${full_name}.bmap ${full_name}.img
-
-			xz -T0 -k -f -z -3 -v -v --verbose ${full_name}.img || true
-			sha256sum ${full_name}.img.xz > ${full_name}.img.xz.sha256sum
-
-			#cleanup:
-			cd ../../
-
 			# TODO
 			# sudo rm -rf ./deploy/ || true
 		else
