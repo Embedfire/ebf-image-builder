@@ -42,6 +42,7 @@ debootstrap_is_installed () {
 			dpkg -l | grep kpartx >/dev/null || deb_pkgs="${deb_pkgs}kpartx "
 			dpkg -l | grep wget >/dev/null || deb_pkgs="${deb_pkgs}wget "
 			dpkg -l | grep parted >/dev/null || deb_pkgs="${deb_pkgs}parted "
+			dpkg -l | grep m4 >/dev/null || deb_pkgs="${deb_pkgs}m4 "
 		fi
 	fi
 
