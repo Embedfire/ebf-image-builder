@@ -1,0 +1,10 @@
+[Unit] 
+Description=Terminate Psplash Act Screen
+After=bootlogo.service solve_qt_deb.service
+
+[Service] 
+Type=forking 
+ExecStart=/bin/bash /opt/scripts/boot/psplash_quit.sh
+
+[Install]
+WantedBy=multi-user.target

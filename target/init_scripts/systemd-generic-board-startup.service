@@ -1,6 +1,6 @@
 [Unit]
 Description=Generic Board Startup
-After=local-fs.target
+After=local-fs.target solve_qt_deb.service
 
 [Service]
 Type=oneshot

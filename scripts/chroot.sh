@@ -509,6 +509,16 @@ if [ "x${deb_arch}" = "xarmhf" ] ; then
 			#while bb-customizations installes "generic-board-startup.service" other boards/configs could use this default.
 			sudo cp "${OIB_DIR}/target/init_scripts/systemd-generic-board-startup.service" "${tempdir}/lib/systemd/system/generic-board-startup.service"
 			sudo chown root:root "${tempdir}/lib/systemd/system/generic-board-startup.service"
+
+			sudo cp "${OIB_DIR}/target/init_scripts/bootlogo.service" "${tempdir}/lib/systemd/system/bootlogo.service"
+			sudo chown root:root "${tempdir}/lib/systemd/system/bootlogo.service"
+
+			sudo cp "${OIB_DIR}/target/init_scripts/solve_qt_deb.service" "${tempdir}/lib/systemd/system/solve_qt_deb.service"
+			sudo chown root:root "${tempdir}/lib/systemd/system/solve_qt_deb.service"
+
+			sudo cp "${OIB_DIR}/target/init_scripts/actlogo.service" "${tempdir}/lib/systemd/system/actlogo.service"
+			sudo chown root:root "${tempdir}/lib/systemd/system/actlogo.service"
+
 			distro="Debian"
 			;;
 		esac
@@ -987,6 +997,31 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			systemctl enable generic-board-startup.service || true
 		fi
 
+
+		if [ -f /lib/systemd/system/bootlogo.service ] ; then
+			systemctl enable bootlogo.service || true
+		fi
+
+		if [ -f /lib/systemd/system/solve_qt_deb.service ] ; then
+			systemctl enable solve_qt_deb.service || true
+		fi
+
+		if [ -f /lib/systemd/system/haveged.service ] ; then
+			systemctl enable haveged.service || true
+		fi
+
+		if [ -f /lib/systemd/system/rng-tools.service ] ; then
+			systemctl enable rng-tools.service || true
+		fi
+
+		if [ -f /lib/systemd/system/actlogo.service ] ; then
+			systemctl enable actlogo.service || true
+		fi
+
+		systemctl mask getty@tty1.service || true
+
+		systemctl mask systemd-logind.service || true
+
 		if [ ! "x${rfs_opt_scripts}" = "x" ] ; then
 			mkdir -p /opt/scripts/ || true
 
@@ -1099,6 +1134,8 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 		if [ -f /lib/systemd/system/hostapd.service ] ; then
 			systemctl disable hostapd.service || true
 		fi
+
+		systemctl mask systemd-logind.service || true
 	}
 
 	grub_tweaks () {

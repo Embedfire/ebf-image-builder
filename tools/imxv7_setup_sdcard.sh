@@ -1020,6 +1020,8 @@ populate_rootfs () {
 		echo "board_eeprom_header=${uboot_eeprom}" > "${TEMPDIR}/disk/boot/.eeprom.txt"
 	fi
 
+	mkdir ${TEMPDIR}/disk/home/debian/.resizerootfs
+
 	wfile="${TEMPDIR}/disk/boot/uEnv.txt"
 	echo "#Docs: http://elinux.org/Beagleboard:U-boot_partitioning_layout_2.0" > ${wfile}
 	echo "" >> ${wfile}
@@ -1056,26 +1058,31 @@ populate_rootfs () {
 			else
 				echo "#enable_uboot_overlays=1" >> ${wfile}
 			fi
-			echo "###" >> ${wfile}
-			echo "###custom overlays" >> ${wfile}
-			echo "#uboot_overlay_addr0=/lib/firmware/<file0>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr1=/lib/firmware/<file1>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr2=/lib/firmware/<file2>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr3=/lib/firmware/<file3>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr4=/lib/firmware/<file4>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr5=/lib/firmware/<file5>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr6=/lib/firmware/<file6>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr7=/lib/firmware/<file7>.dtbo" >> ${wfile}
-			echo "###" >> ${wfile}
-			echo "###U-Boot fdt tweaks... (60000 = 384KB)" >> ${wfile}
-			echo "#uboot_fdt_buffer=0x60000" >> ${wfile}
-			echo "###U-Boot Overlays###" >> ${wfile}
+			echo "#overlay_start">> ${wfile}
+			echo "" >> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-led-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-lcd5-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-sound-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-cam-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-key-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-mpu6050-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-18b20-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-hdmi-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-485r1-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-485r2-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-can1-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-can2-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-dht11-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-ecspi3-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-uart3-overlay.dtbo">> ${wfile}
+			echo "" >> ${wfile}
+			echo "#overlay_end">> ${wfile}
 
 			echo "" >> ${wfile}
 		fi
 	fi
 
-	cmdline="coherent_pool=1M net.ifnames=0 quiet"
+	cmdline="coherent_pool=1M net.ifnames=0 vt.global_cursor_default=0 quiet"
 
 	unset kms_video
 
@@ -1104,45 +1111,10 @@ populate_rootfs () {
 			echo "" >> ${wfile}
 		fi
 
-		if [ "x${usb_flasher}" = "xenable" ] ; then
-			if [ ! "x${oem_flasher_script}" = "x" ] ; then
-				echo "cmdline=init=/opt/scripts/tools/eMMC/${oem_flasher_script}" >> ${wfile}
-			else
-				echo "cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-from-usb-media.sh" >> ${wfile}
-			fi
-		elif [ "x${emmc_flasher}" = "xenable" ] ; then
-			echo "##enable Generic eMMC Flasher:" >> ${wfile}
-			echo "cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh" >> ${wfile}
-			echo "" >> ${wfile}
-			echo "##if eMMC boot failed, disable eMMC specific boot method" >> ${wfile}
-			echo "uenvcmd=mmc partconf 1 0 0 0" >> ${wfile}
-		else
-			echo "##enable Generic eMMC Flasher:" >> ${wfile}
-			echo "##make sure, these tools are installed: dosfstools rsync" >> ${wfile}
-			echo "#cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh" >> ${wfile}
-			echo "" >> ${wfile}
-			echo "##if eMMC boot failed, disable eMMC specific boot method" >> ${wfile}
-			echo "#uenvcmd=mmc partconf 1 0 0 0" >> ${wfile}
-		fi
-
-		if [ "x${nand_flasher}" = "x" ] ; then
-			echo "" >> ${wfile}
-			echo "##enable Generic Nand Flasher:" >> ${wfile}
-			echo "#cmdline=init=/opt/scripts/tools/Nand/init-Nand-flasher-v1.sh" >> ${wfile}
-		fi
+		echo "#flash_firmware=enable" >> ${wfile}
 
 		echo "" >> ${wfile}
-	else
-		if [ "x${usb_flasher}" = "xenable" ] ; then
-			if [ ! "x${oem_flasher_script}" = "x" ] ; then
-				echo "cmdline=init=/opt/scripts/tools/eMMC/${oem_flasher_script}" >> ${wfile}
-			else
-				echo "cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-from-usb-media.sh" >> ${wfile}
-			fi
-		elif [ "x${emmc_flasher}" = "xenable" ] ; then
-			echo "##enable Generic eMMC Flasher:" >> ${wfile}
-			echo "cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3-no-eeprom.sh" >> ${wfile}
-		fi
+	
 	fi
 
 	board=${conf_board}
@@ -1306,14 +1278,14 @@ populate_rootfs () {
 	fi
 
 	if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
-		git clone https://gitee.com/wildfireteam/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1
-		sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
-	else
-		cd ${TEMPDIR}/disk/opt/scripts/
-		git pull
-		cd -
+		sudo git clone https://gitee.com/wildfireteam/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts-bak/ --depth 1
+		cp ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh  ${TEMPDIR}/disk/opt/scripts-bak/boot
+		rm -r ${TEMPDIR}/disk/opt/scripts/
+		mv ${TEMPDIR}/disk/opt/scripts-bak ${TEMPDIR}/disk/opt/scripts/
 		sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
 	fi
+
+
 
 	if [ "x${drm}" = "xetnaviv" ] ; then
 		wfile="/etc/X11/xorg.conf"

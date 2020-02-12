@@ -1,0 +1,9 @@
+[Unit]
+Description=solve QT dependence
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /opt/scripts/boot/ebf-build.sh
+
+[Install]
+WantedBy=multi-user.target
