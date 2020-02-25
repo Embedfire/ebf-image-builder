@@ -712,8 +712,6 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			#Install the user choosen list.
 			echo "Log: (chroot) Installing: ${deb_additional_pkgs}"
 			apt-get update
-			apt-get --reinstall install libgdk-pixbuf2.0-0
-			update-mime-database /usr/share/mime
 			apt-get -y install ${deb_additional_pkgs}
 		fi
 
