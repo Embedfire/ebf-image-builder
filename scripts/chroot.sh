@@ -519,6 +519,9 @@ if [ "x${deb_arch}" = "xarmhf" ] ; then
 			sudo cp "${OIB_DIR}/target/init_scripts/actlogo.service" "${tempdir}/lib/systemd/system/actlogo.service"
 			sudo chown root:root "${tempdir}/lib/systemd/system/actlogo.service"
 
+			sudo cp "${OIB_DIR}/target/init_scripts/autowifi.service" "${tempdir}/lib/systemd/system/autowifi.service"
+			sudo chown root:root "${tempdir}/lib/systemd/system/actlogo.service"
+
 			distro="Debian"
 			;;
 		esac
@@ -709,6 +712,8 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			#Install the user choosen list.
 			echo "Log: (chroot) Installing: ${deb_additional_pkgs}"
 			apt-get update
+			apt-get --reinstall install libgdk-pixbuf2.0-0
+			update-mime-database /usr/share/mime
 			apt-get -y install ${deb_additional_pkgs}
 		fi
 
@@ -1020,8 +1025,6 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 
 		systemctl mask getty@tty1.service || true
 
-		systemctl mask systemd-logind.service || true
-
 		if [ ! "x${rfs_opt_scripts}" = "x" ] ; then
 			mkdir -p /opt/scripts/ || true
 
@@ -1135,7 +1138,6 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			systemctl disable hostapd.service || true
 		fi
 
-		systemctl mask systemd-logind.service || true
 	}
 
 	grub_tweaks () {

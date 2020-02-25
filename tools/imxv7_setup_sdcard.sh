@@ -640,7 +640,7 @@ create_partitions () {
 		dd_uboot_boot
 		bootloader_installed=1
 		if [ "x${enable_fat_partition}" = "xenable" ] ; then
-			conf_boot_endmb=${conf_boot_endmb:-"96"}
+			conf_boot_endmb=${conf_boot_endmb:-"40"}
 			conf_boot_fstype=${conf_boot_fstype:-"fat"}
 			sfdisk_fstype=${sfdisk_fstype:-"0xE"}
 			sfdisk_partition_layout
@@ -662,7 +662,7 @@ create_partitions () {
 		dd_uboot_boot
 		bootloader_installed=1
 		if [ "x${enable_fat_partition}" = "xenable" ] ; then
-			conf_boot_endmb=${conf_boot_endmb:-"96"}
+			conf_boot_endmb=${conf_boot_endmb:-"40"}
 			conf_boot_fstype=${conf_boot_fstype:-"fat"}
 			sfdisk_fstype=${sfdisk_fstype:-"0xE"}
 			sfdisk_partition_layout
@@ -1063,18 +1063,19 @@ populate_rootfs () {
 			echo "dtoverlay=/lib/firmware/imx-fire-led-overlay.dtbo">> ${wfile}
 			echo "dtoverlay=/lib/firmware/imx-fire-lcd5-overlay.dtbo">> ${wfile}
 			echo "dtoverlay=/lib/firmware/imx-fire-sound-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-cam-overlay.dtbo">> ${wfile}
+			echo "#dtoverlay=/lib/firmware/imx-fire-cam-overlay.dtbo">> ${wfile}
 			echo "dtoverlay=/lib/firmware/imx-fire-key-overlay.dtbo">> ${wfile}
 			echo "dtoverlay=/lib/firmware/imx-fire-mpu6050-overlay.dtbo">> ${wfile}
 			echo "dtoverlay=/lib/firmware/imx-fire-18b20-overlay.dtbo">> ${wfile}
 			echo "dtoverlay=/lib/firmware/imx-fire-hdmi-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-485r1-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-485r2-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-can1-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-can2-overlay.dtbo">> ${wfile}
+			echo "#dtoverlay=/lib/firmware/imx-fire-485r1-overlay.dtbo">> ${wfile}
+			echo "#dtoverlay=/lib/firmware/imx-fire-485r2-overlay.dtbo">> ${wfile}
+			echo "#dtoverlay=/lib/firmware/imx-fire-can1-overlay.dtbo">> ${wfile}
+			echo "#dtoverlay=/lib/firmware/imx-fire-can2-overlay.dtbo">> ${wfile}
 			echo "dtoverlay=/lib/firmware/imx-fire-dht11-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-ecspi3-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-uart3-overlay.dtbo">> ${wfile}
+			echo "#dtoverlay=/lib/firmware/imx-fire-ecspi3-overlay.dtbo">> ${wfile}
+			echo "#dtoverlay=/lib/firmware/imx-fire-uart3-overlay.dtbo">> ${wfile}
+			echo "#dtoverlay=/lib/firmware/imx-fire-btwifi-overlay.dtbo">> ${wfile}
 			echo "" >> ${wfile}
 			echo "#overlay_end">> ${wfile}
 
@@ -1112,6 +1113,7 @@ populate_rootfs () {
 		fi
 
 		echo "#flash_firmware=enable" >> ${wfile}
+		echo "uenvcmd=mmc partconf 1 0 0 0" >> ${wfile}
 
 		echo "" >> ${wfile}
 	
@@ -1279,8 +1281,10 @@ populate_rootfs () {
 
 	if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
 		sudo git clone https://gitee.com/wildfireteam/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts-bak/ --depth 1
-		cp ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh  ${TEMPDIR}/disk/opt/scripts-bak/boot
-		rm -r ${TEMPDIR}/disk/opt/scripts/
+		if [ -f ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh ] ; then
+			cp ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh  ${TEMPDIR}/disk/opt/scripts-bak/boot
+			rm -r ${TEMPDIR}/disk/opt/scripts/
+		fi
 		mv ${TEMPDIR}/disk/opt/scripts-bak ${TEMPDIR}/disk/opt/scripts/
 		sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
 	fi
@@ -1564,8 +1568,10 @@ while [ ! -z "$1" ] ; do
 		#
 		### seek=$((1024 * (gsize * 850)))
 		## x 850 (85%) #1GB = 850 #2GB = 1700 #4GB = 3400
-		#
-		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (gsize * 252)))
+		##pure 170
+		#qt 210
+		#xfce4 545
+		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (gsize * 170)))
 		;;
 	--dtb)
 		checkparm $2
