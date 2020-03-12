@@ -982,7 +982,7 @@ populate_rootfs () {
 			pv "${DIR}/${ROOTFS}" | tar --numeric-owner --preserve-permissions -xf - -C ${TEMPDIR}/disk/
 		else
 			echo "pv: not installed, using tar verbose to show progress"
-			tar --numeric-owner --preserve-permissions --verbose -xf "${DIR}/${ROOTFS}" -C ${TEMPDIR}/disk/
+			tar --numeric-owner --preserve-permissions -xf "${DIR}/${ROOTFS}" -C ${TEMPDIR}/disk/
 		fi
 
 		echo "Transfer of data is Complete, now syncing data to disk..."
@@ -1113,7 +1113,7 @@ populate_rootfs () {
 		fi
 
 		echo "#flash_firmware=enable" >> ${wfile}
-		echo "uenvcmd=mmc partconf 1 0 0 0" >> ${wfile}
+
 
 		echo "" >> ${wfile}
 	
