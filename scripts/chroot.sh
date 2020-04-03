@@ -708,6 +708,12 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 	}
 
 	install_pkgs () {
+
+		if [ -f "/linux-image-4.19.71-imx-r1_1stable_armhf.deb" ] ; then
+
+			dpkg -i "/linux-image-4.19.71-imx-r1_1stable_armhf.deb"
+		fi
+
 		if [ ! "x${deb_additional_pkgs}" = "x" ] ; then
 			#Install the user choosen list.
 			echo "Log: (chroot) Installing: ${deb_additional_pkgs}"
@@ -1224,6 +1230,12 @@ __EOF__
 
 sudo mv "${DIR}/chroot_script.sh" "${tempdir}/chroot_script.sh"
 
+if [ -d "${OIB_DIR}/Kernel" ] ; then
+
+	sudo cp "${OIB_DIR}/Kernel/linux-image-4.19.71-imx-r1_1stable_armhf.deb" "${tempdir}/linux-image-4.19.71-imx-r1_1stable_armhf.deb"
+
+fi
+
 if [ "x${include_firmware}" = "xenable" ] ; then
 	if [ ! -d "${tempdir}/lib/firmware/" ] ; then
 		sudo mkdir -p "${tempdir}/lib/firmware/" || true
@@ -1470,6 +1482,7 @@ __EOF__
 
 ###MUST BE LAST...
 sudo mv "${DIR}/cleanup_script.sh" "${tempdir}/cleanup_script.sh"
+
 sudo chroot "${tempdir}" /bin/bash -e cleanup_script.sh
 echo "Log: Complete: [sudo chroot ${tempdir} /bin/bash -e cleanup_script.sh]"
 

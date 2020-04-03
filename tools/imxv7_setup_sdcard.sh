@@ -1569,8 +1569,9 @@ while [ ! -z "$1" ] ; do
 		### seek=$((1024 * (gsize * 850)))
 		## x 850 (85%) #1GB = 850 #2GB = 1700 #4GB = 3400
 		##pure 170
-		#qt 210
+		#qts 210
 		#xfce4 545
+		#qtd 450
 		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (gsize * 170)))
 		;;
 	--dtb)
