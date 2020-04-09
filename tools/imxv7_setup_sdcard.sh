@@ -1060,22 +1060,27 @@ populate_rootfs () {
 			fi
 			echo "#overlay_start">> ${wfile}
 			echo "" >> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-led-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-lcd5-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-sound-overlay.dtbo">> ${wfile}
-			echo "#dtoverlay=/lib/firmware/imx-fire-cam-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-key-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-mpu6050-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-18b20-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-hdmi-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-i2c1-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-i2c2-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-74hc595-overlay.dtbo">> ${wfile}
 			echo "#dtoverlay=/lib/firmware/imx-fire-485r1-overlay.dtbo">> ${wfile}
 			echo "#dtoverlay=/lib/firmware/imx-fire-485r2-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-adc1-overlay.dtbo">> ${wfile}
+			echo "#dtoverlay=/lib/firmware/imx-fire-btwifi-overlay.dtbo">> ${wfile}
+			echo "#dtoverlay=/lib/firmware/imx-fire-cam-overlay.dtbo">> ${wfile}
 			echo "#dtoverlay=/lib/firmware/imx-fire-can1-overlay.dtbo">> ${wfile}
 			echo "#dtoverlay=/lib/firmware/imx-fire-can2-overlay.dtbo">> ${wfile}
 			echo "dtoverlay=/lib/firmware/imx-fire-dht11-overlay.dtbo">> ${wfile}
 			echo "#dtoverlay=/lib/firmware/imx-fire-ecspi3-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-hdmi-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-key-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-lcd5-overlay.dtbo">> ${wfile}
+			echo "#dtoverlay=/lib/firmware/imx-fire-lcd43-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-led-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-sound-overlay.dtbo">> ${wfile}
+			echo "#dtoverlay=/lib/firmware/imx-fire-spidev-overlay.dtbo">> ${wfile}
+			echo "dtoverlay=/lib/firmware/imx-fire-uart2-overlay.dtbo">> ${wfile}
 			echo "#dtoverlay=/lib/firmware/imx-fire-uart3-overlay.dtbo">> ${wfile}
-			echo "#dtoverlay=/lib/firmware/imx-fire-btwifi-overlay.dtbo">> ${wfile}
 			echo "" >> ${wfile}
 			echo "#overlay_end">> ${wfile}
 
@@ -1133,6 +1138,12 @@ populate_rootfs () {
 		sync
 		sync
 		umount ${TEMPDIR}/disk/boot || true
+	fi
+
+	if [ -f ${TEMPDIR}/disk/etc/systemd/logind.conf ] ; then
+		
+		sed ${TEMPDIR}/disk/etc/systemd/logind.conf -i -e "s/^#HandlePowerKey=poweroff/HandlePowerKey=ignore/"
+
 	fi
 
 	#RootStock-NG
@@ -1280,12 +1291,13 @@ populate_rootfs () {
 	fi
 
 	if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
-		sudo git clone https://gitee.com/wildfireteam/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts-bak/ --depth 1
-		if [ -f ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh ] ; then
-			cp ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh  ${TEMPDIR}/disk/opt/scripts-bak/boot
-			rm -r ${TEMPDIR}/disk/opt/scripts/
-		fi
-		mv ${TEMPDIR}/disk/opt/scripts-bak ${TEMPDIR}/disk/opt/scripts/
+		#sudo git clone https://gitee.com/wildfireteam/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts-bak/ --depth 1
+		#if [ -f ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh ] ; then
+		#	cp ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh  ${TEMPDIR}/disk/opt/scripts-bak/boot
+		#	rm -r ${TEMPDIR}/disk/opt/scripts/
+		#fi
+		#mv ${TEMPDIR}/disk/opt/scripts-bak ${TEMPDIR}/disk/opt/scripts/
+		sudo git clone https://gitee.com/wildfireteam/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1
 		sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
 	fi
 

@@ -710,8 +710,8 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 	install_pkgs () {
 
 		if [ -f "/linux-image-4.19.71-imx-r1_1stable_armhf.deb" ] ; then
-
 			dpkg -i "/linux-image-4.19.71-imx-r1_1stable_armhf.deb"
+			rm -f /linux-image-4.19.71-imx-r1_1stable_armhf.deb
 		fi
 
 		if [ ! "x${deb_additional_pkgs}" = "x" ] ; then
