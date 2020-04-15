@@ -982,7 +982,8 @@ populate_rootfs () {
 			pv "${DIR}/${ROOTFS}" | tar --numeric-owner --preserve-permissions -xf - -C ${TEMPDIR}/disk/
 		else
 			echo "pv: not installed, using tar verbose to show progress"
-			tar --numeric-owner --preserve-permissions -xf "${DIR}/${ROOTFS}" -C ${TEMPDIR}/disk/
+
+			sudo tar --numeric-owner --preserve-permissions -xf "${DIR}/${ROOTFS}" -C ${TEMPDIR}/disk/
 		fi
 
 		echo "Transfer of data is Complete, now syncing data to disk..."
@@ -1133,12 +1134,6 @@ populate_rootfs () {
 	wfile="${TEMPDIR}/disk/boot/SOC.sh"
 	generate_soc
 
-	# don't change files in boot partition from now on.
-	if [ ! "x${media_boot_partition}" = "x${media_rootfs_partition}" ] ; then
-		sync
-		sync
-		umount ${TEMPDIR}/disk/boot || true
-	fi
 
 	if [ -f ${TEMPDIR}/disk/etc/systemd/logind.conf ] ; then
 		
@@ -1173,14 +1168,7 @@ populate_rootfs () {
 				echo "${rootfs_drive}  /  ${ROOTFS_TYPE}  noatime,errors=remount-ro  0  1" >> ${wfile}
 			fi
 		fi
-
-		if [ "x${uboot_efi_mode}" = "xenable" ] ; then
-			echo "${boot_drive}  /boot/efi vfat defaults 0 0" >> ${wfile}
-		fi
-		if [ ! "x${boot_drive}" = "x${rootfs_drive}" ] ; then
-			echo "${boot_drive}  /boot vfat defaults 0 0" >> ${wfile}
-		fi
-
+		
 		echo "debugfs  /sys/kernel/debug  debugfs  mode=755,uid=root,gid=gpio,defaults  0  0" >> ${wfile}
 
 		if [ "x${DISABLE_ETH}" != "xskip" ] ; then
@@ -1347,6 +1335,7 @@ populate_rootfs () {
 
 	cd ${TEMPDIR}/disk/
 
+
 	if [ -f ./opt/scripts/mods/debian-add-sbin-usr-sbin-to-default-path.diff ] ; then
 		if [ -f /usr/bin/patch ] ; then
 			echo "Patching: /etc/profile"
@@ -1362,7 +1351,47 @@ populate_rootfs () {
 
 	sync
 	sync
+
 	cd "${DIR}/"
+
+	if [ ! "x${media_boot_partition}" = "x${media_rootfs_partition}" ] ; then
+		umount ${TEMPDIR}/disk/boot || true
+	fi
+
+
+	if [  "x${media_boot_partition}" != "x${media_rootfs_partition}" ] ; then
+		if ! mount -t ${mount_partition_format} ${media_prefix}${media_boot_partition} ${TEMPDIR}/disk/mnt; then
+				echo "-----------------------------"
+				echo "Unable to mount ${media_prefix}${media_boot_partition} at ${TEMPDIR}/C"
+				echo "Please retry running the script, sometimes rebooting your system helps."
+				echo "-----------------------------"
+				exit
+		fi
+		cp -rf ${TEMPDIR}/disk/mnt/* ${TEMPDIR}/disk/boot
+	fi
+
+	# don't change files in boot partition from now on.
+	if [  "x${media_boot_partition}" != "x${media_rootfs_partition}" ] ; then
+		sync
+		sync
+		umount ${TEMPDIR}/disk/mnt || true
+	fi
+
+	cd ${TEMPDIR}/disk
+	tar -cf "${DIR}/${ROOTFS}" . 
+
+	cd "${DIR}/"
+
+	wfile="${TEMPDIR}/disk/etc/fstab"
+
+	if [ "x${uboot_efi_mode}" = "xenable" ] ; then
+		echo "${boot_drive}  /boot/efi vfat defaults 0 0" >> ${wfile}
+	fi
+	if [ ! "x${boot_drive}" = "x${rootfs_drive}" ] ; then
+		echo "${boot_drive}  /boot vfat defaults 0 0" >> ${wfile}
+	fi
+
+	rm -rf ${TEMPDIR}/disk/boot/*
 
 	if [ "x${option_ro_root}" = "xenable" ] ; then
 		umount ${TEMPDIR}/disk/var || true
@@ -1582,9 +1611,9 @@ while [ ! -z "$1" ] ; do
 		## x 850 (85%) #1GB = 850 #2GB = 1700 #4GB = 3400
 		##pure 170
 		#qts 210
-		#xfce4 545
+		#xfce4 500
 		#qtd 450
-		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (gsize * 170)))
+		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (gsize * 190)))
 		;;
 	--dtb)
 		checkparm $2
