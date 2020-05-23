@@ -408,8 +408,13 @@ fi
 
 if [ "x${repo_external}" = "xenable" ] ; then
 	echo "" >> ${wfile}
+	echo "#deb ${repo_external_server_backup1} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
+	echo "#deb ${repo_external_server_backup2} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 	echo "deb [arch=${repo_external_arch}] ${repo_external_server} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 	echo "#deb-src [arch=${repo_external_arch}] ${repo_external_server} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
+
+
+
 fi
 
 if [ "x${repo_flat}" = "xenable" ] ; then
@@ -730,7 +735,7 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 
 		if [ ! "x${repo_external_pkg_list}" = "x" ] ; then
 			echo "Log: (chroot) Installing (from external repo): ${repo_external_pkg_list}"
-			apt-get -y install ${repo_external_pkg_list}
+			apt-get -y install ${repo_external_pkg_list} ${other_pk}
 		fi
 
 		if [ ! "x${repo_ros_pkg_list}" = "x" ] ; then

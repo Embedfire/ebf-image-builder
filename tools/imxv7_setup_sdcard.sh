@@ -1613,7 +1613,7 @@ while [ ! -z "$1" ] ; do
 		#qts 210
 		#xfce4 500
 		#qtd 450
-		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (gsize * 190)))
+		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (gsize * alloc_size)))
 		;;
 	--dtb)
 		checkparm $2

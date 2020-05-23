@@ -12,6 +12,16 @@ this_name=$0
 
 #export apt_proxy=localhost:3142/
 
+Usage() {
+	echo "Usage：sudo ./publish/seeed-imx-stable.sh [option]"
+	echo "Optiong："
+	echo "          lite ：Build a pure version of debian image"
+	echo "          qts  ：Build a static qt libary of debian image"
+	echo "          qtd  ：Build a dynamic qt libary of debian image"
+	echo "          xfce4：Build a debian image with xfec4"		
+	echo "Example：sudo ./publish/seeed-imx-stable.sh lite"	
+}
+
 keep_net_alive () {
 	while : ; do
 		sleep 15
@@ -27,6 +37,36 @@ kill_net_alive() {
 	}
 	return 0;
 }
+
+case $1 in
+lite)
+	img_type="console"
+	other_pk=" "
+	alloc_size=218
+;;
+qts) 
+	img_type="part-qt-app"
+	other_pk="qt-app-static-build"
+	alloc_size=230
+;;
+qtd) 
+	img_type="full-qt-app"
+	other_pk="qt-app"
+	alloc_size=470
+;;
+xfec4)
+	img_type="desktop"
+	other_pk="xfce4"
+	alloc_size=520	
+;;
+*) Usage
+   exit
+;;
+esac 
+
+
+export other_pk
+export alloc_size
 
 trap "kill_net_alive;" EXIT
 
@@ -44,7 +84,7 @@ build_and_upload_image () {
 	if [ -d ./deploy/${image_name} ] ; then
 		cd ./deploy/${image_name}/
 		echo "debug: [./imxv7_setup_sdcard.sh ${options}]"
-		sudo ./imxv7_setup_sdcard.sh ${options}
+		sudo -E ./imxv7_setup_sdcard.sh ${options}
 
 		if [ -f ${full_name}.img ] ; then
 			me=`whoami`
@@ -54,7 +94,7 @@ build_and_upload_image () {
 			fi
 
 			sync ; sync ; sleep 5
-
+#			sudo xz -k6 -T50 ${full_name}.img
 			# TODO
 			# sudo rm -rf ./deploy/ || true
 		else
@@ -81,6 +121,9 @@ config_name="seeed-imx-debian-buster-console-v4.19"
 # using temperary bootloader
 # options="${options} --bootloader /home/pi/packages/u-boot/u-boot-dtb.imx"
 build_and_upload_image
+
+
+
 
 ##Ubuntu 18.04
 : <<\EOF
