@@ -24,14 +24,14 @@
 # Latest can be found at:
 # https://github.com/RobertCNelson/omap-image-builder/blob/master/tools/setup_sdcard.sh
 
-#REQUIREMENTS:
-#uEnv.txt bootscript support
+#global config
+source image-builder.project
 
 BOOT_LABEL="BOOT"
 
 unset USE_BETA_BOOTLOADER
 unset USE_LOCAL_BOOT
-unset LOCAL_BOOTLOADER
+unset LOCAL_BOOT_PATH
 
 #Defaults
 ROOTFS_TYPE=ext4
@@ -187,9 +187,10 @@ local_bootloader () {
 	fi
 
 	if [ "${boot_name}" ] ; then
-		cp ${LOCAL_BOOTLOADER} ${TEMPDIR}/dl/
-		UBOOT=${LOCAL_BOOTLOADER##*/}
-		echo "UBOOT Bootloader: ${UBOOT}"
+		cp  ${LOCAL_BOOT_PATH}/${NUBOOT_FILE} ${TEMPDIR}/dl/
+		cp  ${LOCAL_BOOT_PATH}/${MUBOOT_FILE} ${TEMPDIR}/dl/
+		U_BOOT=${MUBOOT_FILE}
+		echo "U_BOOT Bootloader: ${U_BOOT}"
 	fi
 }
 
@@ -202,7 +203,7 @@ dl_bootloader () {
 	mkdir -p ${TEMPDIR}/dl/${DIST}
 	mkdir -p "${DIR}/dl/${DIST}"
 
-	${dl_quiet} --directory-prefix="${TEMPDIR}/dl/" ${conf_bl_http}/${conf_bl_listfile}
+	#${dl_quiet} --directory-prefix="${TEMPDIR}/dl/" ${conf_bl_http}/${conf_bl_listfile}
 
 	if [ ! -f ${TEMPDIR}/dl/${conf_bl_listfile} ] ; then
 		echo "error: can't connect to downloading site, retry in a few minutes..."
@@ -232,11 +233,11 @@ dl_bootloader () {
 	fi
 
 	if [ "${boot_name}" ] ; then
-		UBOOT=$(cat ${TEMPDIR}/dl/${conf_bl_listfile} | grep "${ABI}:${conf_board}:BOOT" | awk '{print $2}')
-		UBOOT=${UBOOT##*/}
-		echo "UBOOT Bootloader: ${UBOOT}"
+		U_BOOT=$(cat ${TEMPDIR}/dl/${conf_bl_listfile} | grep "${ABI}:${conf_board}:BOOT" | awk '{print $2}')
+		U_BOOT=${U_BOOT##*/}
+		echo "U_BOOT Bootloader: ${U_BOOT}"
 	else
-		unset UBOOT
+		unset U_BOOT
 	fi
 }
 
@@ -272,7 +273,8 @@ generate_soc () {
 			echo "dd_uboot_conf=${dd_uboot_conf}" >> ${wfile}
 		fi
 		echo "dd_uboot_bs=${dd_uboot_bs}" >> ${wfile}
-		echo "dd_uboot_backup=/opt/backup/uboot/${uboot_name}" >> ${wfile}
+		echo "dd_uboot_emmc_backup=/opt/backup/uboot/${MUBOOT_FILE}" >> ${wfile}
+		echo "dd_uboot_nand_backup=/opt/backup/uboot/${NUBOOT_FILE}" >> ${wfile}
 	else
 		echo "uboot_CONFIG_CMD_BOOTZ=${uboot_CONFIG_CMD_BOOTZ}" >> ${wfile}
 		echo "uboot_CONFIG_SUPPORT_RAW_INITRD=${uboot_CONFIG_SUPPORT_RAW_INITRD}" >> ${wfile}
@@ -461,14 +463,12 @@ dd_uboot_boot () {
 	if [ "x${oem_blank_eeprom}" = "xenable" ] ; then
 		uboot_blob="${blank_UBOOT}"
 	else
-		uboot_blob="${UBOOT}"
+		uboot_blob="${U_BOOT}"
 	fi
 
 	echo ""
-	echo "copying $(pwd)/u-boot-dtb.imx"
-	cp  u-boot-dtb.imx  ${TEMPDIR}/dl/${uboot_blob}
-
-	echo "${uboot_name}: dd if=${uboot_blob} of=${media} ${dd_uboot}"
+	echo "copying $(pwd)/${MUBOOT_FILE}"
+	echo "${boot_name}: dd if=${uboot_blob} of=${media} ${dd_uboot}"
 	echo "-----------------------------"
 	dd if=${TEMPDIR}/dl/${uboot_blob} of=${media} ${dd_uboot}
 	echo "-----------------------------"
@@ -779,9 +779,9 @@ populate_boot () {
 
 
 	if [ "${boot_name}" ] ; then
-		if [ -f ${TEMPDIR}/dl/${UBOOT} ] ; then
+		if [ -f ${TEMPDIR}/dl/${U_BOOT} ] ; then
 			if [ ! "${bootloader_installed}" ] ; then
-				cp -v ${TEMPDIR}/dl/${UBOOT} ${TEMPDIR}/disk/${boot_name}
+				cp -v ${TEMPDIR}/dl/${U_BOOT} ${TEMPDIR}/disk/${boot_name}
 				echo "-----------------------------"
 			fi
 		fi
@@ -1024,7 +1024,7 @@ populate_rootfs () {
 	mkdir ${TEMPDIR}/disk/home/debian/.resizerootfs
 
 	wfile="${TEMPDIR}/disk/boot/uEnv.txt"
-	echo "#Docs: http://elinux.org/Beagleboard:U-boot_partitioning_layout_2.0" > ${wfile}
+	echo "#Docs: https://embed-linux-tutorial.readthedocs.io/zh_CN/latest/README.html" > ${wfile}
 	echo "" >> ${wfile}
 
 	if [ "x${kernel_override}" = "x" ] ; then
@@ -1052,7 +1052,7 @@ populate_rootfs () {
 		if [ "x${conf_board}" != "x" ] ; then
 			echo "" >> ${wfile}
 			echo "###U-Boot Overlays###" >> ${wfile}
-			echo "###Documentation: http://elinux.org/Beagleboard:BeagleBoneBlack_Debian#U-Boot_Overlays" >> ${wfile}
+			echo "###Documentation: https://embed-linux-tutorial.readthedocs.io/zh_CN/latest/linux_driver/device_tree_rgb_led.html" >> ${wfile}
 			echo "###Master Enable" >> ${wfile}
 			if [ "x${uboot_cape_overlays}" = "xenable" ] ; then
 				echo "enable_uboot_overlays=1" >> ${wfile}
@@ -1061,27 +1061,7 @@ populate_rootfs () {
 			fi
 			echo "#overlay_start">> ${wfile}
 			echo "" >> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-i2c1-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-i2c2-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-74hc595-overlay.dtbo">> ${wfile}
-			echo "#dtoverlay=/lib/firmware/imx-fire-485r1-overlay.dtbo">> ${wfile}
-			echo "#dtoverlay=/lib/firmware/imx-fire-485r2-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-adc1-overlay.dtbo">> ${wfile}
-			echo "#dtoverlay=/lib/firmware/imx-fire-btwifi-overlay.dtbo">> ${wfile}
-			echo "#dtoverlay=/lib/firmware/imx-fire-cam-overlay.dtbo">> ${wfile}
-			echo "#dtoverlay=/lib/firmware/imx-fire-can1-overlay.dtbo">> ${wfile}
-			echo "#dtoverlay=/lib/firmware/imx-fire-can2-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-dht11-overlay.dtbo">> ${wfile}
-			echo "#dtoverlay=/lib/firmware/imx-fire-ecspi3-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-hdmi-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-key-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-lcd5-overlay.dtbo">> ${wfile}
-			echo "#dtoverlay=/lib/firmware/imx-fire-lcd43-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-led-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-sound-overlay.dtbo">> ${wfile}
-			echo "#dtoverlay=/lib/firmware/imx-fire-spidev-overlay.dtbo">> ${wfile}
-			echo "dtoverlay=/lib/firmware/imx-fire-uart2-overlay.dtbo">> ${wfile}
-			echo "#dtoverlay=/lib/firmware/imx-fire-uart3-overlay.dtbo">> ${wfile}
+			echo "${OVERLAYS}">> ${wfile}
 			echo "" >> ${wfile}
 			echo "#overlay_end">> ${wfile}
 
@@ -1134,7 +1114,6 @@ populate_rootfs () {
 	wfile="${TEMPDIR}/disk/boot/SOC.sh"
 	generate_soc
 
-
 	if [ -f ${TEMPDIR}/disk/etc/systemd/logind.conf ] ; then
 		
 		sed ${TEMPDIR}/disk/etc/systemd/logind.conf -i -e "s/^#HandlePowerKey=poweroff/HandlePowerKey=ignore/"
@@ -1146,6 +1125,11 @@ populate_rootfs () {
 		. ${TEMPDIR}/disk/etc/rcn-ee.conf
 
 		mkdir -p ${TEMPDIR}/disk/boot/uboot || true
+
+		if [ -f "${DIR}/autorun.inf" ] ; then
+		cp -v "${DIR}/autorun.inf" ${TEMPDIR}/disk/boot/
+		cp -v "${DIR}/fire.ico" ${TEMPDIR}/disk/boot/uboot
+		fi
 
 		wfile="${TEMPDIR}/disk/etc/fstab"
 		echo "# /etc/fstab: static file system information." > ${wfile}
@@ -1263,15 +1247,16 @@ populate_rootfs () {
 
 	fi #RootStock-NG
 
-	if [ ! "x${uboot_name}" = "x" ] ; then
+	if [ ! "x${MUBOOT_FILE}" = "x" ] ; then
 		echo "Backup version of u-boot: /opt/backup/uboot/"
 		mkdir -p ${TEMPDIR}/disk/opt/backup/uboot/
-		cp -v ${TEMPDIR}/dl/${UBOOT} ${TEMPDIR}/disk/opt/backup/uboot/${uboot_name}
+		cp -v ${TEMPDIR}/dl/${MUBOOT_FILE} ${TEMPDIR}/disk/opt/backup/uboot/${MUBOOT_FILE}
 	fi
 
-	if [ ! "x${spl_uboot_name}" = "x" ] ; then
+	if [ ! "x${NUBOOT_FILE}" = "x" ] ; then
+		echo "Backup version of u-boot: /opt/backup/uboot/"
 		mkdir -p ${TEMPDIR}/disk/opt/backup/uboot/
-		cp -v ${TEMPDIR}/dl/${SPL} ${TEMPDIR}/disk/opt/backup/uboot/${spl_uboot_name}
+		cp -v ${TEMPDIR}/dl/${NUBOOT_FILE} ${TEMPDIR}/disk/opt/backup/uboot/${NUBOOT_FILE}
 	fi
 
 	if [ -f ${TEMPDIR}/disk/etc/init.d/cpufrequtils ] ; then
@@ -1358,25 +1343,6 @@ populate_rootfs () {
 		umount ${TEMPDIR}/disk/boot || true
 	fi
 
-
-	if [  "x${media_boot_partition}" != "x${media_rootfs_partition}" ] ; then
-		if ! mount -t ${mount_partition_format} ${media_prefix}${media_boot_partition} ${TEMPDIR}/disk/mnt; then
-				echo "-----------------------------"
-				echo "Unable to mount ${media_prefix}${media_boot_partition} at ${TEMPDIR}/C"
-				echo "Please retry running the script, sometimes rebooting your system helps."
-				echo "-----------------------------"
-				exit
-		fi
-		cp -rf ${TEMPDIR}/disk/mnt/* ${TEMPDIR}/disk/boot
-	fi
-
-	# don't change files in boot partition from now on.
-	if [  "x${media_boot_partition}" != "x${media_rootfs_partition}" ] ; then
-		sync
-		sync
-		umount ${TEMPDIR}/disk/mnt || true
-	fi
-
 	cd ${TEMPDIR}/disk
 	tar -cf "${DIR}/${ROOTFS}" . 
 
@@ -1448,83 +1414,6 @@ check_mmc () {
 		echo "lsblk:"
 		lsblk | grep -v sr0
 		echo ""
-		exit
-	fi
-}
-
-process_dtb_conf () {
-	if [ "${conf_warning}" ] ; then
-		show_board_warning
-	fi
-
-	echo "-----------------------------"
-
-	#defaults, if not set...
-	case "${bootloader_location}" in
-	fatfs_boot)
-		conf_boot_startmb=${conf_boot_startmb:-"1"}
-		;;
-	dd_uboot_boot|dd_spl_uboot_boot)
-		conf_boot_startmb=${conf_boot_startmb:-"4"}
-		;;
-	*)
-		conf_boot_startmb=${conf_boot_startmb:-"4"}
-		;;
-	esac
-
-	#https://wiki.linaro.org/WorkingGroups/KernelArchived/Projects/FlashCardSurvey
-	conf_root_device=${conf_root_device:-"/dev/mmcblk0"}
-
-	#error checking...
-	if [ ! "${conf_boot_fstype}" ] ; then
-		conf_boot_fstype="${ROOTFS_TYPE}"
-	fi
-
-	case "${conf_boot_fstype}" in
-	fat)
-		sfdisk_fstype=${sfdisk_fstype:-"0xE"}
-		;;
-	ext2|ext3|ext4|btrfs)
-		sfdisk_fstype="L"
-		;;
-	*)
-		echo "Error: [conf_boot_fstype] not recognized, stopping..."
-		exit
-		;;
-	esac
-
-	if [ "x${uboot_cape_overlays}" = "xenable" ] ; then
-		echo "U-Boot Overlays Enabled..."
-	fi
-}
-
-check_dtb_board () {
-	error_invalid_dtb=1
-
-	#/hwpack/${dtb_board}.conf
-	unset leading_slash
-	leading_slash=$(echo ${dtb_board} | grep "/" || unset leading_slash)
-	if [ "${leading_slash}" ] ; then
-		dtb_board=$(echo "${leading_slash##*/}")
-	fi
-
-	#${dtb_board}.conf
-	dtb_board=$(echo ${dtb_board} | awk -F ".conf" '{print $1}')
-	if [ -f "${DIR}"/hwpack/${dtb_board}.conf ] ; then
-		. "${DIR}"/hwpack/${dtb_board}.conf
-
-		boot=${boot_image}
-		unset error_invalid_dtb
-		process_dtb_conf
-	else
-		cat <<-__EOF__
-			-----------------------------
-			ERROR: This script does not currently recognize the selected: [--dtb ${dtb_board}] option..
-			Please rerun $(basename $0) with a valid [--dtb <device>] option from the list below:
-			-----------------------------
-		__EOF__
-		cat "${DIR}"/hwpack/*.conf | grep supported
-		echo "-----------------------------"
 		exit
 	fi
 }
@@ -1609,18 +1498,7 @@ while [ ! -z "$1" ] ; do
 		#
 		### seek=$((1024 * (gsize * 850)))
 		## x 850 (85%) #1GB = 850 #2GB = 1700 #4GB = 3400
-		##pure 170
-		#qts 210
-		#xfce4 500
-		#qtd 450
-		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (gsize * alloc_size)))
-		;;
-	--dtb)
-		checkparm $2
-		dtb_board="$2"
-		dir_check="${DIR}/"
-		kernel_detection
-		check_dtb_board
+		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (gsize * image_size)))
 		;;
 	--ro)
 		conf_var_startmb="2048"
@@ -1645,7 +1523,7 @@ while [ ! -z "$1" ] ; do
 		;;
 	--bootloader)
 		checkparm $2
-		LOCAL_BOOTLOADER="$2"
+		LOCAL_BOOT_PATH="$2"
 		USE_LOCAL_BOOT=1
 		;;
 	--use-beta-bootloader)
@@ -1725,13 +1603,6 @@ done
 
 if [ ! "${media}" ] ; then
 	echo "ERROR: --mmc undefined"
-	usage
-fi
-
-if [ "${error_invalid_dtb}" ] ; then
-	echo "-----------------------------"
-	echo "ERROR: --dtb undefined"
-	echo "-----------------------------"
 	usage
 fi
 

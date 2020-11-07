@@ -1,7 +1,7 @@
 [Unit]
 Description=Generic Board Startup
-After=local-fs.target solve_qt_deb.service
-
+After=local-fs.target solve_qt_deb.service 
+Before=serial-getty@.service
 [Service]
 Type=oneshot
 ExecStart=/bin/sh /opt/scripts/boot/generic-startup.sh

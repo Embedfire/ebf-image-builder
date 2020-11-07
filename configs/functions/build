@@ -1,0 +1,140 @@
+# Functions:
+# build_uboot
+# build_linux
+# build_linux_debs
+
+
+## Build U-Boot
+build_uboot() {
+	ret=0
+
+	if [ "$UBOOT_GIT_BRANCH" == "" ]; then
+		error_msg "'UBOOT_GIT_BRANCH' is empty!"
+		return -1
+	fi
+
+	cd ${ROOT}
+	if [ ! -d ${UBOOT_DIR}/.git ]; then
+		info_msg "U-boot repository does not exist, clone u-boot repository('$UBOOT_GIT_BRANCH') from '$UBOOT_SOURCE_URL'..."
+		## Clone u-boot from Khadas GitHub
+		git clone $GIT_CLONE_OPTIONS $UBOOT_SOURCE_URL -b $UBOOT_GIT_BRANCH
+		[ $? != 0 ] && error_msg "Failed to clone 'u-boot'" && return -1
+	fi
+
+	cd ${UBOOT_DIR}/
+
+	if ! git branch | grep "^* $UBOOT_GIT_BRANCH$" > /dev/null; then
+		if ! git branch | grep "^  $UBOOT_GIT_BRANCH$" > /dev/null; then
+			# New branch? Try to fetch it.
+			info_msg "Fetching '$UBOOT_GIT_BRANCH' from '$UBOOT_SOURCE_URL'..."
+			git fetch origin $UBOOT_GIT_BRANCH:$UBOOT_GIT_BRANCH
+		fi
+
+		info_msg "U-boot: Switch to branch '$UBOOT_GIT_BRANCH'"
+		make distclean
+		# Check modifications
+		check_modifications || {
+			error_msg "U-boot: can't checkout to branch '$UBOOT_GIT_BRANCH', please commit your modifications and try again!"
+			return -1
+		}
+
+		git checkout $UBOOT_GIT_BRANCH
+		[ $? != 0 ] && error_msg "U-boot: Switch to branch '$UBOOT_GIT_BRANCH' failed." && return -1
+	else
+		info_msg "U-boot: Already on branch '$UBOOT_GIT_BRANCH'"
+	fi
+
+	# Update u-boot
+	update_git_repo "$PWD" "$UBOOT_GIT_BRANCH"
+
+	info_msg "Build u-boot..."
+
+	rm -rf .config *.bin *.img
+
+	if [ "x${INSTALL_TYPE}" = "xeMMC/SD" -o "x${INSTALL_TYPE}" = "xALL" ] ; then
+        make distclean
+        UBOOT_DEFCONFIG="mx6ull_fire_mmc_defconfig"
+        make $UBOOT_DEFCONFIG ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
+	    make -j${NR_JOBS} ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
+        cp ${UBOOT_BUILD_FILE} ${BUILD}/${MUBOOT_FILE}
+    fi
+
+    if [ "x${INSTALL_TYPE}" = "xNAND" -o "x${INSTALL_TYPE}" = "xALL" ] ; then
+        make distclean
+        UBOOT_DEFCONFIG="mx6ull_fire_nand_defconfig"
+        make $UBOOT_DEFCONFIG ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
+	    make -j${NR_JOBS} ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
+        cp ${UBOOT_BUILD_FILE} ${BUILD}/${NUBOOT_FILE}
+    fi
+
+	ret=$?
+
+	return $ret
+}
+
+## Build Linux
+build_linux() {
+	ret=0
+
+	if [ "$LINUX_GIT_BRANCH" == "" ] || [ "$LINUX_DTB" == "" ]; then
+		[ "$LINUX_GIT_BRANCH" == "" ] && error_msg "'LINUX_GIT_BRANCH' is empty!"
+		[ "$LINUX_DTB" == "" ] && error_msg "'LINUX_DTB' is empty!"
+		return -1
+	fi
+
+	cd ${ROOT}
+	if [ ! -d ${LINUX_DIR}/.git ]; then
+		info_msg "Linux repository does not exist, clone linux repository('$LINUX_GIT_BRANCH') from '$LINUX_SOURCE_URL'..."
+		## Clone linux from Khadas GitHub
+		git clone $GIT_CLONE_OPTIONS $LINUX_SOURCE_URL -b $LINUX_GIT_BRANCH
+		[ $? != 0 ] && error_msg "Failed to clone 'linux'" && return -1
+	fi
+
+	cd ${LINUX_DIR}
+
+	if ! git branch | grep "^* $LINUX_GIT_BRANCH$" > /dev/null; then
+		if ! git branch | grep "^  $LINUX_GIT_BRANCH$" > /dev/null; then
+			# New branch? Try to fetch it.
+			info_msg "Fetching '$LINUX_GIT_BRANCH' from '$LINUX_SOURCE_URL'..."
+			git fetch origin $LINUX_GIT_BRANCH:$LINUX_GIT_BRANCH
+		fi
+
+		info_msg "Linux: Switch to branch '$LINUX_GIT_BRANCH'"
+
+		make ARCH=arm distclean
+
+		git checkout $LINUX_GIT_BRANCH
+		[ $? != 0 ] && error_msg "Linux: Switch to branch '$LINUX_GIT_BRANCH' failed." && return -1
+	else
+		info_msg "Linux: Already on branch '$LINUX_GIT_BRANCH'"
+	fi
+
+	# Update linux
+	update_git_repo "$PWD" "$LINUX_GIT_BRANCH"
+
+    # clean linux
+    info_msg "clean linux..."
+    make ARCH=arm CROSS_COMPILE="${KERNEL_COMPILER}" distclean O=${BUILD_IMAGES}
+
+	info_msg "Build linux..."
+
+	make ARCH=arm $LINUX_DEFCONFIG CROSS_COMPILE="${KERNEL_COMPILER}" O=${BUILD_IMAGES} 
+	make -j${NR_JOBS} ARCH=arm CROSS_COMPILE="${KERNEL_COMPILER}" O=${BUILD_IMAGES}
+}
+
+## Build linux debs
+build_linux_debs() {
+
+	# Build linux debs
+	info_msg "Build linux debs..."
+
+	cd $ROOT
+
+	make -j${NR_JOBS} -C ${BUILD_IMAGES} bindeb-pkg ARCH=arm CROSS_COMPILE="${KERNEL_COMPILER}" \
+    CONFIG_SHELL="bash" KDEB_PKGVERSION=${KDEB_VERSION} LOCALVERSION=${LOCAL_VERSION} O=${BUILD_DEBS}
+
+    mkdir -p $BUILD_DEBS	
+    mv $BUILD/*.deb $BUILD_DEBS
+    mv $BUILD/vmlinuz* $BUILD_DEBS
+    rm -rf $BUILD/*.buildinfo $BUILD/*.changes
+}

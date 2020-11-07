@@ -302,18 +302,6 @@ fi
 
 sudo mkdir -p "${tempdir}/etc/dpkg/dpkg.cfg.d/" || true
 
-echo "# neuter flash-kernel" > /tmp/01_noflash_kernel
-echo "path-exclude=/usr/share/flash-kernel/db/all.db" >> /tmp/01_noflash_kernel
-echo "path-exclude=/etc/initramfs/post-update.d/flash-kernel" >> /tmp/01_noflash_kernel
-echo "path-exclude=/etc/kernel/postinst.d/zz-flash-kernel" >> /tmp/01_noflash_kernel
-echo "path-exclude=/etc/kernel/postrm.d/zz-flash-kernel" >> /tmp/01_noflash_kernel
-echo ""  >> /tmp/01_noflash_kernel
-
-sudo mv /tmp/01_noflash_kernel "${tempdir}/etc/dpkg/dpkg.cfg.d/01_noflash_kernel"
-
-sudo mkdir -p "${tempdir}/usr/share/flash-kernel/db/" || true
-sudo cp -v "${OIB_DIR}/target/other/rcn-ee.db" "${tempdir}/usr/share/flash-kernel/db/"
-
 #generic apt.conf tweaks for flash/mmc devices to save on wasted space...
 sudo mkdir -p "${tempdir}/etc/apt/apt.conf.d/" || true
 
@@ -410,7 +398,7 @@ if [ "x${repo_external}" = "xenable" ] ; then
 	echo "" >> ${wfile}
 	echo "#deb ${repo_external_server_backup1} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 	echo "#deb ${repo_external_server_backup2} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
-	echo "deb [arch=${repo_external_arch}] ${repo_external_server} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
+	echo "deb [arch=${repo_external_arch}] ${repo_external_server} buster ${repo_external_components}" >> ${wfile}
 	echo "#deb-src [arch=${repo_external_arch}] ${repo_external_server} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 
 
@@ -610,7 +598,9 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 
 		if [ "x\${distro}" = "xUbuntu" ] ; then
 			dpkg-divert --local --rename --add /sbin/initctl
-			ln -s /bin/true /sbin/initctl
+			if [ ! -h /sbin/initctl ] ; then
+				ln -s /bin/true /sbin/initctl
+			fi
 		fi
 	}
 
@@ -714,9 +704,9 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 
 	install_pkgs () {
 
-		if [ -f "/linux-image-4.19.71-imx-r1_1stable_armhf.deb" ] ; then
-			dpkg -i "/linux-image-4.19.71-imx-r1_1stable_armhf.deb"
-			rm -f /linux-image-4.19.71-imx-r1_1stable_armhf.deb
+		if [ -f "/tmp/${KERNEL_DEB}" ] ; then
+			dpkg -i "/tmp/${KERNEL_DEB}"
+			rm -f /tmp/${KERNEL_DEB}
 		fi
 
 		if [ ! "x${deb_additional_pkgs}" = "x" ] ; then
@@ -932,7 +922,7 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 
 		pkg="sudo"
 		dpkg_check
-
+	
 		if [ "x\${pkg_is_not_installed}" = "x" ] ; then
 			if [ -f /etc/sudoers.d/README ] ; then
 				echo "Log: (chroot) adding admin group to /etc/sudoers.d/admin"
@@ -977,7 +967,14 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 
 			;;
 		Ubuntu)
-			passwd -l root || true
+			if [ "x${rfs_disable_root}" = "xenable" ] ; then
+				passwd -l root || true
+			else
+				passwd <<-EOF
+				root
+				root
+				EOF
+			fi
 			;;
 		esac
 	}
@@ -1033,6 +1030,8 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 		fi
 
 		systemctl mask getty@tty1.service || true
+
+		systemctl enable getty@ttyGS0.service || true
 
 		if [ ! "x${rfs_opt_scripts}" = "x" ] ; then
 			mkdir -p /opt/scripts/ || true
@@ -1235,11 +1234,10 @@ __EOF__
 
 sudo mv "${DIR}/chroot_script.sh" "${tempdir}/chroot_script.sh"
 
-if [ -d "${OIB_DIR}/Kernel" ] ; then
-
-	sudo cp "${OIB_DIR}/Kernel/linux-image-4.19.71-imx-r1_1stable_armhf.deb" "${tempdir}/linux-image-4.19.71-imx-r1_1stable_armhf.deb"
-
+if [ -d "${BUILD_DEBS}" ] ; then
+	sudo cp ${BUILD_DEBS}/${KERNEL_DEB} ${tempdir}/tmp
 fi
+
 
 if [ "x${include_firmware}" = "xenable" ] ; then
 	if [ ! -d "${tempdir}/lib/firmware/" ] ; then
@@ -1541,9 +1539,6 @@ if [ "x${chroot_COPY_SETUP_SDCARD}" = "xenable" ] ; then
 	else
 		sudo cp "${DIR}/tools/${chroot_custom_setup_sdcard}" "${DIR}/deploy/${export_filename}"
 	fi
-	sudo cp "${DIR}/uboot/u-boot-dtb.imx" "${DIR}/deploy/${export_filename}"
-	sudo mkdir -p "${DIR}/deploy/${export_filename}/hwpack/"
-	sudo cp "${DIR}"/tools/hwpack/*.conf "${DIR}/deploy/${export_filename}/hwpack/"
 
 	if [ "x${chroot_sdcard_flashlayout}" != "x" ] ; then
 		sudo cp "${DIR}/tools/${chroot_sdcard_flashlayout}" "${DIR}/deploy/${export_filename}/"
@@ -1554,14 +1549,10 @@ if [ "x${chroot_COPY_SETUP_SDCARD}" = "xenable" ] ; then
 		sudo cp "${OIB_DIR}/target/boot/${chroot_uenv_txt}" "${DIR}/deploy/${export_filename}/uEnv.txt"
 	fi
 
-	if [ -n "${chroot_flasher_uenv_txt}" -a -r "${OIB_DIR}/target/boot/${chroot_flasher_uenv_txt}" ] ; then
-		sudo cp "${OIB_DIR}/target/boot/${chroot_flasher_uenv_txt}" "${DIR}/deploy/${export_filename}/eMMC-flasher.txt"
+	if [ "x${chroot_bootPart_logo}" = "xenable" ]; then
+		sudo cp "${OIB_DIR}/target/boot/fire.ico" "${DIR}/deploy/${export_filename}"
+		sudo cp "${OIB_DIR}/target/boot/autorun.inf" "${DIR}/deploy/${export_filename}"
 	fi
-
-	if [ -n "${chroot_post_uenv_txt}" -a -r "${OIB_DIR}/target/boot/${chroot_post_uenv_txt}" ] ; then
-		sudo cp "${OIB_DIR}/target/boot/${chroot_post_uenv_txt}" "${DIR}/deploy/${export_filename}/post-uEnv.txt"
-	fi
-
 fi
 
 if [ "x${chroot_directory}" = "xenable" ]; then
