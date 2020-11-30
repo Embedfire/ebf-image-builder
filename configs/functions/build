@@ -76,9 +76,9 @@ build_uboot() {
 build_linux() {
 	ret=0
 
-	if [ "$LINUX_GIT_BRANCH" == "" ] || [ "$LINUX_DTB" == "" ]; then
+	if [ "$LINUX_GIT_BRANCH" == "" ] || [ "$LINUX_MMC_DTB" == "" ] || [ "$LINUX_NAND_DTB" == "" ]; then
 		[ "$LINUX_GIT_BRANCH" == "" ] && error_msg "'LINUX_GIT_BRANCH' is empty!"
-		[ "$LINUX_DTB" == "" ] && error_msg "'LINUX_DTB' is empty!"
+		[ "$LINUX_MMC_DTB" == "" ] && error_msg "'LINUX_DTB' is empty!"
 		return -1
 	fi
 
@@ -88,6 +88,12 @@ build_linux() {
 		## Clone linux from Khadas GitHub
 		git clone $GIT_CLONE_OPTIONS $LINUX_SOURCE_URL -b $LINUX_GIT_BRANCH
 		[ $? != 0 ] && error_msg "Failed to clone 'linux'" && return -1
+	fi
+
+	if [ -d ${FIRMWARE_DIR} ]; then
+		mkdir -p ${ROOT_FIRMWARE_PATH}
+		echo "$1" | sudo -E -S cp ${FIRMWARE_DIR}/* ${ROOT_FIRMWARE_PATH}
+		info_msg "copy Firmware..."
 	fi
 
 	cd ${LINUX_DIR}
@@ -130,7 +136,7 @@ build_linux_debs() {
 
 	cd $ROOT
 
-	make -j${NR_JOBS} -C ${BUILD_IMAGES} bindeb-pkg ARCH=arm CROSS_COMPILE="${KERNEL_COMPILER}" \
+	sudo make -j${NR_JOBS} -C ${BUILD_IMAGES} bindeb-pkg ARCH=arm CROSS_COMPILE="${KERNEL_COMPILER}" \
     CONFIG_SHELL="bash" KDEB_PKGVERSION=${KDEB_VERSION} LOCALVERSION=${LOCAL_VERSION} O=${BUILD_DEBS}
 
     mkdir -p $BUILD_DEBS	

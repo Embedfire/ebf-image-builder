@@ -49,9 +49,17 @@ info:
 	@echo ""
 
 help:
+	@echo ""
 	@echo "fire scripts help messages:"
-	@echo "  all               - Create image according to environment."
-	@echo "  kernel            - Build linux kernel."
-	@echo "  uboot             - Build u-boot."
+	@echo ""
+	@echo "TARGET:"
 	@echo "  info              - Display current environment."
-
+	@echo "  all               - Create image according to environment."
+	@echo "  uboot             - Build u-boot."	
+	@echo "  kernel            - Build linux kernel."
+	@echo "  kernel-deb            - Build linux kernel."
+	@echo ""
+	@echo "OPTIONS:"
+	@echo "  DOWNLOAD_MIRROR=china        - Improve download speed for Chinese users."
+	@echo "  FORCE_UPDATE=enable           - Force everything to recompile."
+	@echo ""

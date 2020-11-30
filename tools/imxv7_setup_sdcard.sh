@@ -1044,9 +1044,15 @@ populate_rootfs () {
 	else
 
 		if [ ! "x${forced_dtb}" = "x" ] ; then
-			echo "dtb=${forced_dtb}" >> ${wfile}
+			echo "mmc_dtb=${forced_dtb}" >> ${wfile}
 		else
-			echo "#dtb=" >> ${wfile}
+			echo "#mmc_dtb=" >> ${wfile}
+		fi
+
+		if [ ! "x${backup_dtb}" = "x" ] ; then
+			echo "nand_dtb=${backup_dtb}" >> ${wfile}
+		else
+			echo "#nand_dtb=" >> ${wfile}
 		fi
 
 		if [ "x${conf_board}" != "x" ] ; then
@@ -1069,7 +1075,7 @@ populate_rootfs () {
 		fi
 	fi
 
-	cmdline="coherent_pool=1M net.ifnames=0 vt.global_cursor_default=0 quiet"
+	cmdline="coherent_pool=1M net.ifnames=0 vt.global_cursor_default=0"
 
 	unset kms_video
 
@@ -1077,7 +1083,7 @@ populate_rootfs () {
 	drm_device_timing=${drm_device_timing:-"1024x768@60e"}
 	if [ "x${drm_read_edid_broken}" = "xenable" ] ; then
 		cmdline="${cmdline} video=${drm_device_identifier}:${drm_device_timing}"
-		echo "cmdline=${cmdline}" >> ${wfile}
+		echo "#cmdline=${cmdline}" >> ${wfile}
 		echo "" >> ${wfile}
 	else
 		echo "cmdline=${cmdline}" >> ${wfile}
@@ -1171,8 +1177,8 @@ populate_rootfs () {
 					echo "#auto eth0" >> ${wfile}
 					echo "#iface eth0 inet dhcp" >> ${wfile}
 				else
-					echo "auto eth0"  >> ${wfile}
-					echo "iface eth0 inet dhcp" >> ${wfile}
+					echo "#auto eth0"  >> ${wfile}
+					echo "#iface eth0 inet dhcp" >> ${wfile}
 				fi
 
 				#if we have systemd & wicd-gtk, disable eth0 in /etc/network/interfaces
@@ -1200,8 +1206,8 @@ populate_rootfs () {
 					echo "#auto eth1" >> ${wfile}
 					echo "#iface eth1 inet dhcp" >> ${wfile}
 				else
-					echo "auto eth1"  >> ${wfile}
-					echo "iface eth1 inet dhcp" >> ${wfile}
+					echo "#auto eth1"  >> ${wfile}
+					echo "#iface eth1 inet dhcp" >> ${wfile}
 				fi
 
 				echo "" >> ${wfile}
@@ -1476,10 +1482,12 @@ while [ ! -z "$1" ] ; do
 	--img|--img-[12468]gb)
 		checkparm $2
 		name=${2:-image}
-		gsize=$(echo "$1" | sed -ne 's/^--img-\([[:digit:]]\+\)gb$/\1/p')
+		#gsize=$(echo "$1" | sed -ne 's/^--img-\([[:digit:]]\+\)gb$/\1/p')
 		# --img defaults to --img-2gb
-		gsize=${gsize:-2}
-		imagename=${name%.img}-${gsize}gb.img
+		#gsize=${gsize:-2}
+		read msize < /tmp/npipe
+		rm /tmp/npipe
+		imagename=${name%.img}-${msize}M.img
 		media="${DIR}/${imagename}"
 		build_img_file="enable"
 		check_root
@@ -1498,7 +1506,7 @@ while [ ! -z "$1" ] ; do
 		#
 		### seek=$((1024 * (gsize * 850)))
 		## x 850 (85%) #1GB = 850 #2GB = 1700 #4GB = 3400
-		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (gsize * image_size)))
+		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * msize))
 		;;
 	--ro)
 		conf_var_startmb="2048"
@@ -1597,6 +1605,9 @@ while [ ! -z "$1" ] ; do
 		checkparm $2
 		forced_dtb="$2"
 		;;
+	--backup-device-tree)
+		checkparm $2
+		backup_dtb="$2"
 	esac
 	shift
 done

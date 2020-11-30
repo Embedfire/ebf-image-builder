@@ -1,6 +1,6 @@
 [Unit] 
 Description=Terminate Psplash Act Screen
-After=bootlogo.service solve_qt_deb.service
+After=bootlogo.service
 
 [Service] 
 Type=forking 

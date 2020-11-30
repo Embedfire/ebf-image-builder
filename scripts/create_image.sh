@@ -34,7 +34,7 @@ fi
 
 #build kernel
 if [ ! -f ${BUILD_DEBS}/${KERNEL_DEB} -o "x${FORCE_UPDATE}" = "xenable" ]; then
-		./scripts/build.sh linux
+		./scripts/build.sh linux $PASSWORD
 		./scripts/build.sh linux-deb
 fi
 

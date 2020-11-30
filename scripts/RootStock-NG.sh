@@ -57,7 +57,7 @@ check_project_config () {
 	project_config=$(echo ${project_config} | awk -F ".conf" '{print $1}')
 	if [ -f ${DIR}/configs/boards/${project_config}.conf ] ; then
 		. <(m4 -P ${DIR}/configs/boards/${project_config}.conf)
-		export_filename="${deb_distribution}-${release}-${image_type}-${deb_arch}-${time}"
+		export_filename="${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}"
 
 		# for automation
 		echo "${export_filename}" > ${DIR}/latest_version
@@ -159,7 +159,7 @@ run_roostock_ng () {
 
 	/bin/bash -e "${BUILD_SCRIPT}/install_dependencies.sh" || { exit 1 ; }
 	/bin/bash -e "${BUILD_SCRIPT}/debootstrap.sh" || { exit 1 ; }
-	/bin/bash -e "${BUILD_SCRIPT}/chroot.sh" || { exit 1 ; }
+	/bin/bash -e "${BUILD_SCRIPT}/chroot.sh" || { exit $? ; }
 	#sudo rm -rf ${tempdir}/ || true
 }
 

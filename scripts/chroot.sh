@@ -490,6 +490,9 @@ echo "ff02::2 ip6-allrouters" >> /tmp/hosts
 sudo mv /tmp/hosts "${tempdir}/etc/hosts"
 sudo chown root:root "${tempdir}/etc/hosts"
 
+sudo echo "Defaults lecture = never" > /tmp/privacy
+sudo mv /tmp/privacy "${tempdir}/etc/sudoers.d/privacy"
+
 echo "${rfs_hostname}" > /tmp/hostname
 sudo mv /tmp/hostname "${tempdir}/etc/hostname"
 sudo chown root:root "${tempdir}/etc/hostname"
@@ -505,9 +508,6 @@ if [ "x${deb_arch}" = "xarmhf" ] ; then
 
 			sudo cp "${OIB_DIR}/target/init_scripts/bootlogo.service" "${tempdir}/lib/systemd/system/bootlogo.service"
 			sudo chown root:root "${tempdir}/lib/systemd/system/bootlogo.service"
-
-			sudo cp "${OIB_DIR}/target/init_scripts/solve_qt_deb.service" "${tempdir}/lib/systemd/system/solve_qt_deb.service"
-			sudo chown root:root "${tempdir}/lib/systemd/system/solve_qt_deb.service"
 
 			sudo cp "${OIB_DIR}/target/init_scripts/actlogo.service" "${tempdir}/lib/systemd/system/actlogo.service"
 			sudo chown root:root "${tempdir}/lib/systemd/system/actlogo.service"
@@ -545,7 +545,7 @@ echo "rfs_username=${rfs_username}" >> /tmp/rcn-ee.conf
 echo "release_date=${time}" >> /tmp/rcn-ee.conf
 echo "third_party_modules=${third_party_modules}" >> /tmp/rcn-ee.conf
 echo "abi=${abi}" >> /tmp/rcn-ee.conf
-echo "image_type=${image_type}" >> /tmp/rcn-ee.conf
+echo "image_type=${DISTRIB_TYPE}" >> /tmp/rcn-ee.conf
 sudo mv /tmp/rcn-ee.conf "${tempdir}/etc/rcn-ee.conf"
 sudo chown root:root "${tempdir}/etc/rcn-ee.conf"
 
@@ -708,6 +708,32 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			dpkg -i "/tmp/${KERNEL_DEB}"
 			rm -f /tmp/${KERNEL_DEB}
 		fi
+		
+		if [ -n "`find /tmp -maxdepth 1 -name '*.deb'`" ] ; then
+			dpkg -i /tmp/*.deb
+			rm -f /tmp/*.deb
+		fi
+
+		if [ ! "x${repo_local_file}" = "x" ] ; then
+			if [ -d "/tmp/local_dir" ] ; then
+				if [ ! -d "${system_directory}" ] ; then
+					mkdir -p ${system_directory}
+				fi 
+				mv /tmp/local_dir/* ${system_directory}
+				rm -rf /tmp/local_dir
+			fi
+		fi
+
+		mkdir -p /boot/dtb_tmp
+		cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_MMC_DTB} /boot/dtb_tmp
+		cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_NAND_DTB} /boot/dtb_tmp
+		if [ -d "/boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays" ] ; then
+			mv  /boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays /boot
+		fi  
+		rm /boot/dtbs/${LINUX}${LOCAL_VERSION}/*.dtb
+		mv /boot/dtb_tmp/${LINUX_MMC_DTB}  /boot/dtbs/${LINUX}${LOCAL_VERSION}
+		mv /boot/dtb_tmp/${LINUX_NAND_DTB} /boot/dtbs/${LINUX}${LOCAL_VERSION}
+		rm -rf /boot/dtb_tmp
 
 		if [ ! "x${deb_additional_pkgs}" = "x" ] ; then
 			#Install the user choosen list.
@@ -1013,10 +1039,6 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			systemctl enable bootlogo.service || true
 		fi
 
-		if [ -f /lib/systemd/system/solve_qt_deb.service ] ; then
-			systemctl enable solve_qt_deb.service || true
-		fi
-
 		if [ -f /lib/systemd/system/haveged.service ] ; then
 			systemctl enable haveged.service || true
 		fi
@@ -1238,6 +1260,14 @@ if [ -d "${BUILD_DEBS}" ] ; then
 	sudo cp ${BUILD_DEBS}/${KERNEL_DEB} ${tempdir}/tmp
 fi
 
+if [ -n "`find ${LOCAL_PKG} -maxdepth 1 -name '*.deb'`" ] ; then
+	sudo cp ${LOCAL_PKG}/*.deb ${tempdir}/tmp
+fi
+
+if [ ! "x${repo_local_file}" = "x" ] ; then
+	mkdir ${tempdir}/tmp/local_dir
+	sudo cp -r ${LOCAL_DIR}/* ${tempdir}/tmp/local_dir
+fi
 
 if [ "x${include_firmware}" = "xenable" ] ; then
 	if [ ! -d "${tempdir}/lib/firmware/" ] ; then
@@ -1569,6 +1599,27 @@ else
 fi
 
 echo "Log: USER:${USER}"
+sys_size="$(du -sh ${DIR}/deploy/${export_filename} 2>/dev/null | awk '{print $1}')"
+echo "Log: sys_size:${sys_size}"
+lastchar=${sys_size#${sys_size%?}}
+num=${sys_size%${lastchar}}
+case $lastchar in
+    K|k)
+    value=$(($num / 1024))
+    ;;
+    m|M)
+    value=$num
+    ;;
+    g|G)
+    value=$(($num * 1024))
+    ;;
+    *)
+    echo "Wrong unit"
+    exit 1
+    ;;
+esac
+
+image_size=$(($value + $conf_boot_endmb + $conf_boot_startmb + 30)) 
 
 if [ "x${chroot_tarball}" = "xenable" ] ; then
 	echo "Creating: ${export_filename}.tar"
@@ -1577,7 +1628,9 @@ if [ "x${chroot_tarball}" = "xenable" ] ; then
 	sudo chown -R ${USER}:${USER} "${export_filename}.tar"
 	cd "${DIR}/" || true
 fi
-
+echo "Log: image_size:${image_size}M"
 chroot_completed="true"
+mkfifo -m 777 /tmp/npipe
+echo "$image_size" > /tmp/npipe &
 #
 #
