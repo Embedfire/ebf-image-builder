@@ -53,16 +53,14 @@ build_uboot() {
 
 	if [ "x${INSTALL_TYPE}" = "xeMMC/SD" -o "x${INSTALL_TYPE}" = "xALL" ] ; then
         make distclean
-        UBOOT_DEFCONFIG="mx6ull_fire_mmc_defconfig"
-        make $UBOOT_DEFCONFIG ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
+        make $UBOOT_MMC_DEFCONFIG ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
 	    make -j${NR_JOBS} ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
         cp ${UBOOT_BUILD_FILE} ${BUILD}/${MUBOOT_FILE}
     fi
 
     if [ "x${INSTALL_TYPE}" = "xNAND" -o "x${INSTALL_TYPE}" = "xALL" ] ; then
         make distclean
-        UBOOT_DEFCONFIG="mx6ull_fire_nand_defconfig"
-        make $UBOOT_DEFCONFIG ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
+        make $UBOOT_NAND_DEFCONFIG ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
 	    make -j${NR_JOBS} ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
         cp ${UBOOT_BUILD_FILE} ${BUILD}/${NUBOOT_FILE}
     fi
