@@ -129,7 +129,7 @@ build_linux() {
 	info_msg "Build linux..."
 
 	make ARCH=arm $LINUX_DEFCONFIG CROSS_COMPILE="${KERNEL_COMPILER}" O=${BUILD_IMAGES} 
-	make -j${NR_JOBS} ARCH=arm CROSS_COMPILE="${KERNEL_COMPILER}" O=${BUILD_IMAGES}
+	make -j${NR_JOBS} ARCH=arm CROSS_COMPILE="${KERNEL_COMPILER}" O=${BUILD_IMAGES} ${KERNEL_EXTRA_ARGS}
 }
 
 ## Build linux debs
