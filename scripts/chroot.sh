@@ -731,8 +731,8 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			mv  /boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays /boot
 		fi  
 		rm /boot/dtbs/${LINUX}${LOCAL_VERSION}/*.dtb
-		mv /boot/dtb_tmp/${LINUX_MMC_DTB}  /boot/dtbs/${LINUX}${LOCAL_VERSION}
-		mv /boot/dtb_tmp/${LINUX_NAND_DTB} /boot/dtbs/${LINUX}${LOCAL_VERSION}
+		cp /boot/dtb_tmp/${LINUX_MMC_DTB}  /boot/dtbs/${LINUX}${LOCAL_VERSION}
+		cp /boot/dtb_tmp/${LINUX_NAND_DTB} /boot/dtbs/${LINUX}${LOCAL_VERSION}
 		rm -rf /boot/dtb_tmp
 
 		if [ ! "x${deb_additional_pkgs}" = "x" ] ; then
