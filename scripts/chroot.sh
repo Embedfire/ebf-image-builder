@@ -1569,7 +1569,7 @@ if [ "x${chroot_COPY_SETUP_SDCARD}" = "xenable" ] ; then
 	else
 		sudo cp "${DIR}/tools/${chroot_custom_setup_sdcard}" "${DIR}/deploy/${export_filename}"
 	fi
-
+	sudo mkdir -p "${DIR}/deploy/${export_filename}/hwpack/"
 	if [ "x${chroot_sdcard_flashlayout}" != "x" ] ; then
 		sudo cp "${DIR}/tools/${chroot_sdcard_flashlayout}" "${DIR}/deploy/${export_filename}/"
 		sudo cp "${DIR}"/tools/hwpack/*.tsv "${DIR}/deploy/${export_filename}/hwpack/"

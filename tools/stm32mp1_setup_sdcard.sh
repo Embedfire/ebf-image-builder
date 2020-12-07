@@ -27,6 +27,9 @@
 #REQUIREMENTS:
 #uEnv.txt bootscript support
 
+#global config
+source image-builder.project
+
 BOOT_LABEL="BOOT"
 
 unset USE_BETA_BOOTLOADER
@@ -181,14 +184,14 @@ local_bootloader () {
 	mkdir -p ${TEMPDIR}/dl/
 
 	if [ "${spl_name}" ] ; then
-		cp ${LOCAL_SPL} ${TEMPDIR}/dl/
-		SPL=${LOCAL_SPL##*/}
+		cp ${LOCAL_BOOT_PATH}/${SPL_BUILD_FILE} ${TEMPDIR}/dl/
+		SPL=${SPL_BUILD_FILE}
 		echo "SPL Bootloader: ${SPL}"
 	fi
 
 	if [ "${boot_name}" ] ; then
-		cp ${LOCAL_BOOTLOADER} ${TEMPDIR}/dl/
-		UBOOT=${LOCAL_BOOTLOADER##*/}
+		cp ${LOCAL_BOOT_PATH}/${NUBOOT_FILE} ${TEMPDIR}/dl/
+		UBOOT=${MUBOOT_FILE}
 		echo "UBOOT Bootloader: ${UBOOT}"
 	fi
 }
@@ -344,6 +347,9 @@ sfdisk_partition_layout () {
 	sfdisk_boot_startmb="${conf_boot_startmb}"
 	sfdisk_boot_size_mb="${conf_boot_endmb}"
 	sfdisk_var_size_mb="${conf_var_startmb}"
+	echo "--------------"	
+	echo "${sfdisk_boot_startmb} ${sfdisk_boot_size_mb}"
+	echo "--------------"
 	if [ "x${option_ro_root}" = "xenable" ] ; then
 		sfdisk_var_startmb=$(($sfdisk_boot_startmb + $sfdisk_boot_size_mb))
 		sfdisk_rootfs_startmb=$(($sfdisk_var_startmb + $sfdisk_var_size_mb))
@@ -1415,52 +1421,6 @@ check_mmc () {
 	fi
 }
 
-process_dtb_conf () {
-	if [ "${conf_warning}" ] ; then
-		show_board_warning
-	fi
-
-	echo "-----------------------------"
-
-	#defaults, if not set...
-	case "${bootloader_location}" in
-	fatfs_boot)
-		conf_boot_startmb=${conf_boot_startmb:-"1"}
-		;;
-	dd_uboot_boot|dd_spl_uboot_boot)
-		conf_boot_startmb=${conf_boot_startmb:-"4"}
-		;;
-	*)
-		conf_boot_startmb=${conf_boot_startmb:-"4"}
-		;;
-	esac
-
-	#https://wiki.linaro.org/WorkingGroups/KernelArchived/Projects/FlashCardSurvey
-	conf_root_device=${conf_root_device:-"/dev/mmcblk0"}
-
-	#error checking...
-	if [ ! "${conf_boot_fstype}" ] ; then
-		conf_boot_fstype="${ROOTFS_TYPE}"
-	fi
-
-	case "${conf_boot_fstype}" in
-	fat)
-		sfdisk_fstype=${sfdisk_fstype:-"0xE"}
-		;;
-	ext2|ext3|ext4|btrfs)
-		sfdisk_fstype="L"
-		;;
-	*)
-		echo "Error: [conf_boot_fstype] not recognized, stopping..."
-		exit
-		;;
-	esac
-
-	if [ "x${uboot_cape_overlays}" = "xenable" ] ; then
-		echo "U-Boot Overlays Enabled..."
-	fi
-}
-
 check_dtb_board () {
 	error_invalid_dtb=1
 
@@ -1550,10 +1510,12 @@ while [ ! -z "$1" ] ; do
 	--img|--img-[12468]gb)
 		checkparm $2
 		name=${2:-image}
-		gsize=$(echo "$1" | sed -ne 's/^--img-\([[:digit:]]\+\)gb$/\1/p')
+		#gsize=$(echo "$1" | sed -ne 's/^--img-\([[:digit:]]\+\)gb$/\1/p')
 		# --img defaults to --img-2gb
-		gsize=${gsize:-2}
-		imagename=${name%.img}-${gsize}gb.img
+		#gsize=${gsize:-2}
+		read msize < /tmp/npipe
+		rm /tmp/npipe		
+		imagename=${name%.img}-${gsize}M.img
 		media="${DIR}/${imagename}"
 		build_img_file="enable"
 		check_root
@@ -1573,15 +1535,15 @@ while [ ! -z "$1" ] ; do
 		### seek=$((1024 * (gsize * 850)))
 		## x 850 (85%) #1GB = 850 #2GB = 1700 #4GB = 3400
 		#
-		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (gsize * 850)))
+		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * msize))
 		;;
-	--dtb)
-		checkparm $2
-		dtb_board="$2"
-		dir_check="${DIR}/"
-		kernel_detection
-		check_dtb_board
-		;;
+#	--dtb)
+#		checkparm $2
+#		dtb_board="$2"
+#		dir_check="${DIR}/"
+#		kernel_detection
+#		check_dtb_board
+#		;;
 	--ro)
 		conf_var_startmb="2048"
 		option_ro_root="enable"
@@ -1605,7 +1567,7 @@ while [ ! -z "$1" ] ; do
 		;;
 	--bootloader)
 		checkparm $2
-		LOCAL_BOOTLOADER="$2"
+		LOCAL_BOOT_PATH="$2"
 		USE_LOCAL_BOOT=1
 		;;
 	--use-beta-bootloader)
@@ -1688,12 +1650,12 @@ if [ ! "${media}" ] ; then
 	usage
 fi
 
-if [ "${error_invalid_dtb}" ] ; then
-	echo "-----------------------------"
-	echo "ERROR: --dtb undefined"
-	echo "-----------------------------"
-	usage
-fi
+#if [ "${error_invalid_dtb}" ] ; then
+#	echo "-----------------------------"
+#	echo "ERROR: --dtb undefined"
+#	echo "-----------------------------"
+#	usage
+#fi
 
 if ! is_valid_rootfs_type ${ROOTFS_TYPE} ; then
 	echo "ERROR: ${ROOTFS_TYPE} is not a valid root filesystem type"
