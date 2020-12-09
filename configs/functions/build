@@ -55,14 +55,16 @@ build_uboot() {
         make distclean
         make $UBOOT_MMC_DEFCONFIG ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
 	    make -j${NR_JOBS} ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
-        cp ${UBOOT_BUILD_FILE} ${BUILD}/${MUBOOT_FILE}
+		mkdir -p ${BUILD}
+		cp ${UBOOT_BUILD_FILE} ${BUILD}/${MUBOOT_FILE}
     fi
 
     if [ "x${INSTALL_TYPE}" = "xNAND" -o "x${INSTALL_TYPE}" = "xALL" ] ; then
         make distclean
         make $UBOOT_NAND_DEFCONFIG ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
 	    make -j${NR_JOBS} ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}"
-        cp ${UBOOT_BUILD_FILE} ${BUILD}/${NUBOOT_FILE}
+        mkdir -p ${BUILD}
+		cp ${UBOOT_BUILD_FILE} ${BUILD}/${NUBOOT_FILE}
     fi
 
 	ret=$?
@@ -73,6 +75,12 @@ build_uboot() {
 ## Build Linux
 build_linux() {
 	ret=0
+	if [ "$1" == "" ]; then
+		echo "Building rootfs stage requires root privileges, please enter your passowrd:"
+		read PASSWORD
+	else
+		PASSWORD=$1
+	fi
 
 	if [ "$LINUX_GIT_BRANCH" == "" ] || [ "$LINUX_MMC_DTB" == "" ] || [ "$LINUX_NAND_DTB" == "" ]; then
 		[ "$LINUX_GIT_BRANCH" == "" ] && error_msg "'LINUX_GIT_BRANCH' is empty!"
@@ -90,7 +98,7 @@ build_linux() {
 
 	if [ -d ${FIRMWARE_DIR} ]; then
 		mkdir -p ${ROOT_FIRMWARE_PATH}
-		echo "$1" | sudo -E -S cp ${FIRMWARE_DIR}/* ${ROOT_FIRMWARE_PATH}
+		echo "$PASSWORD" | sudo -E -S cp ${FIRMWARE_DIR}/* ${ROOT_FIRMWARE_PATH}
 		info_msg "copy Firmware..."
 	fi
 
@@ -134,7 +142,7 @@ build_linux_debs() {
 
 	cd $ROOT
 
-	sudo make -j${NR_JOBS} -C ${BUILD_IMAGES} bindeb-pkg ARCH=arm CROSS_COMPILE="${KERNEL_COMPILER}" \
+	make -j${NR_JOBS} -C ${BUILD_IMAGES} bindeb-pkg ARCH=arm CROSS_COMPILE="${KERNEL_COMPILER}" \
     CONFIG_SHELL="bash" KDEB_PKGVERSION=${KDEB_VERSION} LOCALVERSION=${LOCAL_VERSION} O=${BUILD_DEBS}
 
     mkdir -p $BUILD_DEBS	
