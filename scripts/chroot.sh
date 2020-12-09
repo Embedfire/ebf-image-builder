@@ -1445,7 +1445,6 @@ cat > "${DIR}/cleanup_script.sh" <<-__EOF__
 
 	cleanup () {
 		echo "Log: (chroot): cleanup"
-		mkdir -p /boot/uboot/
 
 		if [ -f /etc/apt/apt.conf ] ; then
 			rm -rf /etc/apt/apt.conf || true
@@ -1619,8 +1618,8 @@ case $lastchar in
     ;;
 esac
 
-image_size=$(($value + $conf_boot_endmb + $conf_boot_startmb + 30)) 
-
+image_size=$(bc -l <<< "scale=0; ((($value * 1.2) / 1 + 0) / 4 + 1) * 4")
+image_size=$(($image_size + $conf_boot_endmb + $conf_boot_startmb)) 
 if [ "x${chroot_tarball}" = "xenable" ] ; then
 	echo "Creating: ${export_filename}.tar"
 	cd "${DIR}/deploy/" || true
@@ -1630,6 +1629,9 @@ if [ "x${chroot_tarball}" = "xenable" ] ; then
 fi
 echo "Log: image_size:${image_size}M"
 chroot_completed="true"
+if [ -e /tmp/npipe ] ; then
+	rm /tmp/npipe
+fi
 mkfifo -m 777 /tmp/npipe
 echo "$image_size" > /tmp/npipe &
 #
