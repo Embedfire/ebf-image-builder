@@ -1021,7 +1021,9 @@ populate_rootfs () {
 		echo "board_eeprom_header=${uboot_eeprom}" > "${TEMPDIR}/disk/boot/.eeprom.txt"
 	fi
 
-	mkdir ${TEMPDIR}/disk/home/debian/.resizerootfs
+	if [ -d ${TEMPDIR}/disk/home/debian ] ; then
+		mkdir ${TEMPDIR}/disk/home/debian/.resizerootfs
+	fi
 
 	wfile="${TEMPDIR}/disk/boot/uEnv.txt"
 	echo "#Docs: https://embed-linux-tutorial.readthedocs.io/zh_CN/latest/README.html" > ${wfile}
@@ -1130,11 +1132,11 @@ populate_rootfs () {
 	if [ -f ${TEMPDIR}/disk/etc/rcn-ee.conf ] ; then
 		. ${TEMPDIR}/disk/etc/rcn-ee.conf
 
-		mkdir -p ${TEMPDIR}/disk/boot/uboot || true
+		mkdir -p ${TEMPDIR}/disk/boot/boot || true
 
 		if [ -f "${DIR}/autorun.inf" ] ; then
 		cp -v "${DIR}/autorun.inf" ${TEMPDIR}/disk/boot/
-		cp -v "${DIR}/fire.ico" ${TEMPDIR}/disk/boot/uboot
+		cp -v "${DIR}/fire.ico" ${TEMPDIR}/disk/boot/boot
 		fi
 
 		wfile="${TEMPDIR}/disk/etc/fstab"
@@ -1326,9 +1328,8 @@ populate_rootfs () {
 
 	cd ${TEMPDIR}/disk/
 
-
 	if [ -f ./opt/scripts/mods/debian-add-sbin-usr-sbin-to-default-path.diff ] ; then
-		if [ -f /usr/bin/patch ] ; then
+		if [ -f /usr/bin/patch -a $DISTRIBUTION == "Debian" ] ; then
 			echo "Patching: /etc/profile"
 			patch -p1 < ./opt/scripts/mods/debian-add-sbin-usr-sbin-to-default-path.diff
 		fi
