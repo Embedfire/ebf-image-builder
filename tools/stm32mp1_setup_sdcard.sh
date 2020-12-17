@@ -285,6 +285,7 @@ generate_soc () {
 	fi
 	echo "" >> ${wfile}
 	echo "boot_fstype=${conf_boot_fstype}" >> ${wfile}
+	echo "conf_root_device=${conf_root_device}" >> ${wfile}
 	echo "conf_boot_startmb=${conf_boot_startmb}" >> ${wfile}
 	echo "conf_boot_endmb=${conf_boot_endmb}" >> ${wfile}
 	echo "sfdisk_fstype=${sfdisk_fstype}" >> ${wfile}
@@ -1292,12 +1293,13 @@ populate_rootfs () {
 	fi
 
 	if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
-		git clone https://github.com/turmary/boot-scripts ${TEMPDIR}/disk/opt/scripts/ --depth 1
-		sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
-	else
-		cd ${TEMPDIR}/disk/opt/scripts/
-		git pull
-		cd -
+		#sudo git clone https://gitee.com/wildfireteam/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts-bak/ --depth 1
+		#if [ -f ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh ] ; then
+		#	cp ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh  ${TEMPDIR}/disk/opt/scripts-bak/boot
+		#	rm -r ${TEMPDIR}/disk/opt/scripts/
+		#fi
+		#mv ${TEMPDIR}/disk/opt/scripts-bak ${TEMPDIR}/disk/opt/scripts/
+		sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1 -b 
 		sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
 	fi
 
@@ -1357,6 +1359,18 @@ populate_rootfs () {
 
 	# shorter networking timeout
 	sed -i -re 's/^ *TimeoutStartSec=.*/TimeoutStartSec=1sec/g' ./lib/systemd/system/networking.service
+
+	# stm32mp1 securetty
+	{
+		echo "# ST stm32 ports"
+		echo "${SERIAL}"
+	} >> ./etc/securetty
+
+	# Using module bcmdhd, not module brcmfmac
+	echo blacklist brcmfmac > ./etc/modprobe.d/blacklist-ap6xxx.conf
+
+	echo "RuntimeWatchdogSec=30" >> ./etc/systemd/system.conf
+	echo "ShutdownWatchdogSec=5min" >> ./etc/systemd/system.conf
 
 	sync
 	sync
@@ -1515,7 +1529,7 @@ while [ ! -z "$1" ] ; do
 		#gsize=${gsize:-2}
 		read msize < /tmp/npipe
 		rm /tmp/npipe		
-		imagename=${name%.img}-${gsize}M.img
+		imagename=${name%.img}-${msize}M.img
 		media="${DIR}/${imagename}"
 		build_img_file="enable"
 		check_root
