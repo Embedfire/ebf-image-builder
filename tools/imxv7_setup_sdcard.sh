@@ -40,6 +40,8 @@ ROOTFS_LABEL=rootfs
 DIR="$PWD"
 TEMPDIR=$(mktemp -d)
 
+. ${DIR}/../../scripts/common.sh
+
 keep_net_alive () {
 	while : ; do
 		echo "syncing media... $*"
