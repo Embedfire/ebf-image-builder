@@ -1299,7 +1299,7 @@ populate_rootfs () {
 		#	rm -r ${TEMPDIR}/disk/opt/scripts/
 		#fi
 		#mv ${TEMPDIR}/disk/opt/scripts-bak ${TEMPDIR}/disk/opt/scripts/
-		sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1 -b 
+		sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1 
 		sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
 	fi
 
