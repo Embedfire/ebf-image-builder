@@ -690,6 +690,7 @@ create_partitions () {
 		echo "Creating partition from layout table"
 		echo "Version: `LC_ALL=C sgdisk --version`"
 		echo "-----------------------------"
+		mkimage -C none -A arm -T script -d ./hwpack/${bootscr_img} boot.scr.uimg
 		. ./create_sdcard_from_flashlayout.sh
 		flashlayout_and_bootloader ${media} ./hwpack/$flashlayout_tsv ${TEMPDIR}/dl
 		media_boot_partition=4
@@ -1026,6 +1027,24 @@ populate_rootfs () {
 	if [ ! "x${uboot_eeprom}" = "x" ] ; then
 		echo "board_eeprom_header=${uboot_eeprom}" > "${TEMPDIR}/disk/boot/.eeprom.txt"
 	fi
+
+
+	mkdir ${TEMPDIR}/disk/home/debian/.resizerootfs
+
+	mkdir ${TEMPDIR}/disk/boot/mmc0_extlinux
+	mkdir ${TEMPDIR}/disk/boot/mmc1_extlinux
+	mkdir ${TEMPDIR}/disk/boot/nand0_extlinux
+
+	cp boot.scr.uimg  ${TEMPDIR}/disk/boot/
+
+	wfile="${TEMPDIR}/disk/boot//mmc0_extlinux/extlinux.conf"
+	echo "${MMC0extlinux}" > ${wfile}
+
+	wfile="${TEMPDIR}/disk/boot//mmc1_extlinux/extlinux.conf"
+	echo "${MMC1extlinux}" > ${wfile}
+
+	wfile="${TEMPDIR}/disk/boot//nand0_extlinux/extlinux.conf"
+	echo "${NANDextlinux}" > ${wfile}
 
 	wfile="${TEMPDIR}/disk/boot/uEnv.txt"
 	echo "#Docs: http://elinux.org/Beagleboard:U-boot_partitioning_layout_2.0" > ${wfile}

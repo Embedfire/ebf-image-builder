@@ -1575,6 +1575,10 @@ if [ "x${chroot_COPY_SETUP_SDCARD}" = "xenable" ] ; then
 		sudo cp "${DIR}"/tools/hwpack/*.tsv "${DIR}/deploy/${export_filename}/hwpack/"
 	fi
 
+	if [ "x${bootscr_img}" != "x" ] ; then
+		sudo cp "${DIR}/tools/hwpack/${bootscr_img}" "${DIR}/deploy/${export_filename}/hwpack/"
+	fi
+
 	if [ -n "${chroot_uenv_txt}" -a -r "${OIB_DIR}/target/boot/${chroot_uenv_txt}" ] ; then
 		sudo cp "${OIB_DIR}/target/boot/${chroot_uenv_txt}" "${DIR}/deploy/${export_filename}/uEnv.txt"
 	fi
