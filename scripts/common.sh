@@ -44,7 +44,7 @@ generate_soc () {
 	echo "conf_boot_endmb=${conf_boot_endmb}" >> ${wfile}
 	echo "sfdisk_fstype=${sfdisk_fstype}" >> ${wfile}
 	echo "" >> ${wfile}
-    echo "conf_root_device=${conf_root_device}" >> ${wfile}
+    echo "conf_root_device=${conf_root_device:-/dev/mmcblk0}" >> ${wfile}
     echo "" >> ${wfile}
 	if [ "x${uboot_efi_mode}" = "xenable" ] ; then
 		echo "uboot_efi_mode=${uboot_efi_mode}" >> ${wfile}

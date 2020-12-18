@@ -1386,6 +1386,7 @@ populate_rootfs () {
 	{
 		echo "# ST stm32 ports"
 		echo "${SERIAL}"
+		echo "ttyGS0"
 	} >> ./etc/securetty
 
 	# Using module bcmdhd, not module brcmfmac
