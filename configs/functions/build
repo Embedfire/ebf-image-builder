@@ -147,6 +147,8 @@ build_linux_debs() {
 
     mkdir -p $BUILD_DEBS	
     mv $BUILD/*.deb $BUILD_DEBS
-    mv $BUILD/vmlinuz* $BUILD_DEBS
+	if [ -f $BUILD/vmlinuz* ]; then
+    	mv $BUILD/vmlinuz* $BUILD_DEBS
+	fi
     rm -rf $BUILD/*.buildinfo $BUILD/*.changes
 }

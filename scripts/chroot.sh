@@ -724,16 +724,16 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			fi
 		fi
 
-		mkdir -p /boot/dtb_tmp
-		cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_MMC_DTB} /boot/dtb_tmp
-		cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_NAND_DTB} /boot/dtb_tmp
-		if [ -d "/boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays" ] ; then
-			mv  /boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays /boot
-		fi  
-		rm /boot/dtbs/${LINUX}${LOCAL_VERSION}/*.dtb
-		mv /boot/dtb_tmp/${LINUX_MMC_DTB}  /boot/dtbs/${LINUX}${LOCAL_VERSION}
-		mv /boot/dtb_tmp/${LINUX_NAND_DTB} /boot/dtbs/${LINUX}${LOCAL_VERSION}
-		rm -rf /boot/dtb_tmp
+		#mkdir -p /boot/dtb_tmp
+		#cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_MMC_DTB} /boot/dtb_tmp
+		#cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_NAND_DTB} /boot/dtb_tmp
+		#if [ -d "/boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays" ] ; then
+			#mv  /boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays /boot
+		#fi  
+		#rm /boot/dtbs/${LINUX}${LOCAL_VERSION}/*.dtb
+		#mv /boot/dtb_tmp/${LINUX_MMC_DTB}  /boot/dtbs/${LINUX}${LOCAL_VERSION}
+		#mv /boot/dtb_tmp/${LINUX_NAND_DTB} /boot/dtbs/${LINUX}${LOCAL_VERSION}
+		#rm -rf /boot/dtb_tmp
 
 		if [ ! "x${deb_additional_pkgs}" = "x" ] ; then
 			#Install the user choosen list.

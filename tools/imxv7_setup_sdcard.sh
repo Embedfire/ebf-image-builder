@@ -880,7 +880,6 @@ kernel_select () {
 		echo "Debug: using: v${select_kernel}"
 	else
 		echo "Error: [conf_kernel] not defined [armv7_lpae,armv7,bone,ti,stm32]..."
-		exit
 	fi
 }
 
