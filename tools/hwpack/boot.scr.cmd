@@ -56,7 +56,7 @@ fi
 env delete bootfile
 
 # save the boot config the 2nd boot (boot_prefixes/boot_extlinux)
-env save
+#env save
 
 # start the correct exlinux.conf
 run bootcmd_${target}
