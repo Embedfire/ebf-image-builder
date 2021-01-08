@@ -1075,27 +1075,18 @@ populate_rootfs () {
 		if [ "x${conf_board}" != "x" ] ; then
 			echo "" >> ${wfile}
 			echo "###U-Boot Overlays###" >> ${wfile}
-			echo "###Documentation: http://elinux.org/Beagleboard:BeagleBoneBlack_Debian#U-Boot_Overlays" >> ${wfile}
+			echo "###Documentation: https://embed-linux-tutorial.readthedocs.io/zh_CN/latest/linux_driver/device_tree_rgb_led.html" >> ${wfile}
 			echo "###Master Enable" >> ${wfile}
 			if [ "x${uboot_cape_overlays}" = "xenable" ] ; then
 				echo "enable_uboot_overlays=1" >> ${wfile}
 			else
 				echo "#enable_uboot_overlays=1" >> ${wfile}
 			fi
-			echo "###" >> ${wfile}
-			echo "###custom overlays" >> ${wfile}
-			echo "#uboot_overlay_addr0=/lib/firmware/<file0>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr1=/lib/firmware/<file1>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr2=/lib/firmware/<file2>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr3=/lib/firmware/<file3>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr4=/lib/firmware/<file4>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr5=/lib/firmware/<file5>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr6=/lib/firmware/<file6>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr7=/lib/firmware/<file7>.dtbo" >> ${wfile}
-			echo "###" >> ${wfile}
-			echo "###U-Boot fdt tweaks... (60000 = 384KB)" >> ${wfile}
-			echo "#uboot_fdt_buffer=0x60000" >> ${wfile}
-			echo "###U-Boot Overlays###" >> ${wfile}
+			echo "#overlay_start">> ${wfile}
+			echo "" >> ${wfile}
+			echo "${OVERLAYS}">> ${wfile}
+			echo "" >> ${wfile}
+			echo "#overlay_end">> ${wfile}
 
 			echo "" >> ${wfile}
 		fi
