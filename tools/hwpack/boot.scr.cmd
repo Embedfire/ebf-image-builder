@@ -58,6 +58,42 @@ env delete bootfile
 # save the boot config the 2nd boot (boot_prefixes/boot_extlinux)
 #env save
 
+# 
+echo Checking for: /uEnv.txt ...;
+if test -e ${devtype} ${devnum}:${distro_bootpart} /uEnv.txt;then
+    if load ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_r} /uEnv.txt; then 
+    echo Loaded environment from /uEnv.txt;
+    echo Importing environment from ${devtype} ...; 
+    env import -t ${kernel_addr_r} ${filesize}
+		env set size 0x${filesize}
+    fi
+fi
+echo Checking if flash_firmware is set;
+if test -n ${flash_firmware}; then 
+    echo setting flash firmware...;
+    setenv cmdline ${storage_media};
+fi;
+
+#load base fdt
+echo Checking for: /dtbs/4.19.94-imx-r1/stm32mp157a-basic.dtb ...;
+if test -e ${devtype} ${devnum}:${distro_bootpart} /dtbs/4.19.94-imx-r1/stm32mp157a-basic.dtb;then
+	echo Loading base fdt...;
+	load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} /dtbs/4.19.94-imx-r1/stm32mp157a-basic.dtb
+fi;
+
+if test -n ${enable_uboot_overlays}; then 
+	setenv fdt_buffer 0x60000;
+	if test -n ${uboot_fdt_buffer}; then 
+		setenv fdt_buffer ${uboot_fdt_buffer};
+	fi;
+	echo uboot_overlays: [fdt_buffer=${fdt_buffer}] ... ;
+	dtfile ${fdt_addr_r} ${splashimage} /boot/uEnv.txt ${kernel_addr_r};
+else 
+	echo uboot_overlays: add [enable_uboot_overlays=1] to /boot/uEnv.txt to enable...;
+fi;
+
+env set fdt_addr ${fdt_addr_r}
+
 # start the correct exlinux.conf
 run bootcmd_${target}
 
