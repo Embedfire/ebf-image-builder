@@ -1121,38 +1121,10 @@ populate_rootfs () {
 			echo "" >> ${wfile}
 		fi
 
-		if [ "x${usb_flasher}" = "xenable" ] ; then
-			if [ ! "x${oem_flasher_script}" = "x" ] ; then
-				echo "cmdline=init=/opt/scripts/tools/eMMC/${oem_flasher_script}" >> ${wfile}
-			else
-				echo "cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-from-usb-media.sh" >> ${wfile}
-			fi
-		elif [ "x${emmc_flasher}" = "xenable" ] ; then
-			echo "##enable Generic eMMC Flasher:" >> ${wfile}
-			echo "cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh" >> ${wfile}
-			echo "" >> ${wfile}
-			echo "##if eMMC boot failed, disable eMMC specific boot method" >> ${wfile}
-			echo "uenvcmd=mmc partconf 1 0 0 0" >> ${wfile}
-		else
-			echo "##enable Generic eMMC Flasher:" >> ${wfile}
-			echo "##make sure, these tools are installed: dosfstools rsync" >> ${wfile}
-			echo "#cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh" >> ${wfile}
-			echo "" >> ${wfile}
-			echo "##if eMMC boot failed, disable eMMC specific boot method" >> ${wfile}
-			echo "#uenvcmd=mmc partconf 1 0 0 0" >> ${wfile}
-		fi
+		echo "#flash_firmware=enable" >> ${wfile}
+		
 		echo "" >> ${wfile}
-	else
-		if [ "x${usb_flasher}" = "xenable" ] ; then
-			if [ ! "x${oem_flasher_script}" = "x" ] ; then
-				echo "cmdline=init=/opt/scripts/tools/eMMC/${oem_flasher_script}" >> ${wfile}
-			else
-				echo "cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-from-usb-media.sh" >> ${wfile}
-			fi
-		elif [ "x${emmc_flasher}" = "xenable" ] ; then
-			echo "##enable Generic eMMC Flasher:" >> ${wfile}
-			echo "cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3-no-eeprom.sh" >> ${wfile}
-		fi
+		
 	fi
 
 	board=${conf_board}
