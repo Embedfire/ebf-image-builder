@@ -1262,10 +1262,10 @@ populate_rootfs () {
 
 	fi #RootStock-NG
 
-	if [ ! "x${uboot_name}" = "x" ] ; then
+	if [ ! "x${MUBOOT_FILE}" = "x" ] ; then
 		echo "Backup version of u-boot: /opt/backup/uboot/"
 		mkdir -p ${TEMPDIR}/disk/opt/backup/uboot/
-		cp -v ${TEMPDIR}/dl/${UBOOT} ${TEMPDIR}/disk/opt/backup/uboot/${uboot_name}
+		cp -v ${TEMPDIR}/dl/${MUBOOT_FILE} ${TEMPDIR}/disk/opt/backup/uboot/${MUBOOT_FILE}
 	fi
 
 	if [ ! "x${spl_uboot_name}" = "x" ] ; then
