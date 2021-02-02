@@ -1,5 +1,5 @@
 # Generate boot.scr.uimg:
-# ./tools/mkimage -C none -A arm -T script -d boot.src.cmd boot.scr.uimg
+# ./tools/mkimage -C none -A arm -T script -d boot.scr.cmd boot.scr.uimg
 #
 #########################################################################
 # SAMPLE BOOT SCRIPT: PLEASE DON'T USE this SCRIPT in REAL PRODUCT
@@ -85,6 +85,10 @@ if test -n ${enable_uboot_overlays}; then
 	setenv fdt_buffer 0x60000;
 	if test -n ${uboot_fdt_buffer}; then 
 		setenv fdt_buffer ${uboot_fdt_buffer};
+	fi;
+	if test ${target} = ubifs0; then
+        #mount rootfs
+		ubifsmount ubi0:rootfs
 	fi;
 	echo uboot_overlays: [fdt_buffer=${fdt_buffer}] ... ;
 	dtfile ${fdt_addr_r} ${splashimage} /boot/uEnv.txt ${kernel_addr_r};
