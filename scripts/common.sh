@@ -61,6 +61,7 @@ generate_soc () {
 	echo "" >> ${wfile}
 	echo "#Advanced options" >> ${wfile}
 	echo "#disable_ssh_regeneration=true" >> ${wfile}
-
+	echo "${FlashLayout_NAND}" >> ${wfile}
+	
 	echo "" >> ${wfile}
 }

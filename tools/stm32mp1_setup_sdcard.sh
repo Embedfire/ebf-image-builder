@@ -186,6 +186,11 @@ local_bootloader () {
 	echo "-----------------------------"
 	mkdir -p ${TEMPDIR}/dl/
 
+	if [ "${TFA_BUILD_FILE}" ]; then
+		cp ${LOCAL_BOOT_PATH}/${TFA_BUILD_FILE} ${TEMPDIR}/dl/
+		echo "tfa: ${TFA_BUILD_FILE}"
+	fi
+
 	if [ "${spl_name}" ] ; then
 		cp ${LOCAL_BOOT_PATH}/${SPL_BUILD_FILE} ${TEMPDIR}/dl/
 		SPL=${SPL_BUILD_FILE}
@@ -1092,7 +1097,7 @@ populate_rootfs () {
 		fi
 	fi
 
-	cmdline="coherent_pool=1M net.ifnames=0 quiet"
+	cmdline="coherent_pool=1M net.ifnames=0"
 
 	unset kms_video
 
@@ -1261,6 +1266,12 @@ populate_rootfs () {
 		sync
 
 	fi #RootStock-NG
+
+	if [ ! "x${TFA_BUILD_FILE}" = "x" ];then
+		echo "Backup version of tfa: /opt/backup/tfa/"
+		mkdir -p ${TEMPDIR}/disk/opt/backup/tfa/
+		cp -v ${TEMPDIR}/dl/${TFA_BUILD_FILE} ${TEMPDIR}/disk/opt/backup/tfa/${TFA_BUILD_FILE}
+	fi
 
 	if [ ! "x${MUBOOT_FILE}" = "x" ] ; then
 		echo "Backup version of u-boot: /opt/backup/uboot/"

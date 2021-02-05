@@ -2,7 +2,7 @@
 
 ################################################################
 ROOT="$(pwd)"
-
+unset SUPPORTED_TFA
 unset SUPPORTED_UBOOT
 unset SUPPORTED_LINUX
 
@@ -124,6 +124,64 @@ function choose_fire_board() {
 	done
 
 	source $ROOT/configs/boards/${FIRE_BOARD}.conf
+}
+
+## Choose tfa version
+function choose_tfa_version() {
+    TFA_VERSION_ARRAY_LEN=${#SUPPORTED_TFA[@]}
+
+	if [ $TFA_VERSION_ARRAY_LEN == 0 ]; then
+		echo "Skiping tfa... "
+		return 0
+	fi
+    echo ""
+    echo "Choose uboot version:"
+    i=0
+    while [[ $i -lt ${TFA_VERSION_ARRAY_LEN} ]]
+    do
+        echo "$((${i}+1)). tfa-${SUPPORTED_TFA[$i]}"
+        let i++
+    done
+
+    echo ""
+
+ 	local DEFAULT_NUM
+    DEFAULT_NUM=1
+    export TFA=
+    local ANSWER
+    while [ -z $TFA ]
+    do
+        echo -n "Which tfa version would you like? ["$DEFAULT_NUM"] "
+        if [ -z "$1" ]; then
+            read ANSWER
+        else
+            echo $1
+            ANSWER=$1
+        fi
+
+        if [ -z "$ANSWER" ]; then
+            ANSWER="$DEFAULT_NUM"
+        fi
+
+        if [ -n "`echo $ANSWER | sed -n '/^[0-9][0-9]*$/p'`" ]; then
+            if [ $ANSWER -le ${TFA_VERSION_ARRAY_LEN} ] && [ $ANSWER -gt 0 ]; then
+                index=$((${ANSWER}-1))
+                TFA="${SUPPORTED_TFA[$index]}"
+            else
+                echo
+                echo "number not in range. Please try again."
+                echo
+            fi
+        else
+            echo
+            echo "I didn't understand your response.  Please try again."
+
+            echo
+        fi
+        if [ -n "$1" ]; then
+            break
+        fi
+    done
 }
 
 ## Choose uboot version
@@ -496,6 +554,7 @@ function lunch() {
 	echo "==========================================="
 	echo
 	echo "#FIRE_BOARD=${FIRE_BOARD}"
+	echo "#TFA=${TFA}"
 	echo "#LINUX=${LINUX}"
 	echo "#UBOOT=${UBOOT}"
 	echo "#DISTRIBUTION=${DISTRIBUTION}"
@@ -528,6 +587,7 @@ check_directory
 if [ -z "$LOAD_CONFIG_FROM_FILE" ]; then
     choose_install_type
 	choose_fire_board
+	choose_tfa_version
 	choose_uboot_version
 	choose_linux_version
 	choose_distribution

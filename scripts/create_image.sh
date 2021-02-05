@@ -27,6 +27,12 @@ start_time=`date +%s`
 
 echo "Building rootfs stage requires root privileges, please enter your passowrd:"
 read PASSWORD
+
+#build tfa
+if [ ! -f ${BUILD}/${TFA_BUILD_FILE} -o ! -f ${BUILD}/${TFA_BUILD_FILE} -o "x${FORCE_UPDATE}" = "xenable" ]; then
+		./scripts/build.sh tfa
+fi
+
 #build uboot
 if [ ! -f ${BUILD}/${NUBOOT_FILE} -o ! -f ${BUILD}/${MUBOOT_FILE} -o "x${FORCE_UPDATE}" = "xenable" ]; then
 		./scripts/build.sh u-boot 

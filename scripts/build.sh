@@ -24,6 +24,9 @@ case "$TARGET" in
 	linux-deb)
 		build_linux_debs
 		;;
+	tfa)
+		build_tfa
+		;;
 esac
 
 echo -e "\nDone."
