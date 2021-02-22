@@ -259,7 +259,7 @@ function generate_gpt_partition_table_from_flash_layout() {
 		offset=${FLASHLAYOUT_data[$i,$COL_OFFSET]}
 		bin2flash=${FLASHLAYOUT_data[$i,$COL_BIN2FLASH]}
 		debug "DUMP Process for $partName partition"
-
+		type_code=8300
 		case "$selected" in
 		P|E|1)
 			# partition are present and must be created
@@ -272,6 +272,7 @@ function generate_gpt_partition_table_from_flash_layout() {
 		if [ "$partName" == "bootfs" ];
 		then
 			bootfs_param=" -A $j:set:2"
+			type_code=0700
 		else
 			bootfs_param=""
 		fi
@@ -410,7 +411,7 @@ function generate_gpt_partition_table_from_flash_layout() {
 				fi
 
 				printf "part %d: %8s ..." $j "$partName"
-				exec_print "sgdisk -a 1 -n $j:$offset:$next_offset -c $j:$partName -t $j:8300 $bootfs_param $FLASHLAYOUT_rawname"
+				exec_print "sgdisk -a 1 -n $j:$offset:$next_offset -c $j:$partName -t $j:$type_code $bootfs_param $FLASHLAYOUT_rawname"
 				partition_size=$(sgdisk -p $FLASHLAYOUT_rawname | grep $partName | awk '{ print $4}')
 				partition_size_type=$(sgdisk -p $FLASHLAYOUT_rawname | grep $partName | awk '{ print $5}')
 				printf "\r[CREATED] part %d: %8s [partition size %s %s]\n" $j "$partName"  "$partition_size" "$partition_size_type"
