@@ -64,4 +64,8 @@ generate_soc () {
 	echo "${FlashLayout_NAND}" >> ${wfile}
 	
 	echo "" >> ${wfile}
+
+	echo "${FlashLayout_EMMC}" >> ${wfile}
+	
+	echo "" >> ${wfile}	
 }
