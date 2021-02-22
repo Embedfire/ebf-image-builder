@@ -18,17 +18,17 @@ check_update() {
 	update_git_repo "$PWD" ${FENIX_BRANCH:- master}
 }
 
-if [ "x${INSTALL_TYPE}" != "xALL" ] ; then
-	error_msg "UBOOT INSTALL TYPE must be ALL!"
-	exit 0
-fi
+#if [ "x${INSTALL_TYPE}" != "xALL" ] ; then
+#	error_msg "UBOOT INSTALL TYPE must be ALL!"
+#	exit 0
+#fi
 
 start_time=`date +%s`
 
 echo "Building rootfs stage requires root privileges, please enter your passowrd:"
 read PASSWORD
 #build uboot
-if [ ! -f ${BUILD}/${NUBOOT_FILE} -o ! -f ${BUILD}/${MUBOOT_FILE} -o "x${FORCE_UPDATE}" = "xenable" ]; then
+if [ ! -f ${BUILD}/${MUBOOT_FILE} -a ! -f ${BUILD}/${MUBOOT_FILE} -o "x${FORCE_UPDATE}" = "xenable" ]; then
 		./scripts/build.sh u-boot 
 fi
 

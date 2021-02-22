@@ -399,6 +399,7 @@ if [ "x${repo_external}" = "xenable" ] ; then
 	echo "#deb ${repo_external_server_backup1} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 	echo "#deb ${repo_external_server_backup2} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 	echo "deb [arch=${repo_external_arch}] ${repo_external_server} buster ${repo_external_components}" >> ${wfile}
+	echo "deb [arch=${repo_external_arch}] ${repo_external_server} carp-imx6 ${repo_external_components}" >> ${wfile}
 	echo "#deb-src [arch=${repo_external_arch}] ${repo_external_server} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 
 
@@ -499,7 +500,7 @@ sudo chown root:root "${tempdir}/etc/hostname"
 
 if [ "x${deb_arch}" = "xarmhf" ] ; then
 	case "${deb_distribution}" in
-	debian)
+	lubancat)
 		case "${deb_codename}" in
 		jessie|stretch|buster)
 			#while bb-customizations installes "generic-board-startup.service" other boards/configs could use this default.
@@ -521,10 +522,19 @@ if [ "x${deb_arch}" = "xarmhf" ] ; then
 		;;
 	ubuntu)
 		case "${deb_codename}" in
-		bionic)
+		bionic|focal)
 			#while bb-customizations installes "generic-board-startup.service" other boards/configs could use this default.
 			sudo cp "${OIB_DIR}/target/init_scripts/systemd-generic-board-startup.service" "${tempdir}/lib/systemd/system/generic-board-startup.service"
 			sudo chown root:root "${tempdir}/lib/systemd/system/generic-board-startup.service"
+
+			sudo cp "${OIB_DIR}/target/init_scripts/bootlogo.service" "${tempdir}/lib/systemd/system/bootlogo.service"
+			sudo chown root:root "${tempdir}/lib/systemd/system/bootlogo.service"
+
+			sudo cp "${OIB_DIR}/target/init_scripts/actlogo.service" "${tempdir}/lib/systemd/system/actlogo.service"
+			sudo chown root:root "${tempdir}/lib/systemd/system/actlogo.service"
+
+			sudo cp "${OIB_DIR}/target/init_scripts/autowifi.service" "${tempdir}/lib/systemd/system/autowifi.service"
+			sudo chown root:root "${tempdir}/lib/systemd/system/actlogo.service"
 			distro="Ubuntu"
 			;;
 		esac
@@ -735,6 +745,10 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 		#mv /boot/dtb_tmp/${LINUX_NAND_DTB} /boot/dtbs/${LINUX}${LOCAL_VERSION}
 		#rm -rf /boot/dtb_tmp
 
+		mkdir -p /boot/kernel
+
+		mv /boot/*${LINUX}${LOCAL_VERSION}* /boot/kernel
+
 		if [ ! "x${deb_additional_pkgs}" = "x" ] ; then
 			#Install the user choosen list.
 			echo "Log: (chroot) Installing: ${deb_additional_pkgs}"
@@ -944,6 +958,9 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 		echo "SUBSYSTEM==\"cmem\", GROUP=\"tisdk\", MODE=\"0660\"" > /etc/udev/rules.d/tisdk.rules
 		echo "SUBSYSTEM==\"rpmsg_rpc\", GROUP=\"tisdk\", MODE=\"0660\"" >> /etc/udev/rules.d/tisdk.rules
 
+		echo "SUBSYSTEM==\"gpio\", KERNEL==\"gpiochip*\", ACTION==\"add\", PROGRAM=\"/bin/bash -c 'chown root:gpio /sys/class/gpio/export /sys/class/gpio/unexport ; chmod 220 /sys/class/gpio/export /sys/class/gpio/unexport'\"" > /etc/udev/rules.d/99-gpio.rules
+		echo "SUBSYSTEM==\"gpio\", KERNEL==\"gpio*\", ACTION==\"add\", PROGRAM=\"/bin/bash -c 'chown root:gpio /sys%p/active_low /sys%p/direction /sys%p/edge /sys%p/value ; chmod 660 /sys%p/active_low /sys%p/direction /sys%p/edge /sys%p/value'\"" >> /etc/udev/rules.d/99-gpio.rules
+
 		default_groups="admin,adm,cloud9ide,dialout,gpio,pwm,eqep,i2c,kmem,spi,cdrom,floppy,audio,dip,video,netdev,plugdev,bluetooth,users,systemd-journal,tisdk,weston-launch,xenomai"
 
 		pkg="sudo"
@@ -1054,6 +1071,8 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 		systemctl mask getty@tty1.service || true
 
 		systemctl enable getty@ttyGS0.service || true
+
+		systemctl mask wpa_supplicant.service || true
 
 		if [ ! "x${rfs_opt_scripts}" = "x" ] ; then
 			mkdir -p /opt/scripts/ || true
@@ -1251,6 +1270,16 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 		chown -R ${rfs_username}:${rfs_username} /opt/sgx/
 	fi
 
+	if [ -f /etc/localtime ] ; then
+		ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+	fi
+
+	if [ -f "/tmp/cacert.pem" ] ; then
+			cp "/tmp/cacert.pem" /etc/ssl/certs/
+			c_rehash /etc/ssl/certs/
+			rm -f "/tmp/cacert.pem"
+	fi
+
 	rm -f /chroot_script.sh || true
 __EOF__
 
@@ -1258,6 +1287,14 @@ sudo mv "${DIR}/chroot_script.sh" "${tempdir}/chroot_script.sh"
 
 if [ -d "${BUILD_DEBS}" ] ; then
 	sudo cp ${BUILD_DEBS}/${KERNEL_DEB} ${tempdir}/tmp
+fi
+
+if [ ! "x${repo_external_key}" = "x" ] ; then
+		sudo cp -v "${OIB_DIR}/target/keyring/${repo_external_key}" "${tempdir}/tmp/${repo_external_key}"
+	fi
+
+if [ -f "${OIB_DIR}/target/keyring/cacert.pem" ] ; then
+	sudo cp -v "${OIB_DIR}/target/keyring/cacert.pem" "${tempdir}/tmp"
 fi
 
 if [ -n "`find ${LOCAL_PKG} -maxdepth 1 -name '*.deb'`" ] ; then
@@ -1427,7 +1464,7 @@ if [ -d "${DIR}/deploy/${export_filename}/" ] ; then
 fi
 mkdir -p "${DIR}/deploy/${export_filename}/" || true
 cp -v "${DIR}/.project" "${DIR}/deploy/${export_filename}/image-builder.project"
-
+sync
 if [ -n "${chroot_after_hook}" -a -r "${DIR}/${chroot_after_hook}" ] ; then
 	report_size
 	echo "Calling chroot_after_hook script: ${DIR}/${chroot_after_hook}"
@@ -1515,9 +1552,6 @@ __EOF__
 ###MUST BE LAST...
 sudo mv "${DIR}/cleanup_script.sh" "${tempdir}/cleanup_script.sh"
 
-sudo chroot "${tempdir}" /bin/bash -e cleanup_script.sh
-echo "Log: Complete: [sudo chroot ${tempdir} /bin/bash -e cleanup_script.sh]"
-
 #add /boot/uEnv.txt update script
 if [ -d "${tempdir}/etc/kernel/postinst.d/" ] ; then
 	if [ ! -f "${tempdir}/etc/kernel/postinst.d/zz-uenv_txt" ] ; then
@@ -1526,6 +1560,9 @@ if [ -d "${tempdir}/etc/kernel/postinst.d/" ] ; then
 		sudo chown root:root "${tempdir}/etc/kernel/postinst.d/zz-uenv_txt"
 	fi
 fi
+
+sudo chroot "${tempdir}" /bin/bash -e cleanup_script.sh
+echo "Log: Complete: [sudo chroot ${tempdir} /bin/bash -e cleanup_script.sh]"
 
 if [ -f "${tempdir}/usr/bin/qemu-arm-static" ] ; then
 	sudo rm -f "${tempdir}/usr/bin/qemu-arm-static" || true

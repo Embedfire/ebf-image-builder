@@ -4,14 +4,16 @@
 ROOT="$(pwd)"
 
 unset SUPPORTED_UBOOT
+unset SUPPORTED_UBOOT_TAGS
 unset SUPPORTED_LINUX
+unset SUPPORTED_LINUX_TAGS
 
 DISTRIBUTION_ARRAY=("Debian" "Ubuntu")
 Ubuntu_RELEASE_ARRAY=("bionic" "focal")
 Debian_RELEASE_ARRAY=("buster")
 DISTRIB_ARCH_ARRAY=("armhf")
-Ubuntu_TYPE_ARRAY=("console" "part-qt-app" "full-qt-app" "desktop")
-Debian_TYPE_ARRAY=("console" "part-qt-app" "full-qt-app" "desktop")
+Ubuntu_TYPE_ARRAY=("console" "qt" "desktop")
+Debian_TYPE_ARRAY=("console" "qt" "desktop")
 INSTALL_TYPE_ARRAY=("ALL" "NAND" "eMMC/SD")
 
 DISTRIBUTION_ARRAY_LEN=${#DISTRIBUTION_ARRAY[@]}
@@ -187,6 +189,66 @@ function choose_uboot_version() {
     done
 }
 
+function choose_uboot_tag() {
+    echo ""
+    echo "Choose uboot tag:"
+    i=0
+
+    UBOOT_TAGS_ARRAY_LEN=${#SUPPORTED_UBOOT_TAGS[@]}
+
+	if [ $UBOOT_TAGS_ARRAY_LEN == 0 ]; then
+		echo -e "\033[31mError:\033[0m Missing 'SUPPORTED_UBOOT_TAGS' in board configuration file '$ROOT/configs/boards/${FIRE_BOARD}.conf'? Please add it!"
+		echo -e "Hangup here! \e[0;32mCtrl+C\e[0m to abort."
+		hangup
+	fi
+
+    while [[ $i -lt ${UBOOT_TAGS_ARRAY_LEN} ]]
+    do
+        echo "$((${i}+1)). uboot-${SUPPORTED_UBOOT_TAGS[$i]}"
+        let i++
+    done
+
+    echo ""
+
+    local DEFAULT_NUM
+    DEFAULT_NUM=1
+    export UBOOT_TAGS=
+    local ANSWER
+    while [ -z $UBOOT_TAGS ]
+    do
+        echo -n "Which uboot tag would you like? ["$DEFAULT_NUM"] "
+        if [ -z "$1" ]; then
+            read ANSWER
+        else
+            echo $1
+            ANSWER=$1
+        fi
+
+        if [ -z "$ANSWER" ]; then
+            ANSWER="$DEFAULT_NUM"
+        fi
+
+        if [ -n "`echo $ANSWER | sed -n '/^[0-9][0-9]*$/p'`" ]; then
+            if [ $ANSWER -le ${UBOOT_TAGS_ARRAY_LEN} ] && [ $ANSWER -gt 0 ]; then
+                index=$((${ANSWER}-1))
+                UBOOT_TAGS="${SUPPORTED_UBOOT_TAGS[$index]}"
+            else
+                echo
+                echo "number not in range. Please try again."
+                echo
+            fi
+        else
+            echo
+            echo "I didn't understand your response.  Please try again."
+
+            echo
+        fi
+        if [ -n "$1" ]; then
+            break
+        fi
+    done
+}
+
 ## Choose linux version
 function choose_linux_version() {
 	echo ""
@@ -238,6 +300,66 @@ function choose_linux_version() {
 			if [ $ANSWER -le ${LINUX_VERSION_ARRAY_LEN} ] && [ $ANSWER -gt 0 ]; then
 				index=$((${ANSWER}-1))
 				LINUX="${SUPPORTED_LINUX[$index]}"
+			else
+				echo
+				echo "number not in range. Please try again."
+				echo
+			fi
+		else
+			echo
+			echo "I didn't understand your response.  Please try again."
+
+			echo
+		fi
+		if [ -n "$1" ]; then
+			break
+		fi
+	done
+}
+
+function choose_linux_tag() {
+	echo ""
+	echo "Choose linux tag:"
+	i=0
+
+	LINUX_TAGS_ARRAY_LEN=${#SUPPORTED_LINUX_TAGS[@]}
+	if [ $LINUX_TAGS_ARRAY_LEN == 0 ]; then
+		echo -e "\033[31mError:\033[0m Missing 'SUPPORTED_LINUX_TAGS' in board configuration file '$ROOT/configs/boards/${FIRE_BOARD}.conf'? Please add it!"
+		echo -e "Hangup here! \e[0;32mCtrl+C\e[0m to abort."
+		hangup
+	fi
+
+	while [[ $i -lt ${LINUX_TAGS_ARRAY_LEN} ]]
+	do
+		echo "$((${i}+1)). linux-${SUPPORTED_LINUX_TAGS[$i]}"
+		let i++
+	done
+
+	echo ""
+
+	local DEFAULT_NUM
+	DEFAULT_NUM=1
+
+	export LINUX_TAGS=
+	local ANSWER
+	while [ -z $LINUX_TAGS ]
+	do
+		echo -n "Which linux tag would you like? ["$DEFAULT_NUM"] "
+		if [ -z "$1" ]; then
+			read ANSWER
+		else
+			echo $1
+			ANSWER=$1
+		fi
+
+		if [ -z "$ANSWER" ]; then
+			ANSWER="$DEFAULT_NUM"
+		fi
+
+		if [ -n "`echo $ANSWER | sed -n '/^[0-9][0-9]*$/p'`" ]; then
+			if [ $ANSWER -le ${LINUX_TAGS_ARRAY_LEN} ] && [ $ANSWER -gt 0 ]; then
+				index=$((${ANSWER}-1))
+				LINUX_TAGS="${SUPPORTED_LINUX_TAGS[$index]}"
 			else
 				echo
 				echo "number not in range. Please try again."
@@ -529,7 +651,9 @@ if [ -z "$LOAD_CONFIG_FROM_FILE" ]; then
     choose_install_type
 	choose_fire_board
 	choose_uboot_version
+	choose_uboot_tag
 	choose_linux_version
+	choose_linux_tag
 	choose_distribution
 	choose_distribution_release
 	choose_distribution_type

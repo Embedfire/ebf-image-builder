@@ -4,7 +4,7 @@ DefaultDependencies=no
 After=systemd-udev-trigger.service systemd-udevd.service
 
 [Service]
-ExecStart=/bin/sh /opt/scripts/boot/psplash.sh
+ExecStart=/bin/bash /opt/scripts/boot/psplash.sh
 
 [Install]
 WantedBy=sysinit.target

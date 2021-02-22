@@ -28,17 +28,19 @@ kill_net_alive() {
 	return 0;
 }
 
+echo "*****$deb_arch******"
+
 trap "kill_net_alive;" EXIT
 USE_LOCAL_BOOT="yes"
 build_fire_image () {
-	full_name=${target_name}-${image_name}-${size}
+	full_name=${target_name}-${image_name}
 	info_msg "***BUILDING***: ${FIRE_BOARD}: ${full_name}.img"
 
 	# To prevent rebuilding:
 	# export FULL_REBUILD=
 	FULL_REBUILD=${FULL_REBUILD-1}
 	if [ -n "${FULL_REBUILD}" -o ! -e "deploy/${image_name}.tar" ]; then
-		${BUILD_SCRIPT}/RootStock-NG.sh -c ${BOARD_CONFIG}/${FIRE_BOARD}.conf
+		sudo -E ${BUILD_SCRIPT}/RootStock-NG.sh -c ${BOARD_CONFIG}/${FIRE_BOARD}.conf
 	fi
 
 	if [ -d ${ROOT}/deploy/${image_name} ] ; then

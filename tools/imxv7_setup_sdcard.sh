@@ -813,7 +813,7 @@ populate_boot () {
 
 	sync
 	sync
-
+	
 	umount ${TEMPDIR}/disk || true
 
 	echo "Finished populating Boot Partition"
@@ -1012,16 +1012,12 @@ populate_rootfs () {
 		echo "-----------------------------"
 	fi
 
-	dir_check="${TEMPDIR}/disk/boot/"
+	dir_check="${TEMPDIR}/disk/boot/kernel"
 	kernel_detection
 	kernel_select
 
 	if [ ! "x${uboot_eeprom}" = "x" ] ; then
 		echo "board_eeprom_header=${uboot_eeprom}" > "${TEMPDIR}/disk/boot/.eeprom.txt"
-	fi
-
-	if [ -d ${TEMPDIR}/disk/home/debian ] ; then
-		mkdir ${TEMPDIR}/disk/home/debian/.resizerootfs
 	fi
 
 	wfile="${TEMPDIR}/disk/boot/uEnv.txt"
@@ -1105,8 +1101,8 @@ populate_rootfs () {
 			echo "" >> ${wfile}
 		fi
 
-		echo "#flash_firmware=enable" >> ${wfile}
-
+		echo "#flash_firmware=continued" >> ${wfile}
+		echo "#flash_firmware=once" >> ${wfile}
 
 		echo "" >> ${wfile}
 	
@@ -1324,7 +1320,7 @@ populate_rootfs () {
 		echo "making ping/ping6 setuid root"
 		chmod u+s ${TEMPDIR}/disk//bin/ping ${TEMPDIR}/disk//bin/ping6
 	fi
-
+	 
 	cd ${TEMPDIR}/disk/
 
 	if [ -f ./opt/scripts/mods/debian-add-sbin-usr-sbin-to-default-path.diff ] ; then
@@ -1342,6 +1338,10 @@ populate_rootfs () {
 
 	sync
 	sync
+
+	cd ${TEMPDIR}/disk/boot
+
+	tar -cf "${DIR}/boot.tar" .
 
 	cd "${DIR}/"
 
@@ -1372,6 +1372,8 @@ populate_rootfs () {
 	if [ "x${uboot_efi_mode}" = "xenable" ] ; then
 		umount ${TEMPDIR}/disk/boot/efi || true
 	fi
+	
+	mkdir ${TEMPDIR}/disk/home/.resizerootfs
 
 	umount ${TEMPDIR}/disk || true
 	if [ "x${build_img_file}" = "xenable" ] ; then
@@ -1487,7 +1489,8 @@ while [ ! -z "$1" ] ; do
 		#gsize=${gsize:-2}
 		read msize < /tmp/npipe
 		rm /tmp/npipe
-		imagename=${name%.img}-${msize}M.img
+		#imagename=${name%.img}-${msize}M.img
+		imagename=${name%.img}.img
 		media="${DIR}/${imagename}"
 		build_img_file="enable"
 		check_root
