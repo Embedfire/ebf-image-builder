@@ -1,0 +1,10 @@
+# 定义 stages
+stages:
+  - build_imx6
+
+# 定义 job
+job1:
+  stage: build_imx6
+  script:
+    - source source env/ci_imx6.sh
+    - make  DOWNLOAD_MIRROR=china
