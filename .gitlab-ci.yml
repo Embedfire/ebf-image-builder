@@ -5,6 +5,9 @@ stages:
 # 定义 job
 job1:
   stage: build_imx6
+  tags: 
+    - image-builder-20210223
+
   script:
     - source source env/ci_imx6.sh
     - make  DOWNLOAD_MIRROR=china
