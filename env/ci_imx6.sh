@@ -9,11 +9,11 @@ unset DISTRIB_TYPE
 unset DISTRIB_ARCH
 unset INSTALL_TYPE
 
-FIRE_BOARD=ebf_imx_6ull_pro
-LINUX=4.19.35
-UBOOT=2020.10
-DISTRIBUTION=Debian
-DISTRIB_RELEASE=buster
-DISTRIB_TYPE=console
-DISTRIB_ARCH=armhf
-INSTALL_TYPE=ALL
+export  FIRE_BOARD=ebf_imx_6ull_pro
+export  LINUX=4.19.35
+export  UBOOT=2020.10
+export  DISTRIBUTION=Debian
+export  DISTRIB_RELEASE=buster
+export  DISTRIB_TYPE=console
+export  DISTRIB_ARCH=armhf
+export  INSTALL_TYPE=ALL
