@@ -9,5 +9,5 @@ job1:
     - image-builder-20210223
 
   script:
-    - source source env/ci_imx6.sh
+    - source env/ci_imx6.sh
     - make  DOWNLOAD_MIRROR=china
