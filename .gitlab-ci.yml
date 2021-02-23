@@ -9,4 +9,4 @@ job1:
     - image-builder-20210223
 
   script:
-    - source env/ci_imx6.sh && echo "123$FIRE_BOARD" && echo "laoyening/r/n" | make DOWNLOAD_MIRROR=china
+    - source env/ci_imx6.sh && echo "laoyening" | make DOWNLOAD_MIRROR=china
