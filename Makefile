@@ -8,6 +8,14 @@ endif
 define help_message
 	@echo "You should setup environment first."
 	@echo "Run 'source env/setenv.sh' to setup environment."
+	@echo "#FIRE_BOARD=${FIRE_BOARD}"
+	@echo "#LINUX=${LINUX}"
+	@echo "#UBOOT=${UBOOT}"
+	@echo "#DISTRIBUTION=${DISTRIBUTION}"
+	@echo "#DISTRIB_RELEASE=${DISTRIB_RELEASE}"
+	@echo "#DISTRIB_TYPE=${DISTRIB_TYPE}"
+	@echo "#DISTRIB_ARCH=${DISTRIB_ARCH}"
+	@echo "#INSTALL_TYPE=${INSTALL_TYPE}"
 endef
 
 kernel:
