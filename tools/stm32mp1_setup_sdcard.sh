@@ -1126,7 +1126,7 @@ populate_rootfs () {
 			echo "" >> ${wfile}
 		fi
 
-		echo "#flash_firmware=enable" >> ${wfile}
+		echo "#flash_firmware=once" >> ${wfile}
 		
 		echo "" >> ${wfile}
 		
@@ -1371,6 +1371,12 @@ eof
 
 	sync
 	sync
+	cd "${DIR}/"
+
+
+	cd ${TEMPDIR}/disk
+	tar -cf "${DIR}/${ROOTFS}" . 
+
 	cd "${DIR}/"
 
 	if [ "x${option_ro_root}" = "xenable" ] ; then
@@ -1713,5 +1719,5 @@ fi
 create_partitions
 populate_boot
 populate_rootfs
-exit 0
+
 #

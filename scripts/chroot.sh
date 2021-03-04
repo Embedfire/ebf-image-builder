@@ -399,10 +399,8 @@ if [ "x${repo_external}" = "xenable" ] ; then
 	echo "#deb ${repo_external_server_backup1} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 	echo "#deb ${repo_external_server_backup2} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 	echo "deb [arch=${repo_external_arch}] ${repo_external_server} buster ${repo_external_components}" >> ${wfile}
+	echo "deb [arch=${repo_external_arch}] ${repo_external_server} carp-imx6 ${repo_external_components}" >> ${wfile}
 	echo "#deb-src [arch=${repo_external_arch}] ${repo_external_server} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
-
-
-
 fi
 
 if [ "x${repo_flat}" = "xenable" ] ; then
@@ -1515,7 +1513,11 @@ __EOF__
 
 ###MUST BE LAST...
 sudo mv "${DIR}/cleanup_script.sh" "${tempdir}/cleanup_script.sh"
-
+if [ -e ${OIB_DIR}/firmware/gpu/galcore.ko ];then
+	mkdir -p ${tempdir}/lib/modules/${LINUX}${LOCAL_VERSION}/extra/
+	sudo cp "${OIB_DIR}/firmware/gpu/galcore.ko" "${tempdir}/lib/modules/${LINUX}${LOCAL_VERSION}/extra/"
+	depmod -a
+fi
 sudo chroot "${tempdir}" /bin/bash -e cleanup_script.sh
 echo "Log: Complete: [sudo chroot ${tempdir} /bin/bash -e cleanup_script.sh]"
 
