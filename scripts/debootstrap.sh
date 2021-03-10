@@ -37,7 +37,8 @@ check_defines () {
 
 	if [ "${deb_include}" ] ; then
 		include=$(echo ${deb_include} | sed 's/ /,/g' | sed 's/\t/,/g')
-		options="${options} --include=${include}"
+		board_include=$(echo ${board_deb_include} | sed 's/ /,/g' | sed 's/\t/,/g')
+		options="${options} --include=${include},${board_include}"
 	fi
 
 	if [ "${deb_exclude}" ] ; then
