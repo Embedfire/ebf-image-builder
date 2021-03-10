@@ -507,8 +507,8 @@ if [ "x${deb_arch}" = "xarmhf" ] ; then
 			sudo cp "${OIB_DIR}/target/init_scripts/bootlogo.service" "${tempdir}/lib/systemd/system/bootlogo.service"
 			sudo chown root:root "${tempdir}/lib/systemd/system/bootlogo.service"
 
-			sudo cp "${OIB_DIR}/target/init_scripts/actlogo.service" "${tempdir}/lib/systemd/system/actlogo.service"
-			sudo chown root:root "${tempdir}/lib/systemd/system/actlogo.service"
+			#sudo cp "${OIB_DIR}/target/init_scripts/actlogo.service" "${tempdir}/lib/systemd/system/actlogo.service"
+			#sudo chown root:root "${tempdir}/lib/systemd/system/actlogo.service"
 
 			sudo cp "${OIB_DIR}/target/init_scripts/autowifi.service" "${tempdir}/lib/systemd/system/autowifi.service"
 			sudo chown root:root "${tempdir}/lib/systemd/system/actlogo.service"
