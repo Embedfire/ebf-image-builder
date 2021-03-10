@@ -1097,7 +1097,7 @@ populate_rootfs () {
 		fi
 	fi
 
-	cmdline="coherent_pool=1M net.ifnames=0"
+	cmdline="coherent_pool=1M net.ifnames=0 vt.global_cursor_default=0"
 
 	unset kms_video
 
