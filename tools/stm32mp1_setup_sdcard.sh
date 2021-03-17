@@ -699,7 +699,7 @@ create_partitions () {
 		. ./create_sdcard_from_flashlayout.sh
 		flashlayout_and_bootloader ${media} ./hwpack/$flashlayout_tsv ${TEMPDIR}/dl
 		media_boot_partition=4
-		media_rootfs_partition=5
+		media_rootfs_partition=6
 		;;
 	*)
 		echo "Using sfdisk to create partition layout"
