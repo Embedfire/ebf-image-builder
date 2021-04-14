@@ -25,8 +25,13 @@ check_update() {
 
 start_time=`date +%s`
 
-echo "Building rootfs stage requires root privileges, please enter your passowrd:"
-read PASSWORD
+if [ "$USER" != 'root' ]; then
+	echo "Building rootfs stage requires root privileges, please enter your passowrd:"
+	read PASSWORD
+else
+	PASSWORD=
+fi
+
 #build uboot
 if [ ! -f ${BUILD}/${MUBOOT_FILE} -a ! -f ${BUILD}/${MUBOOT_FILE} -o "x${FORCE_UPDATE}" = "xenable" ]; then
 		./scripts/build.sh u-boot 
@@ -34,7 +39,7 @@ fi
 
 #build kernel
 if [ ! -f ${BUILD_DEBS}/${KERNEL_DEB} -o "x${FORCE_UPDATE}" = "xenable" ]; then
-		./scripts/build.sh linux $PASSWORD
+		./scripts/build.sh linux
 		./scripts/build.sh linux-deb
 fi
 

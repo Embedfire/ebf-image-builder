@@ -498,7 +498,7 @@ echo "${rfs_hostname}" > /tmp/hostname
 sudo mv /tmp/hostname "${tempdir}/etc/hostname"
 sudo chown root:root "${tempdir}/etc/hostname"
 
-if [ "x${deb_arch}" = "xarmhf" ] ; then
+if [ "x${deb_arch}" = "xarmhf" ] || [ "x${deb_arch}" = "xarm64" ]; then
 	case "${deb_distribution}" in
 	lubancat)
 		case "${deb_codename}" in
@@ -991,7 +991,6 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 
 		mkdir -p /home/${rfs_username}/bin
 		chown ${rfs_username}:${rfs_username} /home/${rfs_username}/bin
-
 		case "\${distro}" in
 		Debian)
 
@@ -1064,9 +1063,9 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			systemctl enable rng-tools.service || true
 		fi
 
-		if [ -f /lib/systemd/system/actlogo.service ] ; then
-			systemctl enable actlogo.service || true
-		fi
+#		if [ -f /lib/systemd/system/actlogo.service ] ; then
+#			systemctl enable actlogo.service || true
+#		fi
 
 		systemctl mask getty@tty1.service || true
 

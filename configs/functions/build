@@ -77,21 +77,23 @@ build_uboot() {
 
 	rm -rf .config *.bin *.img
 
-	if [ "x${INSTALL_TYPE}" = "xeMMC/SD" -o "x${INSTALL_TYPE}" = "xALL" ] ; then
-        make distclean
-        make $UBOOT_MMC_DEFCONFIG ARCH=$ARCH CROSS_COMPILE="${UBOOT_COMPILER}"
-	    make -j${NR_JOBS} ARCH=$ARCH CROSS_COMPILE="${UBOOT_COMPILER}"
-		mkdir -p ${BUILD}
-		cp ${UBOOT_BUILD_FILE} ${BUILD}/${MUBOOT_FILE}
-    fi
+	if [ "$BUILD_SCRIPT_OF_UBOOT" == "" ]; then
+		if [ "x${INSTALL_TYPE}" = "xeMMC/SD" -o "x${INSTALL_TYPE}" = "xALL" ] ; then
+			make distclean
+			make $UBOOT_MMC_DEFCONFIG CROSS_COMPILE="${UBOOT_COMPILER}"
+			make -j${NR_JOBS} CROSS_COMPILE="${UBOOT_COMPILER}"
+			mkdir -p ${BUILD}
+			cp ${UBOOT_BUILD_FILE} ${BUILD}/${MUBOOT_FILE}
+		fi
 
-    if [ "x${INSTALL_TYPE}" = "xNAND" -o "x${INSTALL_TYPE}" = "xALL" ] ; then
-        make distclean
-        make $UBOOT_NAND_DEFCONFIG ARCH=$ARCH CROSS_COMPILE="${UBOOT_COMPILER}"
-	    make -j${NR_JOBS} ARCH=$ARCH CROSS_COMPILE="${UBOOT_COMPILER}"
-        mkdir -p ${BUILD}
-		cp ${UBOOT_BUILD_FILE} ${BUILD}/${NUBOOT_FILE}
-    fi
+		if [ "x${INSTALL_TYPE}" = "xNAND" -o "x${INSTALL_TYPE}" = "xALL" ] ; then
+			make distclean
+			make $UBOOT_NAND_DEFCONFIG  CROSS_COMPILE="${UBOOT_COMPILER}"
+			make -j${NR_JOBS}  CROSS_COMPILE="${UBOOT_COMPILER}"
+			mkdir -p ${BUILD}
+			cp ${UBOOT_BUILD_FILE} ${BUILD}/${NUBOOT_FILE}
+		fi
+	fi
 
 	if [ ! "$BUILD_BIN_SCRIPT" == "" ]; then
 		. $BUILD_SCRIPT/$BUILD_BIN_SCRIPT
@@ -104,13 +106,6 @@ build_uboot() {
 
 ## Build Linux
 build_linux() {
-	ret=0
-	if [ "$1" == "" ]; then
-		echo "Building rootfs stage requires root privileges, please enter your passowrd:"
-		read PASSWORD
-	else
-		PASSWORD=$1
-	fi
 
 	if [ "$LINUX_GIT_BRANCH" == "" ] || [ "$LINUX_MMC_DTB" == "" ] || [ "$LINUX_NAND_DTB" == "" ]; then
 		[ "$LINUX_GIT_BRANCH" == "" ] && error_msg "'LINUX_GIT_BRANCH' is empty!"

@@ -40,7 +40,7 @@ build_fire_image () {
 	# export FULL_REBUILD=
 	FULL_REBUILD=${FULL_REBUILD-1}
 	if [ -n "${FULL_REBUILD}" -o ! -e "deploy/${image_name}.tar" ]; then
-		sudo -E ${BUILD_SCRIPT}/RootStock-NG.sh -c ${BOARD_CONFIG}/${FIRE_BOARD}.conf
+		. ${BUILD_SCRIPT}/RootStock-NG.sh -c ${BOARD_CONFIG}/${FIRE_BOARD}.conf
 	fi
 
 	if [ -d ${ROOT}/deploy/${image_name} ] ; then

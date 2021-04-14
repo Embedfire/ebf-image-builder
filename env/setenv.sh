@@ -11,7 +11,6 @@ unset SUPPORTED_LINUX_TAGS
 DISTRIBUTION_ARRAY=("Debian" "Ubuntu")
 Ubuntu_RELEASE_ARRAY=("bionic" "focal")
 Debian_RELEASE_ARRAY=("buster")
-DISTRIB_ARCH_ARRAY=("armhf")
 Ubuntu_TYPE_ARRAY=("console" "qt" "desktop")
 Debian_TYPE_ARRAY=("console" "qt" "desktop")
 INSTALL_TYPE_ARRAY=("ALL" "NAND" "eMMC/SD")
@@ -19,7 +18,6 @@ INSTALL_TYPE_ARRAY=("ALL" "NAND" "eMMC/SD")
 DISTRIBUTION_ARRAY_LEN=${#DISTRIBUTION_ARRAY[@]}
 Ubuntu_RELEASE_ARRAY_LEN=${#Ubuntu_RELEASE_ARRAY[@]}
 Debian_RELEASE_ARRAY_LEN=${#Debian_RELEASE_ARRAY[@]}
-DISTRIB_ARCH_ARRAY_LEN=${#DISTRIB_ARCH_ARRAY[@]}
 Ubuntu_TYPE_ARRAY_LEN=${#Ubuntu_TYPE_ARRAY[@]}
 Debian_TYPE_ARRAY_LEN=${#Debian_TYPE_ARRAY[@]}
 INSTALL_TYPE_ARRAY_LEN=${#INSTALL_TYPE_ARRAY[@]}
@@ -29,7 +27,6 @@ LINUX=
 UBOOT=
 DISTRIBUTION=
 DISTRIB_RELEASE=
-DISTRIB_ARCH=
 INSTALL_TYPE=
 DISTRIB_TYPE=
 VENDOR=
@@ -553,15 +550,6 @@ function choose_distribution_type() {
 	done
 }
 
-## Choose distribution arch
-function choose_distribution_architecture() {
-
-	echo ""
-	echo "Set architecture to 'armhf' by default."
-	DISTRIB_ARCH="armhf"
-	export DISTRIB_ARCH
-}
-
 function choose_install_type() {
 	echo ""
 	echo "Choose install type:"
@@ -623,7 +611,6 @@ function lunch() {
 	echo "#DISTRIBUTION=${DISTRIBUTION}"
 	echo "#DISTRIB_RELEASE=${DISTRIB_RELEASE}"
 	echo "#DISTRIB_TYPE=${DISTRIB_TYPE}"
-	echo "#DISTRIB_ARCH=${DISTRIB_ARCH}"
 	echo "#INSTALL_TYPE=${INSTALL_TYPE}"
 	echo
 	echo "==========================================="
@@ -641,7 +628,6 @@ function load_config_from_file() {
 	export DISTRIBUTION
 	export DISTRIB_RELEASE
 	export DISTRIB_TYPE
-	export DISTRIB_ARCH
 	export INSTALL_TYPE
 }
 
@@ -657,7 +643,6 @@ if [ -z "$LOAD_CONFIG_FROM_FILE" ]; then
 	choose_distribution
 	choose_distribution_release
 	choose_distribution_type
-	choose_distribution_architecture
 else
 	load_config_from_file
 fi

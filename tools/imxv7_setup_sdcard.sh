@@ -843,12 +843,9 @@ kernel_detection () {
 	unset check
 	check=$(ls "${dir_check}" | grep vmlinuz- | head -n 1)
 	if [ "x${check}" != "x" ] ; then
-		check=$(file ${dir_check}/${check} | sed -nre 's/^.*Linux kernel ARM .*(zImage).*$/\1/p')
-		if [ "x${check}" != "x" ] ; then
-			arm_dt_kernel=$(ls "${dir_check}" | grep vmlinuz- | head -n 1 | awk -F'vmlinuz-' '{print $2}')
-			echo "Debug: image has: v${arm_dt_kernel}"
-			has_any_arm_kernel="enable"
-		fi
+		arm_dt_kernel=$(ls "${dir_check}" | grep vmlinuz- | head -n 1 | awk -F'vmlinuz-' '{print $2}')
+		echo "Debug: image has: v${arm_dt_kernel}"
+		has_any_arm_kernel="enable"
 	fi
 }
 

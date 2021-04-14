@@ -1,5 +1,5 @@
 all:
-ifeq ($(and $(DISTRIBUTION),$(DISTRIB_RELEASE),$(DISTRIB_TYPE),$(DISTRIB_ARCH),$(FIRE_BOARD),$(LINUX),$(UBOOT),$(INSTALL_TYPE)),)
+ifeq ($(and $(DISTRIBUTION),$(DISTRIB_RELEASE),$(DISTRIB_TYPE),$(FIRE_BOARD),$(LINUX),$(UBOOT),$(INSTALL_TYPE)),)
 	$(call help_message)
 else
 	@./scripts/create_image.sh
@@ -11,21 +11,21 @@ define help_message
 endef
 
 kernel:
-ifeq ($(and $(DISTRIBUTION),$(DISTRIB_RELEASE),$(DISTRIB_TYPE),$(DISTRIB_ARCH),$(FIRE_BOARD),$(LINUX),$(UBOOT),$(INSTALL_TYPE)),)
+ifeq ($(and $(DISTRIBUTION),$(DISTRIB_RELEASE),$(DISTRIB_TYPE),$(FIRE_BOARD),$(LINUX),$(UBOOT),$(INSTALL_TYPE)),)
 	$(call help_message)
 else
 	@./scripts/build.sh linux
 endif
 
 uboot:
-ifeq ($(and $(DISTRIBUTION),$(DISTRIB_RELEASE),$(DISTRIB_TYPE),$(DISTRIB_ARCH),$(FIRE_BOARD),$(LINUX),$(UBOOT),$(INSTALL_TYPE)),)
+ifeq ($(and $(DISTRIBUTION),$(DISTRIB_RELEASE),$(DISTRIB_TYPE),$(FIRE_BOARD),$(LINUX),$(UBOOT),$(INSTALL_TYPE)),)
 	$(call help_message)
 else
 	@./scripts/build.sh u-boot
 endif
 
 kernel-deb:
-ifeq ($(and $(DISTRIBUTION),$(DISTRIB_RELEASE),$(DISTRIB_TYPE),$(DISTRIB_ARCH),$(FIRE_BOARD),$(LINUX),$(UBOOT),$(INSTALL_TYPE)),)
+ifeq ($(and $(DISTRIBUTION),$(DISTRIB_RELEASE),$(DISTRIB_TYPE),$(FIRE_BOARD),$(LINUX),$(UBOOT),$(INSTALL_TYPE)),)
 	$(call help_message)
 else
 	@./scripts/build.sh linux-deb
@@ -42,7 +42,6 @@ info:
 	@echo "#DISTRIBUTION=${DISTRIBUTION}"
 	@echo "#DISTRIB_RELEASE=${DISTRIB_RELEASE}"
 	@echo "#DISTRIB_TYPE=${DISTRIB_TYPE}"
-	@echo "#DISTRIB_ARCH=${DISTRIB_ARCH}"
 	@echo "#INSTALL_TYPE=${INSTALL_TYPE}"
 	@echo
 	@echo "==========================================="

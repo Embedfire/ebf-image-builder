@@ -19,7 +19,7 @@ case "$TARGET" in
 		build_uboot
 		;;
 	linux)
-		build_linux $2
+		build_linux
 		;;
 	linux-deb)
 		build_linux_debs
