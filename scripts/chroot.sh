@@ -725,14 +725,18 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 		mkdir -p /boot/dtb_tmp
 		cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_MMC_DTB} /boot/dtb_tmp
 		cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_NAND_DTB} /boot/dtb_tmp
-		if [ -d "/boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays" ] ; then
-			mv  /boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays /boot
-		fi  
-		rm /boot/dtbs/${LINUX}${LOCAL_VERSION}/*.dtb
-		cp /boot/dtb_tmp/${LINUX_MMC_DTB}  /boot/dtbs/${LINUX}${LOCAL_VERSION}
-		cp /boot/dtb_tmp/${LINUX_NAND_DTB} /boot/dtbs/${LINUX}${LOCAL_VERSION}
+		#if [ -d "/boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays" ] ; then
+		#	mv  /boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays /boot
+		#fi  
+		rm /boot/dtbs/${LINUX}${LOCAL_VERSION} -rf
+		cp /boot/dtb_tmp/${LINUX_MMC_DTB}  /boot/dtbs/
+		cp /boot/dtb_tmp/${LINUX_NAND_DTB} /boot/dtbs/
 		rm -rf /boot/dtb_tmp
 
+		mkdir -p /boot/kernel
+
+		mv /boot/*${LINUX}${LOCAL_VERSION}* /boot/kernel
+	
 		if [ ! "x${deb_additional_pkgs}" = "x" ] ; then
 			#Install the user choosen list.
 			echo "Log: (chroot) Installing: ${deb_additional_pkgs}"

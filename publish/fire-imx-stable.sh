@@ -52,18 +52,14 @@ build_fire_image () {
 
 	if [ -n "${NEED_EXT4_IMG}" ]; then
 		info_msg "debug: do_ext4_img"
-		which make_ext4fs  >/dev/null 2>&1
-		if [ $? -eq 1 ];then
-			info_msg "***ERROR***: Please run 'sudo apt install android-tools-fsutils'"
-			exit -1
-		fi
+
 		cd ${ROOT}/deploy/${image_name}/
 		tmp_dir=$(mktemp -d  tmp.XXXXXXXXXX)
 		rootfs_dir=$(mktemp -d  tmp.XXXXXXXXXX)
 		sudo tar -xvf armhf-rootfs-debian-buster.tar -C ${tmp_dir}
 
 		file_size=$(du -sb ${tmp_dir} | awk '{print $1}')
-		file_size_b=$(($file_size+52428800))
+		file_size_b=$(($file_size+52428800+52428800+52428800+52428800+52428800+52428800+52428800))
 #		sudo rm -rf ${tmp_dir}/dev/*
 #		sudo make_ext4fs -l 512M rootfs.ext4 ${tmp_dir}
 		sudo dd if=/dev/zero of=rootfs.img bs=${file_size_b} count=1
@@ -87,7 +83,7 @@ build_fire_image () {
 		bootfs_dir=$(mktemp -d  tmp.XXXXXXXXXX)
 
 		sudo mount bootfs.img ${bootfs_dir}
-		img_file=$(cd ${ROOT}/deploy/${image_name}/ && ls *debian-buster-console-armhf*.img)
+		img_file=$(cd ${ROOT}/deploy/${image_name}/ && ls *debian-buster*.img)
 
 		media_loop=$(sudo losetup -f || true)
 		sudo losetup ${media_loop} ${img_file}

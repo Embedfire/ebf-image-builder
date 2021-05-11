@@ -1025,7 +1025,7 @@ populate_rootfs () {
 		echo "-----------------------------"
 	fi
 
-	dir_check="${TEMPDIR}/disk/boot/"
+	dir_check="${TEMPDIR}/disk/boot/kernel"
 	kernel_detection
 	kernel_select
 
@@ -1036,20 +1036,28 @@ populate_rootfs () {
 
 	mkdir ${TEMPDIR}/disk/home/debian/.resizerootfs
 
-	mkdir ${TEMPDIR}/disk/boot/mmc0_extlinux
-	mkdir ${TEMPDIR}/disk/boot/mmc1_extlinux
-	mkdir ${TEMPDIR}/disk/boot/nand0_extlinux
+	if [ ${MMC0extlinux} ];then
+		mkdir ${TEMPDIR}/disk/boot/mmc0_extlinux
+		wfile="${TEMPDIR}/disk/boot/mmc0_extlinux/extlinux.conf"
+		echo "${MMC0extlinux}" > ${wfile}
+	fi
 
-	cp boot.scr.uimg  ${TEMPDIR}/disk/boot/
+	if [ ${MMC1extlinux} ];then
+		mkdir ${TEMPDIR}/disk/boot/mmc1_extlinux
+		wfile="${TEMPDIR}/disk/boot/mmc1_extlinux/extlinux.conf"
+		echo "${MMC1extlinux}" > ${wfile}
+	fi
 
-	wfile="${TEMPDIR}/disk/boot//mmc0_extlinux/extlinux.conf"
-	echo "${MMC0extlinux}" > ${wfile}
+	if [ ${NANDextlinux} ];then
+		mkdir ${TEMPDIR}/disk/boot/nand0_extlinux
+		wfile="${TEMPDIR}/disk/boot/nand0_extlinux/extlinux.conf"
+		echo "${NANDextlinux}" > ${wfile}
+	fi
 
-	wfile="${TEMPDIR}/disk/boot//mmc1_extlinux/extlinux.conf"
-	echo "${MMC1extlinux}" > ${wfile}
-
-	wfile="${TEMPDIR}/disk/boot//nand0_extlinux/extlinux.conf"
-	echo "${NANDextlinux}" > ${wfile}
+	
+	if [ -f boot.scr.uimg ];then 
+		cp   ${TEMPDIR}/disk/boot/
+	fi
 
 	wfile="${TEMPDIR}/disk/boot/uEnv.txt"
 	echo "#Docs: http://elinux.org/Beagleboard:U-boot_partitioning_layout_2.0" > ${wfile}
@@ -1552,7 +1560,7 @@ while [ ! -z "$1" ] ; do
 		### seek=$((1024 * (gsize * 850)))
 		## x 850 (85%) #1GB = 850 #2GB = 1700 #4GB = 3400
 		#
-		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * msize))
+		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (msize + 100)))
 		;;
 #	--dtb)
 #		checkparm $2

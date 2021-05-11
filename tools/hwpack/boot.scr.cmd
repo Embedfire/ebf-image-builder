@@ -75,10 +75,10 @@ if test -n ${flash_firmware}; then
 fi;
 
 #load base fdt
-echo Checking for: /dtbs/4.19.94-stm-r1/stm32mp157a-basic.dtb ...;
-if test -e ${devtype} ${devnum}:${distro_bootpart} /dtbs/4.19.94-stm-r1/stm32mp157a-basic.dtb;then
+echo Checking for: /dtbs/stm32mp157a-basic.dtb ...;
+if test -e ${devtype} ${devnum}:${distro_bootpart} /dtbs/stm32mp157a-basic.dtb;then
 	echo Loading base fdt...;
-	load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} /dtbs/4.19.94-stm-r1/stm32mp157a-basic.dtb
+	load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} /dtbs/stm32mp157a-basic.dtb
 fi;
 
 if test -n ${enable_uboot_overlays}; then 
