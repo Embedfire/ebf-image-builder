@@ -27,6 +27,9 @@
 #REQUIREMENTS:
 #uEnv.txt bootscript support
 
+#global config
+source image-builder.project
+
 BOOT_LABEL="BOOT"
 
 unset USE_BETA_BOOTLOADER
@@ -38,6 +41,9 @@ ROOTFS_TYPE=ext4
 ROOTFS_LABEL=rootfs
 
 DIR="$PWD"
+
+. ${DIR}/../../scripts/common.sh
+
 TEMPDIR=$(mktemp -d)
 
 keep_net_alive () {
@@ -180,15 +186,20 @@ local_bootloader () {
 	echo "-----------------------------"
 	mkdir -p ${TEMPDIR}/dl/
 
+	if [ "${TFA_BUILD_FILE}" ]; then
+		cp ${LOCAL_BOOT_PATH}/${TFA_BUILD_FILE} ${TEMPDIR}/dl/
+		echo "tfa: ${TFA_BUILD_FILE}"
+	fi
+
 	if [ "${spl_name}" ] ; then
-		cp ${LOCAL_SPL} ${TEMPDIR}/dl/
-		SPL=${LOCAL_SPL##*/}
+		cp ${LOCAL_BOOT_PATH}/${SPL_BUILD_FILE} ${TEMPDIR}/dl/
+		SPL=${SPL_BUILD_FILE}
 		echo "SPL Bootloader: ${SPL}"
 	fi
 
 	if [ "${boot_name}" ] ; then
-		cp ${LOCAL_BOOTLOADER} ${TEMPDIR}/dl/
-		UBOOT=${LOCAL_BOOTLOADER##*/}
+		cp ${LOCAL_BOOT_PATH}/${NUBOOT_FILE} ${TEMPDIR}/dl/
+		UBOOT=${MUBOOT_FILE}
 		echo "UBOOT Bootloader: ${UBOOT}"
 	fi
 }
@@ -241,70 +252,71 @@ dl_bootloader () {
 	fi
 }
 
-generate_soc () {
-	echo "#!/bin/sh" > ${wfile}
-	echo "format=1.0" >> ${wfile}
-	echo "" >> ${wfile}
-	if [ ! "x${conf_bootloader_in_flash}" = "xenable" ] ; then
-		echo "board=${board}" >> ${wfile}
-		echo "" >> ${wfile}
-		echo "bootloader_location=${bootloader_location}" >> ${wfile}
-		echo "bootrom_gpt=${bootrom_gpt}" >> ${wfile}
-		echo "" >> ${wfile}
-		echo "dd_spl_uboot_count=${dd_spl_uboot_count}" >> ${wfile}
-		echo "dd_spl_uboot_seek=${dd_spl_uboot_seek}" >> ${wfile}
-		if [ "x${build_img_file}" = "xenable" ] ; then
-			echo "dd_spl_uboot_conf=notrunc" >> ${wfile}
-		else
-			echo "dd_spl_uboot_conf=${dd_spl_uboot_conf}" >> ${wfile}
-		fi
-		echo "dd_spl_uboot_bs=${dd_spl_uboot_bs}" >> ${wfile}
-		if [ ! "x${spl_uboot_name}" = "x" ] ; then
-			echo "dd_spl_uboot_backup=/opt/backup/uboot/${spl_uboot_name}" >> ${wfile}
-		else
-			echo "dd_spl_uboot_backup=" >> ${wfile}
-		fi
-		echo "" >> ${wfile}
-		echo "dd_uboot_count=${dd_uboot_count}" >> ${wfile}
-		echo "dd_uboot_seek=${dd_uboot_seek}" >> ${wfile}
-		if [ "x${build_img_file}" = "xenable" ] ; then
-			echo "dd_uboot_conf=notrunc" >> ${wfile}
-		else
-			echo "dd_uboot_conf=${dd_uboot_conf}" >> ${wfile}
-		fi
-		echo "dd_uboot_bs=${dd_uboot_bs}" >> ${wfile}
-		echo "dd_uboot_backup=/opt/backup/uboot/${uboot_name}" >> ${wfile}
-	else
-		echo "uboot_CONFIG_CMD_BOOTZ=${uboot_CONFIG_CMD_BOOTZ}" >> ${wfile}
-		echo "uboot_CONFIG_SUPPORT_RAW_INITRD=${uboot_CONFIG_SUPPORT_RAW_INITRD}" >> ${wfile}
-		echo "uboot_CONFIG_CMD_FS_GENERIC=${uboot_CONFIG_CMD_FS_GENERIC}" >> ${wfile}
-		echo "zreladdr=${conf_zreladdr}" >> ${wfile}
-	fi
-	echo "" >> ${wfile}
-	echo "boot_fstype=${conf_boot_fstype}" >> ${wfile}
-	echo "conf_boot_startmb=${conf_boot_startmb}" >> ${wfile}
-	echo "conf_boot_endmb=${conf_boot_endmb}" >> ${wfile}
-	echo "sfdisk_fstype=${sfdisk_fstype}" >> ${wfile}
-	echo "" >> ${wfile}
-
-	if [ "x${uboot_efi_mode}" = "xenable" ] ; then
-		echo "uboot_efi_mode=${uboot_efi_mode}" >> ${wfile}
-		echo "" >> ${wfile}
-	fi
-
-	echo "boot_label=${BOOT_LABEL}" >> ${wfile}
-	echo "rootfs_label=${ROOTFS_LABEL}" >> ${wfile}
-	echo "" >> ${wfile}
-	echo "#Kernel" >> ${wfile}
-	echo "dtb=${dtb}" >> ${wfile}
-	echo "serial_tty=${SERIAL}" >> ${wfile}
-	echo "usbnet_mem=${usbnet_mem}" >> ${wfile}
-	echo "" >> ${wfile}
-	echo "#Advanced options" >> ${wfile}
-	echo "#disable_ssh_regeneration=true" >> ${wfile}
-
-	echo "" >> ${wfile}
-}
+#generate_soc () {
+#	echo "#!/bin/sh" > ${wfile}
+#	echo "format=1.0" >> ${wfile}
+#	echo "" >> ${wfile}
+#	if [ ! "x${conf_bootloader_in_flash}" = "xenable" ] ; then
+#		echo "board=${board}" >> ${wfile}
+#		echo "" >> ${wfile}
+#		echo "bootloader_location=${bootloader_location}" >> ${wfile}
+#		echo "bootrom_gpt=${bootrom_gpt}" >> ${wfile}
+#		echo "" >> ${wfile}
+#		echo "dd_spl_uboot_count=${dd_spl_uboot_count}" >> ${wfile}
+#		echo "dd_spl_uboot_seek=${dd_spl_uboot_seek}" >> ${wfile}
+#		if [ "x${build_img_file}" = "xenable" ] ; then
+#			echo "dd_spl_uboot_conf=notrunc" >> ${wfile}
+#		else
+#			echo "dd_spl_uboot_conf=${dd_spl_uboot_conf}" >> ${wfile}
+#		fi
+#		echo "dd_spl_uboot_bs=${dd_spl_uboot_bs}" >> ${wfile}
+#		if [ ! "x${spl_uboot_name}" = "x" ] ; then
+#			echo "dd_spl_uboot_backup=/opt/backup/uboot/${spl_uboot_name}" >> ${wfile}
+#		else
+#			echo "dd_spl_uboot_backup=" >> ${wfile}
+#		fi
+#		echo "" >> ${wfile}
+#		echo "dd_uboot_count=${dd_uboot_count}" >> ${wfile}
+#		echo "dd_uboot_seek=${dd_uboot_seek}" >> ${wfile}
+#		if [ "x${build_img_file}" = "xenable" ] ; then
+#			echo "dd_uboot_conf=notrunc" >> ${wfile}
+#		else
+#			echo "dd_uboot_conf=${dd_uboot_conf}" >> ${wfile}
+#		fi
+#		echo "dd_uboot_bs=${dd_uboot_bs}" >> ${wfile}
+#		echo "dd_uboot_backup=/opt/backup/uboot/${uboot_name}" >> ${wfile}
+#	else
+#		echo "uboot_CONFIG_CMD_BOOTZ=${uboot_CONFIG_CMD_BOOTZ}" >> ${wfile}
+#		echo "uboot_CONFIG_SUPPORT_RAW_INITRD=${uboot_CONFIG_SUPPORT_RAW_INITRD}" >> ${wfile}
+#		echo "uboot_CONFIG_CMD_FS_GENERIC=${uboot_CONFIG_CMD_FS_GENERIC}" >> ${wfile}
+#		echo "zreladdr=${conf_zreladdr}" >> ${wfile}
+#	fi
+#	echo "" >> ${wfile}
+#	echo "boot_fstype=${conf_boot_fstype}" >> ${wfile}
+#	echo "conf_root_device=${conf_root_device}" >> ${wfile}
+#	echo "conf_boot_startmb=${conf_boot_startmb}" >> ${wfile}
+#	echo "conf_boot_endmb=${conf_boot_endmb}" >> ${wfile}
+#	echo "sfdisk_fstype=${sfdisk_fstype}" >> ${wfile}
+#	echo "" >> ${wfile}
+#
+#	if [ "x${uboot_efi_mode}" = "xenable" ] ; then
+#		echo "uboot_efi_mode=${uboot_efi_mode}" >> ${wfile}
+#		echo "" >> ${wfile}
+#	fi
+#
+#	echo "boot_label=${BOOT_LABEL}" >> ${wfile}
+#	echo "rootfs_label=${ROOTFS_LABEL}" >> ${wfile}
+#	echo "" >> ${wfile}
+#	echo "#Kernel" >> ${wfile}
+#	echo "dtb=${dtb}" >> ${wfile}
+#	echo "serial_tty=${SERIAL}" >> ${wfile}
+#	echo "usbnet_mem=${usbnet_mem}" >> ${wfile}
+#	echo "" >> ${wfile}
+#	echo "#Advanced options" >> ${wfile}
+#	echo "#disable_ssh_regeneration=true" >> ${wfile}
+#
+#	echo "" >> ${wfile}
+#}
 
 drive_error_ro () {
 	echo "-----------------------------"
@@ -344,6 +356,9 @@ sfdisk_partition_layout () {
 	sfdisk_boot_startmb="${conf_boot_startmb}"
 	sfdisk_boot_size_mb="${conf_boot_endmb}"
 	sfdisk_var_size_mb="${conf_var_startmb}"
+	echo "--------------"	
+	echo "${sfdisk_boot_startmb} ${sfdisk_boot_size_mb}"
+	echo "--------------"
 	if [ "x${option_ro_root}" = "xenable" ] ; then
 		sfdisk_var_startmb=$(($sfdisk_boot_startmb + $sfdisk_boot_size_mb))
 		sfdisk_rootfs_startmb=$(($sfdisk_var_startmb + $sfdisk_var_size_mb))
@@ -680,6 +695,7 @@ create_partitions () {
 		echo "Creating partition from layout table"
 		echo "Version: `LC_ALL=C sgdisk --version`"
 		echo "-----------------------------"
+		mkimage -C none -A arm -T script -d ./hwpack/${bootscr_img} boot.scr.uimg
 		. ./create_sdcard_from_flashlayout.sh
 		flashlayout_and_bootloader ${media} ./hwpack/$flashlayout_tsv ${TEMPDIR}/dl
 		media_boot_partition=4
@@ -1009,12 +1025,38 @@ populate_rootfs () {
 		echo "-----------------------------"
 	fi
 
-	dir_check="${TEMPDIR}/disk/boot/"
+	dir_check="${TEMPDIR}/disk/boot/kernel"
 	kernel_detection
 	kernel_select
 
 	if [ ! "x${uboot_eeprom}" = "x" ] ; then
 		echo "board_eeprom_header=${uboot_eeprom}" > "${TEMPDIR}/disk/boot/.eeprom.txt"
+	fi
+
+
+	mkdir ${TEMPDIR}/disk/home/debian/.resizerootfs
+
+	if [ ${MMC0extlinux} ];then
+		mkdir ${TEMPDIR}/disk/boot/mmc0_extlinux
+		wfile="${TEMPDIR}/disk/boot/mmc0_extlinux/extlinux.conf"
+		echo "${MMC0extlinux}" > ${wfile}
+	fi
+
+	if [ ${MMC1extlinux} ];then
+		mkdir ${TEMPDIR}/disk/boot/mmc1_extlinux
+		wfile="${TEMPDIR}/disk/boot/mmc1_extlinux/extlinux.conf"
+		echo "${MMC1extlinux}" > ${wfile}
+	fi
+
+	if [ ${NANDextlinux} ];then
+		mkdir ${TEMPDIR}/disk/boot/nand0_extlinux
+		wfile="${TEMPDIR}/disk/boot/nand0_extlinux/extlinux.conf"
+		echo "${NANDextlinux}" > ${wfile}
+	fi
+
+	
+	if [ -f boot.scr.uimg ];then 
+		cp   ${TEMPDIR}/disk/boot/
 	fi
 
 	wfile="${TEMPDIR}/disk/boot/uEnv.txt"
@@ -1046,33 +1088,24 @@ populate_rootfs () {
 		if [ "x${conf_board}" != "x" ] ; then
 			echo "" >> ${wfile}
 			echo "###U-Boot Overlays###" >> ${wfile}
-			echo "###Documentation: http://elinux.org/Beagleboard:BeagleBoneBlack_Debian#U-Boot_Overlays" >> ${wfile}
+			echo "###Documentation: https://embed-linux-tutorial.readthedocs.io/zh_CN/latest/linux_driver/device_tree_rgb_led.html" >> ${wfile}
 			echo "###Master Enable" >> ${wfile}
 			if [ "x${uboot_cape_overlays}" = "xenable" ] ; then
 				echo "enable_uboot_overlays=1" >> ${wfile}
 			else
 				echo "#enable_uboot_overlays=1" >> ${wfile}
 			fi
-			echo "###" >> ${wfile}
-			echo "###custom overlays" >> ${wfile}
-			echo "#uboot_overlay_addr0=/lib/firmware/<file0>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr1=/lib/firmware/<file1>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr2=/lib/firmware/<file2>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr3=/lib/firmware/<file3>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr4=/lib/firmware/<file4>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr5=/lib/firmware/<file5>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr6=/lib/firmware/<file6>.dtbo" >> ${wfile}
-			echo "#uboot_overlay_addr7=/lib/firmware/<file7>.dtbo" >> ${wfile}
-			echo "###" >> ${wfile}
-			echo "###U-Boot fdt tweaks... (60000 = 384KB)" >> ${wfile}
-			echo "#uboot_fdt_buffer=0x60000" >> ${wfile}
-			echo "###U-Boot Overlays###" >> ${wfile}
+			echo "#overlay_start">> ${wfile}
+			echo "" >> ${wfile}
+			echo "${OVERLAYS}">> ${wfile}
+			echo "" >> ${wfile}
+			echo "#overlay_end">> ${wfile}
 
 			echo "" >> ${wfile}
 		fi
 	fi
 
-	cmdline="coherent_pool=1M net.ifnames=0 quiet"
+	cmdline="coherent_pool=1M net.ifnames=0 vt.global_cursor_default=0"
 
 	unset kms_video
 
@@ -1101,38 +1134,10 @@ populate_rootfs () {
 			echo "" >> ${wfile}
 		fi
 
-		if [ "x${usb_flasher}" = "xenable" ] ; then
-			if [ ! "x${oem_flasher_script}" = "x" ] ; then
-				echo "cmdline=init=/opt/scripts/tools/eMMC/${oem_flasher_script}" >> ${wfile}
-			else
-				echo "cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-from-usb-media.sh" >> ${wfile}
-			fi
-		elif [ "x${emmc_flasher}" = "xenable" ] ; then
-			echo "##enable Generic eMMC Flasher:" >> ${wfile}
-			echo "cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh" >> ${wfile}
-			echo "" >> ${wfile}
-			echo "##if eMMC boot failed, disable eMMC specific boot method" >> ${wfile}
-			echo "uenvcmd=mmc partconf 1 0 0 0" >> ${wfile}
-		else
-			echo "##enable Generic eMMC Flasher:" >> ${wfile}
-			echo "##make sure, these tools are installed: dosfstools rsync" >> ${wfile}
-			echo "#cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3.sh" >> ${wfile}
-			echo "" >> ${wfile}
-			echo "##if eMMC boot failed, disable eMMC specific boot method" >> ${wfile}
-			echo "#uenvcmd=mmc partconf 1 0 0 0" >> ${wfile}
-		fi
+		echo "#flash_firmware=once" >> ${wfile}
+		
 		echo "" >> ${wfile}
-	else
-		if [ "x${usb_flasher}" = "xenable" ] ; then
-			if [ ! "x${oem_flasher_script}" = "x" ] ; then
-				echo "cmdline=init=/opt/scripts/tools/eMMC/${oem_flasher_script}" >> ${wfile}
-			else
-				echo "cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-from-usb-media.sh" >> ${wfile}
-			fi
-		elif [ "x${emmc_flasher}" = "xenable" ] ; then
-			echo "##enable Generic eMMC Flasher:" >> ${wfile}
-			echo "cmdline=init=/opt/scripts/tools/eMMC/init-eMMC-flasher-v3-no-eeprom.sh" >> ${wfile}
-		fi
+		
 	fi
 
 	board=${conf_board}
@@ -1270,10 +1275,16 @@ populate_rootfs () {
 
 	fi #RootStock-NG
 
-	if [ ! "x${uboot_name}" = "x" ] ; then
+	if [ ! "x${TFA_BUILD_FILE}" = "x" ];then
+		echo "Backup version of tfa: /opt/backup/tfa/"
+		mkdir -p ${TEMPDIR}/disk/opt/backup/tfa/
+		cp -v ${TEMPDIR}/dl/${TFA_BUILD_FILE} ${TEMPDIR}/disk/opt/backup/tfa/${TFA_BUILD_FILE}
+	fi
+
+	if [ ! "x${MUBOOT_FILE}" = "x" ] ; then
 		echo "Backup version of u-boot: /opt/backup/uboot/"
 		mkdir -p ${TEMPDIR}/disk/opt/backup/uboot/
-		cp -v ${TEMPDIR}/dl/${UBOOT} ${TEMPDIR}/disk/opt/backup/uboot/${uboot_name}
+		cp -v ${TEMPDIR}/dl/${MUBOOT_FILE} ${TEMPDIR}/disk/opt/backup/uboot/${MUBOOT_FILE}
 	fi
 
 	if [ ! "x${spl_uboot_name}" = "x" ] ; then
@@ -1286,12 +1297,13 @@ populate_rootfs () {
 	fi
 
 	if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
-		git clone https://github.com/turmary/boot-scripts ${TEMPDIR}/disk/opt/scripts/ --depth 1
-		sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
-	else
-		cd ${TEMPDIR}/disk/opt/scripts/
-		git pull
-		cd -
+		#sudo git clone https://gitee.com/wildfireteam/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts-bak/ --depth 1
+		#if [ -f ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh ] ; then
+		#	cp ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh  ${TEMPDIR}/disk/opt/scripts-bak/boot
+		#	rm -r ${TEMPDIR}/disk/opt/scripts/
+		#fi
+		#mv ${TEMPDIR}/disk/opt/scripts-bak ${TEMPDIR}/disk/opt/scripts/
+		sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1 -b dev_wind
 		sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
 	fi
 
@@ -1352,8 +1364,27 @@ populate_rootfs () {
 	# shorter networking timeout
 	sed -i -re 's/^ *TimeoutStartSec=.*/TimeoutStartSec=1sec/g' ./lib/systemd/system/networking.service
 
+	# stm32mp1 securetty
+	{
+		echo "# ST stm32 ports"
+		echo "${SERIAL}"
+		echo "ttyGS0"
+	} >> ./etc/securetty
+
+	# Using module bcmdhd, not module brcmfmac
+	echo blacklist brcmfmac > ./etc/modprobe.d/blacklist-ap6xxx.conf
+
+	echo "RuntimeWatchdogSec=30" >> ./etc/systemd/system.conf
+	echo "ShutdownWatchdogSec=5min" >> ./etc/systemd/system.conf
+
 	sync
 	sync
+	cd "${DIR}/"
+
+
+	cd ${TEMPDIR}/disk
+	tar -cf "${DIR}/${ROOTFS}" . 
+
 	cd "${DIR}/"
 
 	if [ "x${option_ro_root}" = "xenable" ] ; then
@@ -1412,52 +1443,6 @@ check_mmc () {
 		lsblk | grep -v sr0
 		echo ""
 		exit
-	fi
-}
-
-process_dtb_conf () {
-	if [ "${conf_warning}" ] ; then
-		show_board_warning
-	fi
-
-	echo "-----------------------------"
-
-	#defaults, if not set...
-	case "${bootloader_location}" in
-	fatfs_boot)
-		conf_boot_startmb=${conf_boot_startmb:-"1"}
-		;;
-	dd_uboot_boot|dd_spl_uboot_boot)
-		conf_boot_startmb=${conf_boot_startmb:-"4"}
-		;;
-	*)
-		conf_boot_startmb=${conf_boot_startmb:-"4"}
-		;;
-	esac
-
-	#https://wiki.linaro.org/WorkingGroups/KernelArchived/Projects/FlashCardSurvey
-	conf_root_device=${conf_root_device:-"/dev/mmcblk0"}
-
-	#error checking...
-	if [ ! "${conf_boot_fstype}" ] ; then
-		conf_boot_fstype="${ROOTFS_TYPE}"
-	fi
-
-	case "${conf_boot_fstype}" in
-	fat)
-		sfdisk_fstype=${sfdisk_fstype:-"0xE"}
-		;;
-	ext2|ext3|ext4|btrfs)
-		sfdisk_fstype="L"
-		;;
-	*)
-		echo "Error: [conf_boot_fstype] not recognized, stopping..."
-		exit
-		;;
-	esac
-
-	if [ "x${uboot_cape_overlays}" = "xenable" ] ; then
-		echo "U-Boot Overlays Enabled..."
 	fi
 }
 
@@ -1550,10 +1535,12 @@ while [ ! -z "$1" ] ; do
 	--img|--img-[12468]gb)
 		checkparm $2
 		name=${2:-image}
-		gsize=$(echo "$1" | sed -ne 's/^--img-\([[:digit:]]\+\)gb$/\1/p')
+		#gsize=$(echo "$1" | sed -ne 's/^--img-\([[:digit:]]\+\)gb$/\1/p')
 		# --img defaults to --img-2gb
-		gsize=${gsize:-2}
-		imagename=${name%.img}-${gsize}gb.img
+		#gsize=${gsize:-2}
+		read msize < /tmp/npipe
+		rm /tmp/npipe		
+		imagename=${name%.img}-${msize}M.img
 		media="${DIR}/${imagename}"
 		build_img_file="enable"
 		check_root
@@ -1573,15 +1560,15 @@ while [ ! -z "$1" ] ; do
 		### seek=$((1024 * (gsize * 850)))
 		## x 850 (85%) #1GB = 850 #2GB = 1700 #4GB = 3400
 		#
-		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (gsize * 850)))
+		dd if=/dev/zero of="${media}" bs=1024 count=0 seek=$((1024 * (msize + 100)))
 		;;
-	--dtb)
-		checkparm $2
-		dtb_board="$2"
-		dir_check="${DIR}/"
-		kernel_detection
-		check_dtb_board
-		;;
+#	--dtb)
+#		checkparm $2
+#		dtb_board="$2"
+#		dir_check="${DIR}/"
+#		kernel_detection
+#		check_dtb_board
+#		;;
 	--ro)
 		conf_var_startmb="2048"
 		option_ro_root="enable"
@@ -1605,7 +1592,7 @@ while [ ! -z "$1" ] ; do
 		;;
 	--bootloader)
 		checkparm $2
-		LOCAL_BOOTLOADER="$2"
+		LOCAL_BOOT_PATH="$2"
 		USE_LOCAL_BOOT=1
 		;;
 	--use-beta-bootloader)
@@ -1688,12 +1675,12 @@ if [ ! "${media}" ] ; then
 	usage
 fi
 
-if [ "${error_invalid_dtb}" ] ; then
-	echo "-----------------------------"
-	echo "ERROR: --dtb undefined"
-	echo "-----------------------------"
-	usage
-fi
+#if [ "${error_invalid_dtb}" ] ; then
+#	echo "-----------------------------"
+#	echo "ERROR: --dtb undefined"
+#	echo "-----------------------------"
+#	usage
+#fi
 
 if ! is_valid_rootfs_type ${ROOTFS_TYPE} ; then
 	echo "ERROR: ${ROOTFS_TYPE} is not a valid root filesystem type"
@@ -1740,5 +1727,5 @@ fi
 create_partitions
 populate_boot
 populate_rootfs
-exit 0
+
 #

@@ -401,9 +401,6 @@ if [ "x${repo_external}" = "xenable" ] ; then
 	echo "deb [arch=${repo_external_arch}] ${repo_external_server} buster ${repo_external_components}" >> ${wfile}
 	echo "deb [arch=${repo_external_arch}] ${repo_external_server} carp-imx6 ${repo_external_components}" >> ${wfile}
 	echo "#deb-src [arch=${repo_external_arch}] ${repo_external_server} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
-
-
-
 fi
 
 if [ "x${repo_flat}" = "xenable" ] ; then
@@ -510,11 +507,11 @@ if [ "x${deb_arch}" = "xarmhf" ] || [ "x${deb_arch}" = "xarm64" ]; then
 			sudo cp "${OIB_DIR}/target/init_scripts/bootlogo.service" "${tempdir}/lib/systemd/system/bootlogo.service"
 			sudo chown root:root "${tempdir}/lib/systemd/system/bootlogo.service"
 
-			sudo cp "${OIB_DIR}/target/init_scripts/actlogo.service" "${tempdir}/lib/systemd/system/actlogo.service"
-			sudo chown root:root "${tempdir}/lib/systemd/system/actlogo.service"
+			#sudo cp "${OIB_DIR}/target/init_scripts/actlogo.service" "${tempdir}/lib/systemd/system/actlogo.service"
+			#sudo chown root:root "${tempdir}/lib/systemd/system/actlogo.service"
 
 			sudo cp "${OIB_DIR}/target/init_scripts/autowifi.service" "${tempdir}/lib/systemd/system/autowifi.service"
-			sudo chown root:root "${tempdir}/lib/systemd/system/actlogo.service"
+			sudo chown root:root "${tempdir}/lib/systemd/system/autowifi.service"
 
 			distro="Debian"
 			;;
@@ -734,21 +731,21 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			fi
 		fi
 
-		#mkdir -p /boot/dtb_tmp
-		#cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_MMC_DTB} /boot/dtb_tmp
-		#cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_NAND_DTB} /boot/dtb_tmp
+		mkdir -p /boot/dtb_tmp
+		cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_MMC_DTB} /boot/dtb_tmp
+		cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_NAND_DTB} /boot/dtb_tmp
 		#if [ -d "/boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays" ] ; then
-			#mv  /boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays /boot
+		#	mv  /boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays /boot
 		#fi  
-		#rm /boot/dtbs/${LINUX}${LOCAL_VERSION}/*.dtb
-		#mv /boot/dtb_tmp/${LINUX_MMC_DTB}  /boot/dtbs/${LINUX}${LOCAL_VERSION}
-		#mv /boot/dtb_tmp/${LINUX_NAND_DTB} /boot/dtbs/${LINUX}${LOCAL_VERSION}
-		#rm -rf /boot/dtb_tmp
+		rm /boot/dtbs/${LINUX}${LOCAL_VERSION} -rf
+		cp /boot/dtb_tmp/${LINUX_MMC_DTB}  /boot/dtbs/
+		cp /boot/dtb_tmp/${LINUX_NAND_DTB} /boot/dtbs/
+		rm -rf /boot/dtb_tmp
 
 		mkdir -p /boot/kernel
 
 		mv /boot/*${LINUX}${LOCAL_VERSION}* /boot/kernel
-
+	
 		if [ ! "x${deb_additional_pkgs}" = "x" ] ; then
 			#Install the user choosen list.
 			echo "Log: (chroot) Installing: ${deb_additional_pkgs}"
@@ -1550,6 +1547,13 @@ __EOF__
 
 ###MUST BE LAST...
 sudo mv "${DIR}/cleanup_script.sh" "${tempdir}/cleanup_script.sh"
+if [ -e ${OIB_DIR}/firmware/gpu/galcore.ko ];then
+	mkdir -p ${tempdir}/lib/modules/${LINUX}${LOCAL_VERSION}/extra/
+	sudo cp "${OIB_DIR}/firmware/gpu/galcore.ko" "${tempdir}/lib/modules/${LINUX}${LOCAL_VERSION}/extra/"
+	depmod -a
+fi
+sudo chroot "${tempdir}" /bin/bash -e cleanup_script.sh
+echo "Log: Complete: [sudo chroot ${tempdir} /bin/bash -e cleanup_script.sh]"
 
 #add /boot/uEnv.txt update script
 if [ -d "${tempdir}/etc/kernel/postinst.d/" ] ; then
@@ -1604,10 +1608,14 @@ if [ "x${chroot_COPY_SETUP_SDCARD}" = "xenable" ] ; then
 	else
 		sudo cp "${DIR}/tools/${chroot_custom_setup_sdcard}" "${DIR}/deploy/${export_filename}"
 	fi
-
+	sudo mkdir -p "${DIR}/deploy/${export_filename}/hwpack/"
 	if [ "x${chroot_sdcard_flashlayout}" != "x" ] ; then
 		sudo cp "${DIR}/tools/${chroot_sdcard_flashlayout}" "${DIR}/deploy/${export_filename}/"
 		sudo cp "${DIR}"/tools/hwpack/*.tsv "${DIR}/deploy/${export_filename}/hwpack/"
+	fi
+
+	if [ "x${bootscr_img}" != "x" ] ; then
+		sudo cp "${DIR}/tools/hwpack/${bootscr_img}" "${DIR}/deploy/${export_filename}/hwpack/"
 	fi
 
 	if [ -n "${chroot_uenv_txt}" -a -r "${OIB_DIR}/target/boot/${chroot_uenv_txt}" ] ; then

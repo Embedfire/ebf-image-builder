@@ -74,6 +74,11 @@ if [ -f ${udir}/uEnv.txt ] ; then
 	fi
 fi
 
+
 mkdir -p /boot/kernel
 
-mv /boot/*${version}* /boot/kernel
+mv  /boot/*${version}* /boot/kernel
+
+mv /boot/dtbs/${version}/*.dtb /boot/dtbs/
+
+rm -rf /boot/dtbs/${version}

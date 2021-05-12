@@ -3,6 +3,63 @@
 # build_linux
 # build_linux_debs
 
+## Build TF-A
+build_tfa() {
+	ret=0
+	echo "$TFA_GIT_BRANCH"
+	if [ "$TFA_GIT_BRANCH" == "" ]; then
+		error_msg "'UBOOT_GIT_BRANCH' is empty!"
+		return -1
+	fi	
+
+	cd ${ROOT}
+	if [ ! -d ${TFA_DIR}/.git ]; then
+		info_msg "tfa repository does not exist, clone tfa repository('$TFA_GIT_BRANCH') from '$TFA_SOURCE_URL'..."
+		## Clone tfa from Khadas GitHub
+		git clone $GIT_CLONE_OPTIONS $TFA_SOURCE_URL -b $TFA_GIT_BRANCH
+		[ $? != 0 ] && error_msg "Failed to clone 'tfa'" && return -1
+	fi
+
+	cd ${TFA_DIR}/
+
+	if ! git branch | grep "^* $TFA_GIT_BRANCH$" > /dev/null; then
+		if ! git branch | grep "^  $TFA_GIT_BRANCH$" > /dev/null; then
+			# New branch? Try to fetch it.
+			info_msg "Fetching '$TFA_GIT_BRANCH' from '$TFA_SOURCE_URL'..."
+			git fetch origin $TFA_GIT_BRANCH:$TFA_GIT_BRANCH
+		fi
+
+		info_msg "tfa: Switch to branch '$TFA_GIT_BRANCH'"
+		make distclean
+		# Check modifications
+		check_modifications || {
+			error_msg "tfa: can't checkout to branch '$TFA_GIT_BRANCH', please commit your modifications and try again!"
+			return -1
+		}
+
+		git checkout $TFA_GIT_BRANCH
+		[ $? != 0 ] && error_msg "tfa: Switch to branch '$TFA_GIT_BRANCH' failed." && return -1
+	else
+		info_msg "tfa: Already on branch '$TFA_GIT_BRANCH'"
+	fi
+
+	# Update tfa
+	update_git_repo "$PWD" "$TFA_GIT_BRANCH"
+
+	info_msg "Build tfa..."
+
+    make ARCH=arm CROSS_COMPILE="${TFA_COMPILER}" distclean
+
+	info_msg "Build tfa..."
+
+	make -j${NR_JOBS} ARCH=arm CROSS_COMPILE="${TFA_COMPILER}"  ${TFA_EXTRA_ARGS}
+
+	cp ${TFA_DIR}//build/trusted/${TFA_BUILD_FILE} ${BUILD}/${TFA_BUILD_FILE}
+
+	ret=$?
+
+	return $ret
+}
 
 ## Build U-Boot
 build_uboot() {
@@ -80,24 +137,34 @@ build_uboot() {
 	if [ "$BUILD_SCRIPT_OF_UBOOT" == "" ]; then
 		if [ "x${INSTALL_TYPE}" = "xeMMC/SD" -o "x${INSTALL_TYPE}" = "xALL" ] ; then
 			make distclean
-			make $UBOOT_MMC_DEFCONFIG CROSS_COMPILE="${UBOOT_COMPILER}"
-			make -j${NR_JOBS} CROSS_COMPILE="${UBOOT_COMPILER}"
+			make $UBOOT_MMC_DEFCONFIG CROSS_COMPILE="${UBOOT_COMPILER}" ARCH=arm
+			make -j${NR_JOBS} CROSS_COMPILE="${UBOOT_COMPILER}" ${UBOOT_EXTRA_ARGS}
 			mkdir -p ${BUILD}
 			cp ${UBOOT_BUILD_FILE} ${BUILD}/${MUBOOT_FILE}
+			if [ "${SPL_BUILD_FILE}" ]; then
+				cp ${SPL_BUILD_FILE} ${BUILD}
+			fi
 		fi
 
-		if [ "x${INSTALL_TYPE}" = "xNAND" -o "x${INSTALL_TYPE}" = "xALL" ] ; then
+		if [ "x${INSTALL_TYPE}" = "xNAND" ] || [ "x${INSTALL_TYPE}" = "xALL" -a "${MUBOOT_FILE}" != "${NUBOOT_FILE}" ] ; then
 			make distclean
-			make $UBOOT_NAND_DEFCONFIG  CROSS_COMPILE="${UBOOT_COMPILER}"
-			make -j${NR_JOBS}  CROSS_COMPILE="${UBOOT_COMPILER}"
+			make $UBOOT_NAND_DEFCONFIG  CROSS_COMPILE="${UBOOT_COMPILER}" ARCH=arm
+			make -j${NR_JOBS}  ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}" ${UBOOT_EXTRA_ARGS}
 			mkdir -p ${BUILD}
 			cp ${UBOOT_BUILD_FILE} ${BUILD}/${NUBOOT_FILE}
+			if [ "${SPL_BUILD_FILE}" ] ; then
+				cp ${SPL_BUILD_FILE} ${BUILD}
+			fi		
 		fi
 	fi
 
 	if [ ! "$BUILD_BIN_SCRIPT" == "" ]; then
 		. $BUILD_SCRIPT/$BUILD_BIN_SCRIPT
 	fi
+
+
+       	
+    
 
 	ret=$?
 
@@ -179,8 +246,8 @@ build_linux() {
 
 	info_msg "Build linux..."
 
-	make ARCH=$ARCH $LINUX_DEFCONFIG CROSS_COMPILE="${KERNEL_COMPILER}" O=${BUILD_IMAGES} 
-	make -j${NR_JOBS} ARCH=$ARCH CROSS_COMPILE="${KERNEL_COMPILER}" O=${BUILD_IMAGES}
+	make ARCH=arm $LINUX_DEFCONFIG CROSS_COMPILE="${KERNEL_COMPILER}" O=${BUILD_IMAGES} 
+	make -j${NR_JOBS} ARCH=arm CROSS_COMPILE="${KERNEL_COMPILER}" O=${BUILD_IMAGES} ${KERNEL_EXTRA_ARGS}
 }
 
 ## Build linux debs

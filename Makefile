@@ -31,6 +31,13 @@ else
 	@./scripts/build.sh linux-deb
 endif
 
+tfa:
+ifeq ($(and $(DISTRIBUTION),$(DISTRIB_RELEASE),$(DISTRIB_TYPE),$(DISTRIB_ARCH),$(FIRE_BOARD),$(LINUX),$(UBOOT),$(INSTALL_TYPE)),)
+	$(call help_message)
+else
+	@./scripts/build.sh tfa
+endif
+
 info:
 	@echo ""
 	@echo "Current environment:"
