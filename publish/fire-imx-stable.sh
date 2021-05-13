@@ -58,7 +58,7 @@ build_fire_image () {
 		cd ${ROOT}/deploy/${image_name}/
 		tmp_dir=$(mktemp -d  tmp.XXXXXXXXXX)
 		rootfs_dir=$(mktemp -d  tmp.XXXXXXXXXX)
-		sudo tar -xvf armhf-rootfs-debian-buster.tar -C ${tmp_dir}
+		sudo tar -xvf armhf-rootfs-lubancat-buster.tar -C ${tmp_dir}
 
 		file_size=$(du -sb ${tmp_dir} | awk '{print $1}')
 		file_size_b=$(($file_size+52428800+52428800+52428800+52428800+52428800+52428800+52428800))
@@ -85,7 +85,7 @@ build_fire_image () {
 		bootfs_dir=$(mktemp -d  tmp.XXXXXXXXXX)
 
 		sudo mount bootfs.img ${bootfs_dir}
-		img_file=$(cd ${ROOT}/deploy/${image_name}/ && ls *debian-buster*.img)
+		img_file=$(cd ${ROOT}/deploy/${image_name}/ && ls *-armhf-*.img)
 
 		media_loop=$(sudo losetup -f || true)
 		sudo losetup ${media_loop} ${img_file}

@@ -30,11 +30,14 @@ if [ "$USER" != 'root' ]; then
 	read PASSWORD
 else
 	PASSWORD=
+fi
 
 
 #build tfa
 if [ ! -f ${BUILD}/${TFA_BUILD_FILE} -o ! -f ${BUILD}/${TFA_BUILD_FILE} -o "x${FORCE_UPDATE}" = "xenable" ]; then
-		./scripts/build.sh tfa
+		if [ ! -z ${TFA_BUILD_FILE} ]; then
+			./scripts/build.sh tfa
+		fi
 fi
 
 #build uboot

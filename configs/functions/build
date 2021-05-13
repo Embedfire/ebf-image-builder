@@ -8,7 +8,7 @@ build_tfa() {
 	ret=0
 	echo "$TFA_GIT_BRANCH"
 	if [ "$TFA_GIT_BRANCH" == "" ]; then
-		error_msg "'UBOOT_GIT_BRANCH' is empty!"
+		error_msg "'TFA_GIT_BRANCH' is empty!"
 		return -1
 	fi	
 
@@ -246,8 +246,8 @@ build_linux() {
 
 	info_msg "Build linux..."
 
-	make ARCH=arm $LINUX_DEFCONFIG CROSS_COMPILE="${KERNEL_COMPILER}" O=${BUILD_IMAGES} 
-	make -j${NR_JOBS} ARCH=arm CROSS_COMPILE="${KERNEL_COMPILER}" O=${BUILD_IMAGES} ${KERNEL_EXTRA_ARGS}
+	make ARCH=$ARCH  $LINUX_DEFCONFIG CROSS_COMPILE="${KERNEL_COMPILER}" O=${BUILD_IMAGES} 
+	make -j${NR_JOBS} ARCH=$ARCH  CROSS_COMPILE="${KERNEL_COMPILER}" O=${BUILD_IMAGES} ${KERNEL_EXTRA_ARGS}
 }
 
 ## Build linux debs

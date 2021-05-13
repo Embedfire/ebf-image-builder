@@ -1056,7 +1056,7 @@ populate_rootfs () {
 
 	
 	if [ -f boot.scr.uimg ];then 
-		cp   ${TEMPDIR}/disk/boot/
+		cp  boot.scr.uimg ${TEMPDIR}/disk/boot/
 	fi
 
 	wfile="${TEMPDIR}/disk/boot/uEnv.txt"

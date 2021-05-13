@@ -732,14 +732,20 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 		fi
 
 		mkdir -p /boot/dtb_tmp
-		cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_MMC_DTB} /boot/dtb_tmp
-		cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_NAND_DTB} /boot/dtb_tmp
-		#if [ -d "/boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays" ] ; then
-		#	mv  /boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays /boot
-		#fi  
+
+		if [ -f /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_MMC_DTB} ];then
+			cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_MMC_DTB} /boot/dtb_tmp
+			cp /boot/dtb_tmp/${LINUX_MMC_DTB}  /boot/dtbs/
+		fi
+		if [ -f /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_NAND_DTB} ];then
+			cp /boot/dtbs/${LINUX}${LOCAL_VERSION}/${LINUX_NAND_DTB} /boot/dtb_tmp
+			#if [ -d "/boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays" ] ; then
+			#	mv  /boot/dtbs/${LINUX}${LOCAL_VERSION}/overlays /boot
+			#fi  
+			cp /boot/dtb_tmp/${LINUX_NAND_DTB} /boot/dtbs/
+		fi
+
 		rm /boot/dtbs/${LINUX}${LOCAL_VERSION} -rf
-		cp /boot/dtb_tmp/${LINUX_MMC_DTB}  /boot/dtbs/
-		cp /boot/dtb_tmp/${LINUX_NAND_DTB} /boot/dtbs/
 		rm -rf /boot/dtb_tmp
 
 		mkdir -p /boot/kernel
@@ -1564,8 +1570,6 @@ if [ -d "${tempdir}/etc/kernel/postinst.d/" ] ; then
 	fi
 fi
 
-sudo chroot "${tempdir}" /bin/bash -e cleanup_script.sh
-echo "Log: Complete: [sudo chroot ${tempdir} /bin/bash -e cleanup_script.sh]"
 
 if [ -f "${tempdir}/usr/bin/qemu-arm-static" ] ; then
 	sudo rm -f "${tempdir}/usr/bin/qemu-arm-static" || true
