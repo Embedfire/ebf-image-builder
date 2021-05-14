@@ -13,5 +13,7 @@ job1:
 
   script:
     - source env/ci_imx6.sh && make uboot DOWNLOAD_MIRROR=china
-    - cp  build/u-boot-*.imx  /mnt/share
+    - pwd
+    - ls
+    #- cp  build/u-boot-*.imx  /mnt/share
 
