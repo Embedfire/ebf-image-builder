@@ -12,8 +12,10 @@ job1:
   stage: build_imx6
 
   script:
-    - source env/ci_imx6.sh && make uboot DOWNLOAD_MIRROR=china
+    - chmod +x ./env/ci_imx6.sh
+    - ./env/ci_imx6.sh
     - pwd
     - ls
-    #- cp  build/u-boot-*.imx  /mnt/share
+    - cp 
+    - cp  build/u-boot-*.imx  /mnt/share
 
