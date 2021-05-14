@@ -21,7 +21,7 @@ build_image:
     - ./env/ci_imx6.sh
 
     - cp build/u-boot-*.imx  "$image_dir"
-    #- cp build/debs/linux-image*.deb  "$image_dir"
-    #- cp deploy/*/*.img  "$image_dir"
+    - cp build/debs/linux-image*.deb  "$image_dir"
+    - cp deploy/*/*.img  "$image_dir"
 
 
