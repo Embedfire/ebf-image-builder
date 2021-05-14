@@ -1,12 +1,26 @@
+
 # 定义 stages
 stages:
   - build_imx6
+  - build_output
 
 # 定义 job
 job1:
-  stage: build_imx6
+
   tags: 
-    - image-builder-20210223
+    - ENABLE
+  stage: build_imx6
 
   script:
-    - source env/ci_imx6.sh && make DOWNLOAD_MIRROR=china
+    - source env/ci_imx6.sh && make uboot DOWNLOAD_MIRROR=china
+
+job2:
+
+  tags:
+    - ENABLE
+  stage: build_output
+
+  script:
+
+    - cp  build/u-boot-*.imx  /mnt/share
+
