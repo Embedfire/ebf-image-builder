@@ -13,10 +13,6 @@ job1:
 
   script:
     - chmod +x ./env/ci_imx6.sh
-    #- ./env/ci_imx6.sh
-    - pwd
-    - ls /mnt/
-    - ls /mnt/share/
-
-    #- cp  build/u-boot-*.imx  /mnt/share
+    - ./env/ci_imx6.sh
+    - cp  build/u-boot-*.imx  /mnt/share
 
