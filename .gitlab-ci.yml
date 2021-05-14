@@ -4,12 +4,30 @@ stages:
   - build_imx6
 #  - build_output
 
-# 定义 job
+#再次编译时不需要清除以下目录及文件，以git项目路径为相对路径
+cache: 
+  paths:
+
+    - .project
+    - build/
+    - ebf_linux_kernel/
+    - ebf_linux_uboot/
+    - git/
+    - latest_version
+    #- ignore/
+    
+
+    
+# 定义 build_image  job
 build_image:
 
   tags: 
     - ENABLE
   stage: build_imx6
+
+  #指定分支更新进行编译
+  only:
+    - CI/CD_test
 
   before_script:
     - time=$(date +%Y-%m-%d)
@@ -18,10 +36,16 @@ build_image:
     - mkdir -p  "$image_dir"
 
   script:
+
+    #编译镜像
     - ./env/ci_imx6.sh
 
+    #拷贝到指定文件夹
     - cp build/u-boot-*.imx  "$image_dir"
     - cp build/debs/linux-image*.deb  "$image_dir"
     - cp deploy/*/*.img  "$image_dir"
+
+    #压缩img镜像为xz格式
+    - xz -z "$image_dir"/*.img
 
 
