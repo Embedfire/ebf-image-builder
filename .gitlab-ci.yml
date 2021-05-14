@@ -15,7 +15,7 @@ job1:
     - chmod +x ./env/ci_imx6.sh
     #- ./env/ci_imx6.sh
     - pwd
-    - ls /
+    - ls /mnt/share
 
     #- cp  build/u-boot-*.imx  /mnt/share
 
