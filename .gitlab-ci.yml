@@ -6,7 +6,6 @@ stages:
 #再次编译时不需要清除以下目录及文件，以git项目路径为相对路径
 cache: 
   paths:
-
     - .project
     - build/
     - ebf_linux_kernel/
@@ -21,7 +20,7 @@ build_image:
 
   tags: 
     - ENABLE
-    
+
   stage: build_imx6
 
   #指定分支更新进行编译
