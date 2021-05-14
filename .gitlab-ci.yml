@@ -2,7 +2,7 @@
 # 定义 stages
 stages:
   - build_imx6
-  - build_output
+#  - build_output
 
 # 定义 job
 job1:
@@ -13,14 +13,5 @@ job1:
 
   script:
     - source env/ci_imx6.sh && make uboot DOWNLOAD_MIRROR=china
-
-job2:
-
-  tags:
-    - ENABLE
-  stage: build_output
-
-  script:
-
     - cp  build/u-boot-*.imx  /mnt/share
 
