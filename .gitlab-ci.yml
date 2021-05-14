@@ -5,14 +5,23 @@ stages:
 #  - build_output
 
 # 定义 job
-job1:
+build_image:
 
   tags: 
     - ENABLE
   stage: build_imx6
 
-  script:
+  before_script:
+    - time=$(date +%Y-%m-%d)
+    - image_dir="/mnt/share/$time"
     - chmod +x ./env/ci_imx6.sh
+    - mkdir -p  "$image_dir"
+
+  script:
     - ./env/ci_imx6.sh
-    - cp  build/u-boot-*.imx  /mnt/share
+
+    - cp build/u-boot-*.imx  "$image_dir"
+    #- cp build/debs/linux-image*.deb  "$image_dir"
+    #- cp deploy/*/*.img  "$image_dir"
+
 
