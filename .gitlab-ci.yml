@@ -28,10 +28,17 @@ build_image:
     - CI/CD_test
 
   before_script:
+ 
+    - cat >> /etc/apt/apt.conf.d/01proxy << EOF
+    - Acquire::http::Proxy "http://10.255.200.109:3142";
+    - EOF
+    
     - time=$(date +%Y-%m-%d)
     - image_dir="/mnt/share/$time"
     - chmod +x ./env/ci_imx6.sh
     - mkdir -p  "$image_dir"
+
+
 
   script:
 
