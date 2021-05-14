@@ -16,6 +16,5 @@ job1:
     - ./env/ci_imx6.sh
     - pwd
     - ls
-    - cp 
     - cp  build/u-boot-*.imx  /mnt/share
 
