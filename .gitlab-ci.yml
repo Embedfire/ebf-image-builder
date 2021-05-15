@@ -7,7 +7,7 @@ variables:
   GIT_USERNAME: zhanqinghui
 
   #image-builder的存放目录
-  IMAGE_BUILDER_DIR: /opt/ebf-image-builder
+  
 
 # 定义 stages
 stages:
@@ -34,6 +34,7 @@ build_image:
     - time=$(date +%Y-%m-%d)
     - image_dir="/mnt/share/$time"
     - chmod +x ./env/ci_imx6.sh
+    - IMAGE_BUILDER_DIR="/opt/ebf-image-builder"
 
   script:
 
