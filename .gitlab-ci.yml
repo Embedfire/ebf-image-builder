@@ -42,6 +42,7 @@ build_image:
 
     - pwd
     - cd /opt/ebf-image-builder
+    - pwd
     - git pull
     - chmod +x /opt/ebf-image-builder/env/ci_imx6.sh
     
