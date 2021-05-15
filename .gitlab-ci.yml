@@ -6,13 +6,15 @@ variables:
   #git 用户名
   GIT_USERNAME: zhanqinghui
 
+  KEY: 123456
+
 # 定义 stages
 stages:
   - build_imx6
 
 #缓存路径
 cache: 
-  key: 1
+  key: "$KEY"
     paths:
       - .project
       - build/
