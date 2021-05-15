@@ -12,13 +12,14 @@ stages:
 
 #缓存路径
 cache: 
-  paths:
-    - .project
-    - build/
-    - ebf_linux_kernel/
-    - ebf_linux_uboot/
-    - git/
-    - latest_version
+  key:
+    paths:
+      - .project
+      - build/
+      - ebf_linux_kernel/
+      - ebf_linux_uboot/
+      - git/
+      - latest_version
     
 # 定义 build_image  job
 build_image:
@@ -43,15 +44,15 @@ build_image:
 
   script:
 
-    - pwd
-    - cd /opt/ebf-image-builder
-    - pwd
-    - git pull
-    - chmod +x /opt/ebf-image-builder/env/ci_imx6.sh
+
+    #- cd /opt/ebf-image-builder
+    #- git pull
+    #- chmod +x /opt/ebf-image-builder/env/ci_imx6.sh
     
     
     #编译镜像
-    - /opt/ebf-image-builder/env/ci_imx6.sh
+    #- /opt/ebf-image-builder/env/ci_imx6.sh
+    - ./env/ci_imx6.sh
 
     #拷贝到指定文件夹
     #- mkdir -p  "$image_dir"
