@@ -6,7 +6,7 @@ variables:
   #git 用户名
   GIT_USERNAME: zhanqinghui
 
-  #需要编译image-builder目录
+  #image-builder的存放目录
   IMAGE_BUILDER_DIR: /opt/ebf-image-builder
 
 # 定义 stages
@@ -37,10 +37,9 @@ build_image:
 
   script:
 
-
     - cd "$IMAGE_BUILDER_DIR"
     - git pull
-    - chmod +x /opt/ebf-image-builder/env/ci_imx6.sh
+    - chmod +x "$IMAGE_BUILDER_DIR"/env/ci_imx6.sh
     
     
     #编译镜像
