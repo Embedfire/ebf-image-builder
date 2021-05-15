@@ -4,7 +4,7 @@
 CI_CONFIG="$1"
 
 #拉取image-builder更新
-sleep 10     
+sleep 20     
 git fetch --all
 git reset --hard CI/CD_test
 git pull
