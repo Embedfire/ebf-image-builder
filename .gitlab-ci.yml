@@ -3,7 +3,7 @@
 stages:
   - build_imx6
 
-#再次编译时不需要清除以下目录及文件，以git项目路径为相对路径
+#缓存路径
 cache: 
   paths:
     - .project
@@ -29,9 +29,6 @@ build_image:
 
   before_script:
  
-    - cat >> /etc/apt/apt.conf.d/01proxy << EOF
-    - Acquire::http::Proxy "http://10.255.200.109:3142";
-    - EOF
     
     - time=$(date +%Y-%m-%d)
     - image_dir="/mnt/share/$time"
