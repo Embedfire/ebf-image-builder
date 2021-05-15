@@ -1,4 +1,11 @@
 
+
+variables:
+  #git 邮箱
+  GIT_USEREMAIL: 1442190496@qq.com
+  #git 用户名
+  GIT_USERNAME: zhanqinghui
+
 # 定义 stages
 stages:
   - build_imx6
@@ -12,8 +19,6 @@ cache:
     - ebf_linux_uboot/
     - git/
     - latest_version
-    
-
     
 # 定义 build_image  job
 build_image:
@@ -29,25 +34,27 @@ build_image:
 
   before_script:
  
-    
     - time=$(date +%Y-%m-%d)
     - image_dir="/mnt/share/$time"
     - chmod +x ./env/ci_imx6.sh
     - mkdir -p  "$image_dir"
 
-
-
   script:
+
+    - pwd
+    - cd /opt/ebf-image-builder
+    - git pull
+    
 
     #编译镜像
     - ./env/ci_imx6.sh
 
     #拷贝到指定文件夹
-    - cp build/u-boot-*.imx  "$image_dir"
-    - cp build/debs/linux-image*.deb  "$image_dir"
-    - cp deploy/*/*.img  "$image_dir"
+    #- cp build/u-boot-*.imx  "$image_dir"
+    #- cp build/debs/linux-image*.deb  "$image_dir"
+    #- cp deploy/*/*.img  "$image_dir"
 
     #压缩img镜像为xz格式
-    - xz -z "$image_dir"/*.img
+    #- xz -z "$image_dir"/*.img
 
 
