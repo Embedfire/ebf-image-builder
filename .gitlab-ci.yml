@@ -12,7 +12,7 @@ stages:
 
 #缓存路径
 cache: 
-  key:
+  key: 1
     paths:
       - .project
       - build/
