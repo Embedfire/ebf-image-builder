@@ -33,18 +33,37 @@ build_image_job:
     - git config --global user.email "$GIT_USEREMAIL"
     - git config --global user.name "$GIT_USERNAME"
 
-    - time=$(date +%Y-%m-%d)
-    - image_dir="/mnt/share/$time"
-
   script:
 
+    #
     - cd $IMAGE_BUILDER_DIR
-    - git pull
+    - git fetch --all
+    - git reset --hard CI/CD_test
     
     #编译镜像
     - $IMAGE_BUILDER_DIR/env/ci_builder.sh  imx6ull_pro_console_def.conf
 
-    #拷贝到指定文件夹
+  
+
+build_output_job:
+
+  tags: 
+    - ENABLE
+
+  stage: build_output
+
+  #指定分支更新进行编译
+  only:
+    - CI/CD_test
+
+  before_script:
+
+    - time=$(date +%Y-%m-%d)
+    - image_dir="/mnt/share/$time"    
+
+  script:
+
+  #拷贝到指定文件夹
     - mkdir -p  "$image_dir"
     - cp $IMAGE_BUILDER_DIR/build/u-boot-*.imx                       "$image_dir"     #uboot
     - cp $IMAGE_BUILDER_DIR/build/images/arch/arm/boot/zImage        "$image_dir"     #内核
@@ -55,8 +74,7 @@ build_image_job:
     - cp "$IMAGE_BUILDER_DIR"/deploy/*$time*/*.img  "$image_dir"                  #完整的img镜像
 
     #压缩img镜像为xz格式
-    - xz -z $image_dir/*.img
+    #- xz -z $image_dir/*.img
 
     #删除临时文件夹
     - rm -r $IMAGE_BUILDER_DIR/ignore
-
