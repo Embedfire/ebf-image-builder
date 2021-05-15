@@ -36,20 +36,21 @@ build_image:
  
     - time=$(date +%Y-%m-%d)
     - image_dir="/mnt/share/$time"
-    - chmod +x ./env/ci_imx6.sh
-    - mkdir -p  "$image_dir"
+    #- chmod +x ./env/ci_imx6.sh
 
   script:
 
     - pwd
     - cd /opt/ebf-image-builder
     - git pull
+    - chmod +x /opt/ebf-image-builder/env/ci_imx6.sh
     
-
+    
     #编译镜像
-    - ./env/ci_imx6.sh
+    - /opt/ebf-image-builder/env/ci_imx6.sh
 
     #拷贝到指定文件夹
+    #- mkdir -p  "$image_dir"
     #- cp build/u-boot-*.imx  "$image_dir"
     #- cp build/debs/linux-image*.deb  "$image_dir"
     #- cp deploy/*/*.img  "$image_dir"
