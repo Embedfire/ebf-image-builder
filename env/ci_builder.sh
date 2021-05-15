@@ -2,5 +2,5 @@
 
 source ./env/$1
 
-make  DOWNLOAD_MIRROR=china 
+echo "" | make  DOWNLOAD_MIRROR=china 
 
