@@ -16,9 +16,9 @@ cache:
   key: ${CI_BUILD_STAGE}
   paths:
     - build/
-    - ebf_linux_kernel/
+    #- ebf_linux_kernel/
     - ebf_linux_uboot/
-    - git/
+    #- git/
     
 # 定义 build_image  job
 build_image:
@@ -39,7 +39,7 @@ build_image:
 
     - time=$(date +%Y-%m-%d)
     - image_dir="/mnt/share/$time"
-    #- chmod +x ./env/ci_imx6.sh
+    - chmod +x ./env/ci_imx6.sh
 
   script:
 
