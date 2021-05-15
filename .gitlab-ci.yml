@@ -38,7 +38,7 @@ build_image:
 
   script:
 
-    - cd "$IMAGE_BUILDER_DIR"
+    - cd $IMAGE_BUILDER_DIR
     - git pull
     - chmod +x "$IMAGE_BUILDER_DIR"/env/ci_imx6.sh
     
