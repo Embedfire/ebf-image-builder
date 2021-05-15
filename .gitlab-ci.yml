@@ -36,13 +36,10 @@ build_image_job:
   script:
 
     #
-    - sleep 10     #延时10秒后再获取
     - cd $IMAGE_BUILDER_DIR
-    - git fetch --all
-    - git reset --hard CI/CD_test
     
     #编译镜像
-    - $IMAGE_BUILDER_DIR/env/ci_builder.sh  imx6ull_pro_console_def.conf
+    - ./env/ci_builder.sh  imx6ull_pro_console_def.conf
 
 build_output_job:
 
