@@ -14,14 +14,14 @@ stages:
 
 #缓存路径
 cache: 
-  key: "$KEY"
-    paths:
-      - .project
-      - build/
-      - ebf_linux_kernel/
-      - ebf_linux_uboot/
-      - git/
-      - latest_version
+  key: 
+  paths:
+    - .project
+    - build/
+    - ebf_linux_kernel/
+    - ebf_linux_uboot/
+    - git/
+    - latest_version
     
 # 定义 build_image  job
 build_image:
