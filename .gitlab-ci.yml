@@ -6,7 +6,6 @@ variables:
   #git 用户名
   GIT_USERNAME: zhanqinghui
 
-  KEY: 123456
 
 # 定义 stages
 stages:
@@ -14,14 +13,12 @@ stages:
 
 #缓存路径
 cache: 
-  key: 
+  key: ${CI_BUILD_STAGE}
   paths:
-    - .project
     - build/
     - ebf_linux_kernel/
     - ebf_linux_uboot/
     - git/
-    - latest_version
     
 # 定义 build_image  job
 build_image:
