@@ -47,7 +47,7 @@ build_image_job:
     - git pull
     - chmod +x  ./env/test.sh
     - ./env/test.sh $CI_COMMIT_BRANCH
-    - ./env/test.sh $CI_BUILDS_DIR
+    - ./env/test.sh $CI_JOB_STAGE
     - echo $CI_BUILDS_DIR
     - echo $CI_JOB_STAGE
 
