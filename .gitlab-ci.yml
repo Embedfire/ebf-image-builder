@@ -39,8 +39,11 @@ build_image_job:
     #
     - cd $IMAGE_BUILDER_DIR
 
+    #test
+    - ./env/test.sh $CI_COMMIT_BRANCH
     - echo $CI_COMMIT_BRANCH
     
+
     #编译镜像
     #- ./env/ci_builder.sh  imx6ull_pro_console_def.conf
 
