@@ -8,6 +8,9 @@ variables:
 
   #image-builder的存放目录
   IMAGE_BUILDER_DIR: /opt/ebf-image-builder
+
+  #
+  CI_BUILDS_DIR: /opt/ebf-image-builder
  
 
 # 定义 stages
@@ -37,7 +40,7 @@ build_image_job:
   script:
 
     #
-    - cd $IMAGE_BUILDER_DIR
+    #- cd $IMAGE_BUILDER_DIR
 
     #test
     #拉取image-builder更新
