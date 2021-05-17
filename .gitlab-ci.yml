@@ -2,9 +2,9 @@
 
 variables:
   #git 邮箱
-  #GIT_USEREMAIL: 1442190496@qq.com
+  #GITLAB_USER_EMAIL: 1442190496@qq.com
   #git 用户名
-  #GIT_USERNAME: zhanqinghui
+  #GITLAB_USER_NAME: zhanqinghui
 
   
 
