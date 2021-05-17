@@ -9,8 +9,7 @@ variables:
   #image-builder的存放目录
   IMAGE_BUILDER_DIR: /opt/ebf-image-builder
 
-  #
-  CI_BUILDS_DIR: /opt/ebf-image-builder
+
  
 
 # 定义 stages
@@ -50,9 +49,9 @@ build_image_job:
     #- git pull
     - pwd
     - chmod +x  ./env/test.sh
-    - ./env/test.sh $CI_COMMIT_BRANCH
+    - ./env/test.sh $CI_COMMIT_REF_NAME
     - ./env/test.sh $CI_JOB_STAGE
-    - echo $CI_BUILDS_DIR
+    - echo $CI_COMMIT_REF_NAME
     - echo $CI_JOB_STAGE
 
     #编译镜像
