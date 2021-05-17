@@ -45,7 +45,7 @@ build_image_job:
     - git fetch --all
     - git reset --hard CI/CD_test
     - git pull
-    - chmod -x  ./env/test.sh
+    - chmod +x  ./env/test.sh
     - ./env/test.sh $CI_COMMIT_BRANCH
     
 
