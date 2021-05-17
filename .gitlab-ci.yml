@@ -41,10 +41,11 @@ build_image_job:
 
     #test
     #拉取image-builder更新
-    - sleep 20     
+    #- sleep 20     
     - git fetch --all
     - git reset --hard CI/CD_test
     - git pull
+    - chmod -x  ./env/test.sh
     - ./env/test.sh $CI_COMMIT_BRANCH
     
 
