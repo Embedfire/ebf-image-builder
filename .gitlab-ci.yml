@@ -39,8 +39,8 @@ build_image_job:
 
   #指定分支更新进行编译
   only:
-    #- CI/CD_test
-    - master
+    - CI/CD_test
+    #- master
 
   before_script:
  
@@ -63,8 +63,8 @@ build_output_job:
 
   #指定分支更新进行编译
   only:
-    #- CI/CD_test
-    - master
+    - CI/CD_test
+    #- master
 
   before_script:
     - time=$(date +%Y-%m-%d)

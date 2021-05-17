@@ -1,7 +1,7 @@
 #!/bin/bash
 
-IMAGE_BUILDER_BRANCH="$1"
-CI_CONFIG="$2"
+IMAGE_BUILDER_BRANCH="$1"       #当前分支
+CI_CONFIG="$2"                  #板级配置文件信息
 
 
 #拉取image-builder更新
