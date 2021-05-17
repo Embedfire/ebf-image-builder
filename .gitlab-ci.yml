@@ -13,7 +13,7 @@ variables:
 # 定义 stages
 stages:
   - build_image
-  - build_output
+#  - build_output
 
 
 # 定义 build_image  job
@@ -39,7 +39,7 @@ build_image_job:
     - cd $IMAGE_BUILDER_DIR
     
     #编译镜像
-    - ./env/ci_builder.sh  imx6ull_pro_console_def.conf
+    #- ./env/ci_builder.sh  imx6ull_pro_console_def.conf
 
 build_output_job:
 
