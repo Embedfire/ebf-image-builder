@@ -47,7 +47,7 @@ build_image_job:
     - git pull
     - chmod +x  ./env/test.sh
     - ./env/test.sh $CI_COMMIT_BRANCH
-    
+    - ./env/test.sh $CI_BUILDS_DIR
 
     #编译镜像
     #- ./env/ci_builder.sh  imx6ull_pro_console_def.conf
