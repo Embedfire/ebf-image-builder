@@ -2,22 +2,31 @@
 
 variables:
   #git 邮箱
-  #GITLAB_USER_EMAIL: 1442190496@qq.com
+  GIT_USEREMAIL: 1442190496@qq.com
   #git 用户名
-  #GITLAB_USER_NAME: zhanqinghui
-
-  
+  GIT_USERNAME: zhanqinghui
 
   #image-builder的存放目录
   IMAGE_BUILDER_DIR: /opt/ebf-image-builder
 
-
- 
-
 # 定义 stages
 stages:
+  - test
   - build_image
   - build_output
+
+test_job:
+
+  tags: 
+    - ENABLE
+
+  stage: build_image  
+
+  only:
+    - CI/CD_test
+
+  script:
+    - pwd
 
 
 # 定义 build_image  job
@@ -30,37 +39,20 @@ build_image_job:
 
   #指定分支更新进行编译
   only:
-    - CI/CD_test
-    #- master
+    #- CI/CD_test
+    - master
 
   before_script:
  
-    #- git config --global user.email "$GIT_USEREMAIL"
-    #- git config --global user.name "$GIT_USERNAME"
+    - git config --global user.email "$GIT_USEREMAIL"
+    - git config --global user.name "$GIT_USERNAME"
 
   script:
 
-    #
-    #- cd $IMAGE_BUILDER_DIR
+    - cd $IMAGE_BUILDER_DIR
 
-    #test
-    #拉取image-builder更新
-    #- sleep 20     
-    #- git fetch --all
-    #- git reset --hard CI/CD_test
-    #- git pull
-    - pwd
-    - chmod +x  ./env/test.sh
-    - ./env/test.sh $CI_JOB_STAGE
-
-    - echo $CI_COMMIT_REF_NAME  #当前分支
-    - echo $CI_JOB_STAGE
-
-    - echo $GITLAB_USER_EMAIL
-    - echo $GITLAB_USER_NAME
-
-    #编译镜像
-    #- ./env/ci_builder.sh  imx6ull_pro_console_def.conf
+    #编译镜像 分支  配置文件
+    - ./env/ci_builder.sh $CI_COMMIT_REF_NAME imx6ull_pro_console_def.conf
 
 build_output_job:
 

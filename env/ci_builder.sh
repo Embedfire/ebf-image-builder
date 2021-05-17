@@ -1,12 +1,13 @@
 #!/bin/bash
 
+IMAGE_BUILDER_BRANCH="$1"
+CI_CONFIG="$2"
 
-CI_CONFIG="$1"
 
 #拉取image-builder更新
 sleep 20     
 git fetch --all
-git reset --hard CI/CD_test
+git reset --hard $IMAGE_BUILDER_BRANCH
 git pull
 
 
