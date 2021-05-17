@@ -40,8 +40,12 @@ build_image_job:
     - cd $IMAGE_BUILDER_DIR
 
     #test
+    #拉取image-builder更新
+    - sleep 20     
+    - git fetch --all
+    - git reset --hard CI/CD_test
+    - git pull
     - ./env/test.sh $CI_COMMIT_BRANCH
-    - echo $CI_COMMIT_BRANCH
     
 
     #编译镜像
