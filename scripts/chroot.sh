@@ -716,11 +716,6 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			rm -f /tmp/${KERNEL_DEB}
 		fi
 		
-		if [ -n "`find /tmp -maxdepth 1 -name '*.deb'`" ] ; then
-			dpkg -i /tmp/*.deb
-			rm -f /tmp/*.deb
-		fi
-
 		if [ ! "x${repo_local_file}" = "x" ] ; then
 			if [ -d "/tmp/local_dir" ] ; then
 				if [ ! -d "${system_directory}" ] ; then
@@ -728,6 +723,11 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 				fi 
 				mv /tmp/local_dir/* ${system_directory}
 				rm -rf /tmp/local_dir
+			fi
+
+			if [ -d "/tmp/local_pkg_deb" ] ; then
+				dpkg -i /tmp/local_pkg_deb/*.deb
+				rm -rf /tmp/local_pkg_deb
 			fi
 		fi
 
@@ -1304,8 +1304,18 @@ if [ -n "`find ${LOCAL_PKG} -maxdepth 1 -name '*.deb'`" ] ; then
 fi
 
 if [ ! "x${repo_local_file}" = "x" ] ; then
-	mkdir ${tempdir}/tmp/local_dir
-	sudo cp -r ${LOCAL_DIR}/* ${tempdir}/tmp/local_dir
+
+	if [ -d  ${LOCAL_DIR} ] ; then
+		mkdir ${tempdir}/tmp/local_dir
+		sudo cp -r ${LOCAL_DIR}/* ${tempdir}/tmp/local_dir
+	fi
+
+	if [ -d  ${LOCAL_PKG} ] ; then
+		if [ -n "`find ${LOCAL_PKG} -maxdepth 1 -name '*.deb'`" ] ; then
+			mkdir ${tempdir}/tmp/local_pkg_deb
+			sudo cp ${LOCAL_PKG}/*.deb ${tempdir}/tmp/local_pkg_deb
+		fi
+	fi
 fi
 
 if [ "x${include_firmware}" = "xenable" ] ; then
