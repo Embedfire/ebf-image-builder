@@ -2,6 +2,8 @@
 
 set -e -o pipefail
 
+time=$(date +%Y-%m-%d)
+
 ## Parameters
 source configs/common.conf
 
@@ -24,6 +26,13 @@ check_update() {
 #fi
 
 start_time=`date +%s`
+
+## 历史编译目录
+mkdir -p history/${target_name}/${DISTRIBUTION}/${time}/image
+mkdir -p history/${target_name}/${DISTRIBUTION}/${time}/uboot
+mkdir -p history/${target_name}/${DISTRIBUTION}/${time}/kernel_deb 
+mkdir -p history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
+mkdir -p history/tempdir/basefs/${DISTRIBUTION}/${DISTRIB_RELEASE}
 
 if [ "$USER" != 'root' ]; then
 	echo "Building rootfs stage requires root privileges, please enter your passowrd:"
@@ -54,8 +63,27 @@ fi
 ## Rootfs stage requires root privileges
 echo "$PASSWORD" | sudo -E -S $ROOT/publish/fire-imx-stable.sh
 
+
+
+#编译输出
+cp ${BUILD}/${NUBOOT_FILE}  history/${target_name}/${DISTRIBUTION}/${time}/uboot
+cp ${BUILD}/${MUBOOT_FILE}  history/${target_name}/${DISTRIBUTION}/${time}/uboot
+cp ${BUILD_DEBS}/${KERNEL_DEB}   history/${target_name}/${DISTRIBUTION}/${time}/kernel_deb
+cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/*.img  \
+   history/${target_name}/${DISTRIBUTION}/${time}/image
+
+cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/*rootfs* \
+   history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
+
+echo "$(date +%Y-%m-%d-%H:%M:%S)  ${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}"  >> history/history_version
+
+
+
+
+
 echo -e "\nDone."
 echo -e "\n`date`"
 
 end_time=`date +%s`
 time_cal $(($end_time - $start_time))
+
