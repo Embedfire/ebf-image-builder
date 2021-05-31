@@ -11,6 +11,7 @@ if [ ! "$SCRIPT_URL" == "" ]; then
 fi
 
 if [ ! "$BUILD_SCRIPT_OF_UBOOT" == "" ]; then
+		mkdir -p ${BUILD}
 		. $BUILD_SCRIPT_OF_UBOOT evb-rk3328
 fi
 
