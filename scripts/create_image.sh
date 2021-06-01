@@ -50,7 +50,7 @@ if [ ! -f ${BUILD}/${TFA_BUILD_FILE} -o ! -f ${BUILD}/${TFA_BUILD_FILE} -o "x${F
 fi
 
 #build uboot
-if [ ! -f ${BUILD}/${MUBOOT_FILE} -a ! -f ${BUILD}/${MUBOOT_FILE} -o "x${FORCE_UPDATE}" = "xenable" ]; then
+if [ ! -f ${BUILD}/${MUBOOT_FILE} -a ! -f ${BUILD}/${NUBOOT_FILE} -o "x${FORCE_UPDATE}" = "xenable" ]; then
 		./scripts/build.sh u-boot 
 fi
 
