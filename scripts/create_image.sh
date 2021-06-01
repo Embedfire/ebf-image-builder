@@ -32,7 +32,7 @@ mkdir -p history/${target_name}/${DISTRIBUTION}/${time}/image
 mkdir -p history/${target_name}/${DISTRIBUTION}/${time}/uboot
 mkdir -p history/${target_name}/${DISTRIBUTION}/${time}/kernel_deb 
 mkdir -p history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
-mkdir -p history/tempdir/basefs/${DISTRIBUTION}/${DISTRIB_RELEASE}
+mkdir -p history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}
 
 if [ "$USER" != 'root' ]; then
 	echo "Building rootfs stage requires root privileges, please enter your passowrd:"

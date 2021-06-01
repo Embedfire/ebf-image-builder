@@ -159,9 +159,9 @@ run_roostock_ng () {
 
 	/bin/bash -e "${BUILD_SCRIPT}/install_dependencies.sh" || { exit 1 ; }
 
-	if [ -f "${DIR}/history/tempdir/basefs/${DISTRIBUTION}/${DISTRIB_RELEASE}/basefs.tar" ] ;then
+	if [ -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/basefs.tar" ] ;then
 		cd $tempdir
-		sudo tar -xvf "${DIR}/history/tempdir/basefs/${DISTRIBUTION}/${DISTRIB_RELEASE}/basefs.tar"
+		sudo tar -xvf "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/basefs.tar"
 		cd $DIR 
 	else
 		/bin/bash -e "${BUILD_SCRIPT}/debootstrap.sh" || { exit 1 ; }	#创建基本根文件系统
