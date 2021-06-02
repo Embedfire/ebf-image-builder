@@ -90,7 +90,7 @@ make  DOWNLOAD_MIRROR=china
 
 #cope to target_dir
 
-cp -ur ${IMAGE_BUILDER_DIR}/history  ${TARGET_DIR}/
+cp -ur ${IMAGE_BUILDER_DIR}/history/*  ${TARGET_DIR}/
 
 end_time=`date +%s`
 time_cal $(($end_time - $start_time))
