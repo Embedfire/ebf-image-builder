@@ -52,7 +52,7 @@ build_fire_image () {
 		exit -1
 	fi
 
-	if [ -n "${NEED_EXT4_IMG}" ]; then
+	if [ ${NEED_EXT4_IMG} ]; then
 		info_msg "debug: do_ext4_img"
 
 		cd ${ROOT}/deploy/${image_name}/

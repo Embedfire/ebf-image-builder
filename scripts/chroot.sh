@@ -399,7 +399,7 @@ if [ "x${repo_external}" = "xenable" ] ; then
 	echo "#deb ${repo_external_server_backup1} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 	echo "#deb ${repo_external_server_backup2} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 	echo "deb [arch=${repo_external_arch}] ${repo_external_server} buster ${repo_external_components}" >> ${wfile}
-	echo "deb [arch=${repo_external_arch}] ${repo_external_server} carp-imx6 ${repo_external_components}" >> ${wfile}
+	echo "deb [arch=${repo_external_arch}] ${repo_external_server} ${ebf_repo_dist} ${repo_external_components}" >> ${wfile}
 	echo "#deb-src [arch=${repo_external_arch}] ${repo_external_server} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 fi
 

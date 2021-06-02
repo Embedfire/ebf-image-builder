@@ -6,7 +6,7 @@
 ## Build TF-A
 build_tfa() {
 	ret=0
-	echo "$TFA_GIT_BRANCH"
+
 	if [ "$TFA_GIT_BRANCH" == "" ]; then
 		error_msg "'TFA_GIT_BRANCH' is empty!"
 		return -1
