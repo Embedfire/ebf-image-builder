@@ -9,6 +9,8 @@ source configs/common.conf
 
 ## Board configuraions
 source ${BOARD_CONFIG}/${FIRE_BOARD}.conf
+source configs/user.conf
+
 
 ##common functions
 source configs/functions/functions
@@ -66,19 +68,48 @@ echo "$PASSWORD" | sudo -E -S $ROOT/publish/fire-imx-stable.sh
 
 
 #编译输出
-cp ${BUILD}/${NUBOOT_FILE}  history/${target_name}/${DISTRIBUTION}/${time}/uboot
-cp ${BUILD}/${MUBOOT_FILE}  history/${target_name}/${DISTRIBUTION}/${time}/uboot
-cp ${BUILD_DEBS}/${KERNEL_DEB}   history/${target_name}/${DISTRIBUTION}/${time}/kernel_deb
+cp ${BUILD}/${NUBOOT_FILE}  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/uboot
+cp ${BUILD}/${MUBOOT_FILE}  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/uboot
+cp ${BUILD_DEBS}/${KERNEL_DEB}   ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/kernel_deb
 cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/*.img  \
-   history/${target_name}/${DISTRIBUTION}/${time}/image
+   ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/image
 
 cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/*rootfs* \
-   history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
+   ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
 
-echo "$(date +%Y-%m-%d-%H:%M:%S)  ${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}"  >> history/history_version
+#echo "$(date +%Y-%m-%d-%H:%M:%S)  ${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}"  >> ${ROOT}/history/history_version
 
 
+echo "镜像使用说明文档："  > ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo "https://doc.embedfire.com/lubancat/os_release_note/zh/latest/index.html" >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo " " >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
 
+echo "主机名：$rfs_hostname" >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo "用户名：$rfs_username" >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo "密码: $rfs_password" >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo " " >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+
+cd $UBOOT_DIR
+echo "uboot仓库：$UBOOT_SOURCE_URL " >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo "uboot分支：$UBOOT_GIT_BRANCH " >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo "uboot提交ID $(git log | grep commit | head -n 1 |  awk '{print $2}')" >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo " " >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+
+cd $LINUX_DIR
+echo "内核仓库：$LINUX_SOURCE_URL " >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo "内核分支：$LINUX_GIT_BRANCH " >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo "内核提交ID $(git log | grep commit | head -n 1 |  awk '{print $2}')" >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo " " >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+
+cd $ROOT
+echo "image-builder仓库：https://gitee.com/Embedfire/ebf-image-builder" >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo "image-builder分支：image-builder_2.0" >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo "image-builder提交ID: $(git log | grep commit | head -n 1 |  awk '{print $2}')"  >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo " " >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+
+
+#压缩
+xz -zf ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/image/*.img
 
 
 echo -e "\nDone."
