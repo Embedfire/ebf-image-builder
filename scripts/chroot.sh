@@ -74,7 +74,7 @@ check_defines () {
 	fi
 
 	case "${deb_distribution}" in
-	debian)
+	debian|lubancat)
 		deb_components=${deb_components:-"main contrib non-free"}
 		#deb_mirror=${deb_mirror:-"deb.debian.org/debian"}
 		;;
@@ -252,11 +252,24 @@ if [ "x${host_arch}" != "xarmv7l" ] && [ "x${host_arch}" != "xaarch64" ] ; then
 	fi
 fi
 
-chroot_mount_run
-echo "Log: Running: debootstrap second-stage in [${tempdir}]"
-sudo chroot "${tempdir}" debootstrap/debootstrap --second-stage
-echo "Log: Complete: [sudo chroot ${tempdir} debootstrap/debootstrap --second-stage]"
-report_size
+if [ ! -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/basefs.tar" ] ;then
+
+	chroot_mount_run
+	echo "Log: Running: debootstrap second-stage in [${tempdir}]"
+	sudo chroot "${tempdir}" debootstrap/debootstrap --second-stage
+	echo "Log: Complete: [sudo chroot ${tempdir} debootstrap/debootstrap --second-stage]"
+	report_size
+
+	#打包文件系统
+	echo "....................................................."
+	echo "packing base rootfs......"
+	cd "$tempdir"
+	mkdir -p ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}
+	sudo tar  -cf ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/basefs.tar .  #压缩基本的根文件系统
+	cd "$DIR" 
+	echo "....................................................."
+
+fi
 
 if [ "x${chroot_very_small_image}" = "xenable" ] ; then
 	#so debootstrap just extracts the *.deb's, so lets clean this up hackish now,
@@ -315,7 +328,7 @@ sudo mv /tmp/02apt-get-clean "${tempdir}/etc/apt/apt.conf.d/02apt-get-clean"
 echo 'Acquire::Languages "none";' > /tmp/02-no-languages
 sudo mv /tmp/02-no-languages "${tempdir}/etc/apt/apt.conf.d/02-no-languages"
 
-if [ "x${deb_distribution}" = "xdebian" ] ; then
+if [ "x${deb_distribution}" = "xdebian" -o "x${deb_distribution}" = "lubancat" ] ; then
 	#apt: /var/lib/apt/lists/, store compressed only
 	case "${deb_codename}" in
 	jessie)
@@ -716,11 +729,6 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			rm -f /tmp/${KERNEL_DEB}
 		fi
 		
-		if [ -n "`find /tmp -maxdepth 1 -name '*.deb'`" ] ; then
-			dpkg -i /tmp/*.deb
-			rm -f /tmp/*.deb
-		fi
-
 		if [ ! "x${repo_local_file}" = "x" ] ; then
 			if [ -d "/tmp/local_dir" ] ; then
 				if [ ! -d "${system_directory}" ] ; then
@@ -728,6 +736,11 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 				fi 
 				mv /tmp/local_dir/* ${system_directory}
 				rm -rf /tmp/local_dir
+			fi
+
+			if [ -d "/tmp/local_pkg_deb" ] ; then
+				dpkg -i /tmp/local_pkg_deb/*.deb
+				rm -rf /tmp/local_pkg_deb
 			fi
 		fi
 
@@ -1304,8 +1317,18 @@ if [ -n "`find ${LOCAL_PKG} -maxdepth 1 -name '*.deb'`" ] ; then
 fi
 
 if [ ! "x${repo_local_file}" = "x" ] ; then
-	mkdir ${tempdir}/tmp/local_dir
-	sudo cp -r ${LOCAL_DIR}/* ${tempdir}/tmp/local_dir
+
+	if [ -d  ${LOCAL_DIR} ] ; then
+		mkdir ${tempdir}/tmp/local_dir
+		sudo cp -r ${LOCAL_DIR}/* ${tempdir}/tmp/local_dir
+	fi
+
+	if [ -d  ${LOCAL_PKG} ] ; then
+		if [ -n "`find ${LOCAL_PKG} -maxdepth 1 -name '*.deb'`" ] ; then
+			mkdir ${tempdir}/tmp/local_pkg_deb
+			sudo cp ${LOCAL_PKG}/*.deb ${tempdir}/tmp/local_pkg_deb
+		fi
+	fi
 fi
 
 if [ "x${include_firmware}" = "xenable" ] ; then
@@ -1630,6 +1653,17 @@ if [ "x${chroot_COPY_SETUP_SDCARD}" = "xenable" ] ; then
 		sudo cp "${OIB_DIR}/target/boot/fire.ico" "${DIR}/deploy/${export_filename}"
 		sudo cp "${OIB_DIR}/target/boot/autorun.inf" "${DIR}/deploy/${export_filename}"
 	fi
+fi
+
+if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
+	#sudo git clone https://gitee.com/wildfireteam/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts-bak/ --depth 1
+	#if [ -f ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh ] ; then
+	#	cp ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh  ${TEMPDIR}/disk/opt/scripts-bak/boot
+	#	rm -r ${TEMPDIR}/disk/opt/scripts/
+	#fi
+	#mv ${TEMPDIR}/disk/opt/scripts-bak ${TEMPDIR}/disk/opt/scripts/
+	sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1
+	sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
 fi
 
 if [ "x${chroot_directory}" = "xenable" ]; then
