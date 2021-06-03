@@ -1036,19 +1036,19 @@ populate_rootfs () {
 
 	mkdir ${TEMPDIR}/disk/home/debian/.resizerootfs
 
-	if [ ${MMC0extlinux} ];then
+	if [ "${MMC0extlinux}" ];then
 		mkdir ${TEMPDIR}/disk/boot/mmc0_extlinux
 		wfile="${TEMPDIR}/disk/boot/mmc0_extlinux/extlinux.conf"
 		echo "${MMC0extlinux}" > ${wfile}
 	fi
 
-	if [ ${MMC1extlinux} ];then
+	if [ "${MMC1extlinux}" ];then
 		mkdir ${TEMPDIR}/disk/boot/mmc1_extlinux
 		wfile="${TEMPDIR}/disk/boot/mmc1_extlinux/extlinux.conf"
 		echo "${MMC1extlinux}" > ${wfile}
 	fi
 
-	if [ ${NANDextlinux} ];then
+	if [ "${NANDextlinux}" ];then
 		mkdir ${TEMPDIR}/disk/boot/nand0_extlinux
 		wfile="${TEMPDIR}/disk/boot/nand0_extlinux/extlinux.conf"
 		echo "${NANDextlinux}" > ${wfile}
