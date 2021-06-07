@@ -35,7 +35,7 @@ build_image_job:
     - ./env/ci.sh  $uboot_branch
     - elif [  $kernel_branch ]; then
     - ./env/ci.sh  $kernel_branch
-    - else /env/ci.sh
+    - else ./env/ci.sh
     - fi
 
 
