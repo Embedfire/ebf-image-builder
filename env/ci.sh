@@ -17,26 +17,7 @@ source configs/functions/functions
 
 start_time=`date +%s`
 
-if [ ! -d ${IMAGE_BUILDER_DIR}/.git ]; then
-    info_msg "Image-builder  repository does not exist, clone image-builder repository('$1') from '$IMAGE_BUILDER_SOURCE_URL'..."
-    ## Clone u-boot from Khadas GitHub
-    if [ "$1" == "" ]; then
-        git clone $GIT_CLONE_OPTIONS $IMAGE_BUILDER_SOURCE_URL -b $IMAGE_BUILDER_GIT_TAGS $IMAGE_BUILDER_DIR
-        [ $? != 0 ] && error_msg "Failed to clone 'image-builder'" && return -1
-    else
-        git clone $GIT_CLONE_OPTIONS $IMAGE_BUILDER_SOURCE_URL -b $1 $IMAGE_BUILDER_DIR
-        [ $? != 0 ] && error_msg "Failed to clone 'image-builder'" && return -1
-    fi
-fi
 
-cd $IMAGE_BUILDER_DIR
-
-#拉取image-builder更新
-git fetch --all
-git reset --hard $IMAGE_BUILDER_GIT_TAGS
-git pull
-
-echo "需要编译的芯片为$1"
 
 export FIRE_BOARD=
 export LINUX=
@@ -184,6 +165,28 @@ rk3328_build_img(){
     make  DOWNLOAD_MIRROR=china 
 
 }  
+
+
+if [ ! -d ${IMAGE_BUILDER_DIR}/.git ]; then
+    info_msg "Image-builder  repository does not exist, clone image-builder repository('$1') from '$IMAGE_BUILDER_SOURCE_URL'..."
+    ## Clone u-boot from Khadas GitHub
+    if [ "$1" == "" ]; then
+        git clone $GIT_CLONE_OPTIONS $IMAGE_BUILDER_SOURCE_URL -b $IMAGE_BUILDER_GIT_TAGS $IMAGE_BUILDER_DIR
+        [ $? != 0 ] && error_msg "Failed to clone 'image-builder'" && return -1
+    else
+        git clone $GIT_CLONE_OPTIONS $IMAGE_BUILDER_SOURCE_URL -b $1 $IMAGE_BUILDER_DIR
+        [ $? != 0 ] && error_msg "Failed to clone 'image-builder'" && return -1
+    fi
+fi
+
+cd $IMAGE_BUILDER_DIR
+
+#拉取image-builder更新
+git fetch --all
+git reset --hard $IMAGE_BUILDER_GIT_TAGS
+git pull
+
+echo "需要编译的芯片为$build_cpu"
 
 if [ -n $build_cpu ]; then
 
