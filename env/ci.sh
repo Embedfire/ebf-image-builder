@@ -170,13 +170,10 @@ rk3328_build_img(){
 if [ ! -d ${IMAGE_BUILDER_DIR}/.git ]; then
     info_msg "Image-builder  repository does not exist, clone image-builder repository('$1') from '$IMAGE_BUILDER_SOURCE_URL'..."
     ## Clone u-boot from Khadas GitHub
-    if [ "$1" == "" ]; then
-        git clone $GIT_CLONE_OPTIONS $IMAGE_BUILDER_SOURCE_URL -b $IMAGE_BUILDER_GIT_TAGS $IMAGE_BUILDER_DIR
-        [ $? != 0 ] && error_msg "Failed to clone 'image-builder'" && return -1
-    else
-        git clone $GIT_CLONE_OPTIONS $IMAGE_BUILDER_SOURCE_URL -b $1 $IMAGE_BUILDER_DIR
-        [ $? != 0 ] && error_msg "Failed to clone 'image-builder'" && return -1
-    fi
+
+    git clone $GIT_CLONE_OPTIONS $IMAGE_BUILDER_SOURCE_URL -b $IMAGE_BUILDER_GIT_TAGS $IMAGE_BUILDER_DIR
+    [ $? != 0 ] && error_msg "Failed to clone 'image-builder'" && return -1
+
 fi
 
 cd $IMAGE_BUILDER_DIR
