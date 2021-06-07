@@ -188,7 +188,7 @@ git pull
 
 
 
-if [ -n $build_cpu ]; then
+if [ ! $build_cpu ]; then
 
     echo "需要编译的芯片为$build_cpu"
 

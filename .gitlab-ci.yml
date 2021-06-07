@@ -31,9 +31,9 @@ build_image_job:
   script:
 
     #编译镜像 
-    - if [ -n $uboot_branch ];then
+    - if [  $uboot_branch ];then
     - ./env/ci.sh  $uboot_branch
-    - elif [ -n $kernel_branch ]; then
+    - elif [  $kernel_branch ]; then
     - ./env/ci.sh  $kernel_branch
     - else /env/ci.sh
     - fi
