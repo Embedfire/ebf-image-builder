@@ -186,9 +186,11 @@ git fetch --all
 git reset --hard $IMAGE_BUILDER_GIT_TAGS
 git pull
 
-echo "需要编译的芯片为$build_cpu"
+
 
 if [ -n $build_cpu ]; then
+
+    echo "需要编译的芯片为$build_cpu"
 
     case $build_cpu in
         imx6ull)  
@@ -205,6 +207,7 @@ if [ -n $build_cpu ]; then
     esac
 
 else
+    echo "只默认更新根文件系统"
     imx6ull_build_img
     stm32mp157_build_img
     rk3328_build_img
