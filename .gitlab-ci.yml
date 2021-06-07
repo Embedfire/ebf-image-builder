@@ -30,12 +30,16 @@ build_image_job:
 
   script:
 
-    #编译镜像 分支  配置文件
-    #- ./env/ci.sh 
-    echo $uboot_branch
+    #编译镜像 
+    - if [ ! -n $uboot_branch ];them
+    - ./env/ci.sh  $uboot_branch
+    - elfi [ ! -n $kernel_branch ];them
+    - ./env/ci.sh  $kernel_branch
+    - else /env/ci.sh
+    - fi
 
 
   when: delayed
-  #start_in: 60 minutes
-  start_in: 10 sec
+  start_in: 60 minutes
+  #start_in: 10 sec
 
