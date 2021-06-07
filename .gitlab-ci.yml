@@ -33,7 +33,7 @@ build_image_job:
     #编译镜像 
     - if [ ! -n $uboot_branch ];them
     - ./env/ci.sh  $uboot_branch
-    - elfi [ ! -n $kernel_branch ];them
+    - elif [ ! -n $kernel_branch ];them
     - ./env/ci.sh  $kernel_branch
     - else /env/ci.sh
     - fi
