@@ -77,6 +77,9 @@ cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/*.i
 cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/*rootfs* \
    ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
 
+cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/boot.tar \
+   ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
+
 #echo "$(date +%Y-%m-%d-%H:%M:%S)  ${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}"  >> ${ROOT}/history/history_version
 
 
