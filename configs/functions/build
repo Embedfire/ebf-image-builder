@@ -78,7 +78,7 @@ build_uboot() {
 	fi
 
 	cd ${UBOOT_DIR}/
-
+	make distclean
 	if [ "$UBOOT_GIT_TAGS" == "" ]; then
 		if ! git branch | grep "^* $UBOOT_GIT_BRANCH$" > /dev/null; then
 			if ! git branch | grep "^  $UBOOT_GIT_BRANCH$" > /dev/null; then
@@ -196,6 +196,7 @@ build_linux() {
 	fi
 
 	cd ${LINUX_DIR}
+	make ARCH=$ARCH distclean
 
 	if [ "$LINUX_GIT_TAGS" == "" ]; then
 		if ! git branch | grep "^* $LINUX_GIT_BRANCH$" > /dev/null; then

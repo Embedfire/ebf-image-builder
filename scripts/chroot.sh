@@ -1367,6 +1367,16 @@ if [ "x${include_firmware}" = "xenable" ] ; then
 		sudo cp "${DIR}/git/linux-firmware/mt7601u.bin" "${tempdir}/lib/firmware/mt7601u.bin"
 	fi
 
+	if [ -d "${DIR}/git/linux-firmware/rtl_nic/" ] ; then
+		sudo mkdir -p "${tempdir}/lib/firmware/rtl_nic"
+		sudo cp "${DIR}"/git/linux-firmware/rtl_nic/* "${tempdir}/lib/firmware/rtl_nic"
+	fi
+
+	if [ -d "${DIR}/git/linux-firmware/rtl_bt/" ] ; then
+		sudo mkdir -p "${tempdir}/lib/firmware/rtl_bt"
+		sudo cp "${DIR}"/git/linux-firmware/rtl_bt/* "${tempdir}/lib/firmware/rtl_bt"
+	fi
+
 	if [ -d "${DIR}/git/linux-firmware/imx/sdma" ] ; then
 		sudo mkdir -p "${tempdir}/lib/firmware/imx/sdma"
 		sudo cp "${DIR}"/git/linux-firmware/imx/sdma/* "${tempdir}/lib/firmware/imx/sdma"

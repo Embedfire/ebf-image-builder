@@ -10,82 +10,207 @@ GIT_CLONE_OPTIONS="--depth=1"
 IMAGE_BUILDER_GIT_TAGS=image-builder_2.0
 IMAGE_BUILDER_SOURCE_URL="git@gitlab.embedfire.local:i.mx6/ebf-image-builder.git"
 
+build_cpu=$1
 
 source configs/functions/functions
 
 
 start_time=`date +%s`
 
+
+
+export FIRE_BOARD=
+export LINUX=
+export UBOOT=
+export DISTRIBUTION=
+export DISTRIB_RELEASE=
+export DISTRIB_TYPE=
+export INSTALL_TYPE=
+
+
+imx6ull_build_img(){
+
+    rebuild=$1
+
+    #编译镜像 debian console
+    FIRE_BOARD=ebf_imx_6ull_pro
+    LINUX=4.19.35
+    UBOOT=2020.10
+    DISTRIBUTION=Debian
+    DISTRIB_RELEASE=buster
+    DISTRIB_TYPE=console
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china  FORCE_UPDATE=$rebuild
+
+    #编译镜像 debian qt
+    FIRE_BOARD=ebf_imx_6ull_pro
+    LINUX=4.19.35
+    UBOOT=2020.10
+    DISTRIBUTION=Debian
+    DISTRIB_RELEASE=buster
+    DISTRIB_TYPE=qt
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china 
+
+    #ubuntu18.04  console
+    FIRE_BOARD=ebf_imx_6ull_pro
+    LINUX=4.19.35
+    UBOOT=2020.10
+    DISTRIBUTION=Ubuntu
+    DISTRIB_RELEASE=bionic
+    DISTRIB_TYPE=console
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china 
+
+    #ubuntu20.04  console
+    FIRE_BOARD=ebf_imx_6ull_pro
+    LINUX=4.19.35
+    UBOOT=2020.10
+    DISTRIBUTION=Ubuntu
+    DISTRIB_RELEASE=focal
+    DISTRIB_TYPE=console
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china 
+
+}
+
+stm32mp157_build_img(){
+
+    #编译镜像 debian console
+    rebuild=$1
+
+    FIRE_BOARD=ebf_stm_mp157_star
+    LINUX=4.19.94
+    UBOOT=2018.11
+    DISTRIBUTION=Debian
+    DISTRIB_RELEASE=buster
+    DISTRIB_TYPE=console
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china  FORCE_UPDATE=$rebuild
+
+    #编译镜像 debian qt
+    FIRE_BOARD=ebf_stm_mp157_star
+    LINUX=4.19.94
+    UBOOT=2018.11
+    DISTRIBUTION=Debian
+    DISTRIB_RELEASE=buster
+    DISTRIB_TYPE=qt
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china 
+
+    #ubuntu18.04  console
+    FIRE_BOARD=ebf_stm_mp157_star
+    LINUX=4.19.94
+    UBOOT=2018.11
+    DISTRIBUTION=Ubuntu
+    DISTRIB_RELEASE=bionic
+    DISTRIB_TYPE=console
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china 
+
+    #ubuntu20.04  console
+    FIRE_BOARD=ebf_stm_mp157_star
+    LINUX=4.19.94
+    UBOOT=2018.11
+    DISTRIBUTION=Ubuntu
+    DISTRIB_RELEASE=focal
+    DISTRIB_TYPE=console
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china 
+
+}
+
+rk3328_build_img(){
+
+    rebuild=$1
+
+    #编译镜像 debian console
+    FIRE_BOARD=ebf_rockchip_3328
+    LINUX=5.10.25
+    UBOOT=2017.09
+    DISTRIBUTION=Debian
+    DISTRIB_RELEASE=buster
+    DISTRIB_TYPE=console
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china  FORCE_UPDATE=$rebuild
+
+    #编译镜像 debian qt
+    FIRE_BOARD=ebf_rockchip_3328
+    LINUX=5.10.25
+    UBOOT=2017.09
+    DISTRIBUTION=Debian
+    DISTRIB_RELEASE=buster
+    DISTRIB_TYPE=qt
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china 
+
+    #ubuntu18.04  console
+    FIRE_BOARD=ebf_rockchip_3328
+    LINUX=5.10.25
+    UBOOT=2017.09
+    DISTRIBUTION=Ubuntu
+    DISTRIB_RELEASE=bionic
+    DISTRIB_TYPE=console
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china 
+
+    #ubuntu20.04  console
+    FIRE_BOARD=ebf_rockchip_3328
+    LINUX=5.10.25
+    UBOOT=2017.09
+    DISTRIBUTION=Ubuntu
+    DISTRIB_RELEASE=focal
+    DISTRIB_TYPE=console
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china 
+
+}  
+
+
 if [ ! -d ${IMAGE_BUILDER_DIR}/.git ]; then
     info_msg "Image-builder  repository does not exist, clone image-builder repository('$1') from '$IMAGE_BUILDER_SOURCE_URL'..."
     ## Clone u-boot from Khadas GitHub
-    if [ "$1" == "" ]; then
-        git clone $GIT_CLONE_OPTIONS $IMAGE_BUILDER_SOURCE_URL -b $IMAGE_BUILDER_GIT_TAGS $IMAGE_BUILDER_DIR
-        [ $? != 0 ] && error_msg "Failed to clone 'image-builder'" && return -1
-    else
-        git clone $GIT_CLONE_OPTIONS $IMAGE_BUILDER_SOURCE_URL -b $1 $IMAGE_BUILDER_DIR
-        [ $? != 0 ] && error_msg "Failed to clone 'image-builder'" && return -1
-    fi
+
+    git clone $GIT_CLONE_OPTIONS $IMAGE_BUILDER_SOURCE_URL -b $IMAGE_BUILDER_GIT_TAGS $IMAGE_BUILDER_DIR
+    [ $? != 0 ] && error_msg "Failed to clone 'image-builder'" && return -1
+
 fi
 
 cd $IMAGE_BUILDER_DIR
 
 #拉取image-builder更新
-sleep 20     
 git fetch --all
-
-if [ "$1" == "" ]; then
-    git reset --hard $IMAGE_BUILDER_GIT_TAGS
-else
-    git reset --hard $1
-fi
-
+git reset --hard $IMAGE_BUILDER_GIT_TAGS
 git pull
 
 
-#编译镜像 debian console
-export FIRE_BOARD=ebf_imx_6ull_pro
-export LINUX=4.19.35
-export UBOOT=2020.10
-export DISTRIBUTION=Debian
-export DISTRIB_RELEASE=buster
-export DISTRIB_TYPE=console
-export INSTALL_TYPE=ALL
 
-make  DOWNLOAD_MIRROR=china 
+if [  $build_cpu ]; then
 
-#编译镜像 debian qt
-FIRE_BOARD=ebf_imx_6ull_pro
-LINUX=4.19.35
-UBOOT=2020.10
-DISTRIBUTION=Debian
-DISTRIB_RELEASE=buster
-DISTRIB_TYPE=qt
-INSTALL_TYPE=ALL
+    echo "需要编译的芯片为$build_cpu"
 
-make  DOWNLOAD_MIRROR=china 
+    case $build_cpu in
+        imx6ull)  
+            imx6ull_build_img enable
+            ;;
 
-#ubuntu18.04  console
-FIRE_BOARD=ebf_imx_6ull_pro
-LINUX=4.19.35
-UBOOT=2020.10
-DISTRIBUTION=Ubuntu
-DISTRIB_RELEASE=bionic
-DISTRIB_TYPE=console
-INSTALL_TYPE=ALL
+        #stm32mp157)
+        #    stm32mp157_build_img enable
+        #    ;;
 
-make  DOWNLOAD_MIRROR=china 
+        #rk3328)
+        #    rk3328_build_img enable
+        #    ;;  
+    esac
 
-#ubuntu20.04  console
-FIRE_BOARD=ebf_imx_6ull_pro
-LINUX=4.19.35
-UBOOT=2020.10
-DISTRIBUTION=Ubuntu
-DISTRIB_RELEASE=focal
-DISTRIB_TYPE=console
-INSTALL_TYPE=ALL
+else
+    echo "只默认更新根文件系统"
+    imx6ull_build_img
+    #stm32mp157_build_img
+    #rk3328_build_img
+fi
 
-make  DOWNLOAD_MIRROR=china 
+
 
 
 #cope to target_dir

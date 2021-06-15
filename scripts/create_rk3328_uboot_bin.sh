@@ -15,7 +15,7 @@ if [ ! "$BUILD_SCRIPT_OF_UBOOT" == "" ]; then
 		. $BUILD_SCRIPT_OF_UBOOT evb-rk3328
 fi
 
-tools/mkimage -n rk3328 -T rksd -d ../rkbin/bin/rk33/rk3328_ddr_333MHz_v1.16.bin idbloader.img
+tools/mkimage -n rk3328 -T rksd -d ../rkbin/bin/rk33/rk3328_ddr_333MHz_v1.17.bin idbloader.img
 cat ../rkbin/bin/rk33/rk322xh_miniloader_v2.50.bin >> idbloader.img
 
 dd if=idbloader.img of=$MUBOOT_FILE seek=64
