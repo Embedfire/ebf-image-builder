@@ -14,6 +14,8 @@ source configs/functions/functions
 ######################################################################################
 TARGET="$1"
 
+mkdir -p ${BUILD}
+
 case "$TARGET" in
 	u-boot)
 		build_uboot
