@@ -26,6 +26,7 @@ export DISTRIBUTION=
 export DISTRIB_RELEASE=
 export DISTRIB_TYPE=
 export INSTALL_TYPE=
+export SUPPORTED_TFA=
 
 
 imx6ull_build_img(){
@@ -80,6 +81,7 @@ stm32mp157_build_img(){
     rebuild=$1
 
     FIRE_BOARD=ebf_stm_mp157_star
+    SUPPORTED_TFA=v2.0  
     LINUX=4.19.94
     UBOOT=2018.11
     DISTRIBUTION=Debian
@@ -90,6 +92,7 @@ stm32mp157_build_img(){
 
     #编译镜像 debian qt
     FIRE_BOARD=ebf_stm_mp157_star
+    SUPPORTED_TFA=v2.0  
     LINUX=4.19.94
     UBOOT=2018.11
     DISTRIBUTION=Debian
@@ -100,6 +103,7 @@ stm32mp157_build_img(){
 
     #ubuntu18.04  console
     FIRE_BOARD=ebf_stm_mp157_star
+    SUPPORTED_TFA=v2.0  
     LINUX=4.19.94
     UBOOT=2018.11
     DISTRIBUTION=Ubuntu
@@ -110,6 +114,7 @@ stm32mp157_build_img(){
 
     #ubuntu20.04  console
     FIRE_BOARD=ebf_stm_mp157_star
+    SUPPORTED_TFA=v2.0  
     LINUX=4.19.94
     UBOOT=2018.11
     DISTRIBUTION=Ubuntu
