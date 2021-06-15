@@ -77,8 +77,16 @@ cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/*.i
 cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/*rootfs* \
    ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
 
-cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/boot.tar \
-   ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
+if [ "${target_name}" == "stm32mp157" ]; then
+	cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/bootfs.img \
+		${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
+else
+
+	cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/boot.tar \
+		${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
+fi
+
+
 
 #echo "$(date +%Y-%m-%d-%H:%M:%S)  ${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}"  >> ${ROOT}/history/history_version
 
@@ -112,8 +120,9 @@ echo " " >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.
 
 
 #压缩
-xz -zf ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/image/*.img
+xz -zf ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/image/${target_name}*.img
 
+#target_name
 
 echo -e "\nDone."
 echo -e "\n`date`"

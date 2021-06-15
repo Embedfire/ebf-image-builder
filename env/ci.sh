@@ -194,9 +194,9 @@ if [  $build_cpu ]; then
             imx6ull_build_img enable
             ;;
 
-        #stm32mp157)
-        #    stm32mp157_build_img enable
-        #    ;;
+        stm32mp157)
+            stm32mp157_build_img enable
+            ;;
 
         #rk3328)
         #    rk3328_build_img enable
@@ -206,7 +206,7 @@ if [  $build_cpu ]; then
 else
     echo "只默认更新根文件系统"
     imx6ull_build_img
-    #stm32mp157_build_img
+    stm32mp157_build_img
     #rk3328_build_img
 fi
 
