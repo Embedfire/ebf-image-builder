@@ -138,6 +138,11 @@ check_defines () {
 		deb_additional_pkgs="${deb_additional_pkgs} ${include}"
 	fi
 
+	if [ ! "x${board_deb_include}" = "x" ] ; then
+		include=$(echo ${board_deb_include} | sed 's/,/ /g' | sed 's/\t/,/g')
+		deb_additional_pkgs="${deb_additional_pkgs} ${include}"
+	fi
+
 	if [ "x${repo_rcnee}" = "xenable" ] ; then
 		if [ ! "x${repo_rcnee_pkg_list}" = "x" ] ; then
 			include=$(echo ${repo_rcnee_pkg_list} | sed 's/,/ /g' | sed 's/\t/,/g')
