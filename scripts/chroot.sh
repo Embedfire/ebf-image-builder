@@ -257,7 +257,7 @@ if [ "x${host_arch}" != "xarmv7l" ] && [ "x${host_arch}" != "xaarch64" ] ; then
 	fi
 fi
 
-if [ ! -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/basefs.tar" ] ;then
+if [ ! -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/basefs.tar" ] ;then
 
 	chroot_mount_run
 	echo "Log: Running: debootstrap second-stage in [${tempdir}]"
@@ -270,7 +270,7 @@ if [ ! -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEA
 	echo "packing base rootfs......"
 	cd "$tempdir"
 	mkdir -p ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}
-	sudo tar  -cf ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/basefs.tar .  #压缩基本的根文件系统
+	sudo tar  -cf ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/basefs.tar .  #压缩基本的根文件系统
 	cd "$DIR" 
 	echo "....................................................."
 
