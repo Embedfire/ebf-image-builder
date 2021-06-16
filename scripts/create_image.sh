@@ -71,7 +71,7 @@ echo "$PASSWORD" | sudo -E -S $ROOT/publish/fire-imx-stable.sh
 cp ${BUILD}/${NUBOOT_FILE}  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/uboot
 cp ${BUILD}/${MUBOOT_FILE}  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/uboot
 cp ${BUILD_DEBS}/${KERNEL_DEB}   ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/kernel_deb
-cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/*.img  \
+cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/${target_name}*.img  \
    ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/image
 
 cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/*rootfs* \
