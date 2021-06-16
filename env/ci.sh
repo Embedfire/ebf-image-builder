@@ -139,6 +139,7 @@ rk3328_build_img(){
     INSTALL_TYPE=ALL
     make  DOWNLOAD_MIRROR=china  FORCE_UPDATE=$rebuild
 
+:<<qt
     #编译镜像 debian qt
     FIRE_BOARD=ebf_rockchip_3328
     LINUX=5.10.25
@@ -148,7 +149,7 @@ rk3328_build_img(){
     DISTRIB_TYPE=qt
     INSTALL_TYPE=ALL
     make  DOWNLOAD_MIRROR=china 
-
+qt
     #ubuntu18.04  console
     FIRE_BOARD=ebf_rockchip_3328
     LINUX=5.10.25
@@ -203,16 +204,16 @@ if [  $build_cpu ]; then
             stm32mp157_build_img enable
             ;;
 
-        #rk3328)
-        #    rk3328_build_img enable
-        #    ;;  
+        rk3328)
+            rk3328_build_img enable
+            ;;  
     esac
 
 else
     echo "只默认更新根文件系统"
     imx6ull_build_img
-    stm32mp157_build_img
-    #rk3328_build_img
+    #stm32mp157_build_img
+    rk3328_build_img
 fi
 
 
