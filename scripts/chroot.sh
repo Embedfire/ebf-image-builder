@@ -269,7 +269,7 @@ if [ ! -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEA
 	echo "....................................................."
 	echo "packing base rootfs......"
 	cd "$tempdir"
-	mkdir -p ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}
+	mkdir -p ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}
 	sudo tar  -cf ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/basefs.tar .  #压缩基本的根文件系统
 	cd "$DIR" 
 	echo "....................................................."
