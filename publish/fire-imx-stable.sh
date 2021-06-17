@@ -76,8 +76,8 @@ build_fire_image () {
 		sudo echo "/dev/mmcblk1p4 /  ext4  noatime,errors=remount-ro  0  1" >> ${rootfs_dir}/etc/fstab
 		sudo echo "debugfs  /sys/kernel/debug  debugfs  defaults  0  0" >> ${rootfs_dir}/etc/fstab
 
-		sudo rm -rf ${rootfs_dir}/home/debian/.resizerootfs
-		sudo touch ${rootfs_dir}/home/debian/.resizerootfs
+		sudo rm -rf ${rootfs_dir}/home/${rfs_username}/.resizerootfs
+		sudo mkdir ${rootfs_dir}/home/${rfs_username}/.resizerootfs
 		sudo umount ${rootfs_dir}
 
 		sudo dd if=/dev/zero of=bootfs.img bs=1024 count=102400

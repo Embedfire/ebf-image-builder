@@ -1034,7 +1034,7 @@ populate_rootfs () {
 	fi
 
 
-	mkdir ${TEMPDIR}/disk/home/debian/.resizerootfs
+	mkdir ${TEMPDIR}/disk/home/${rfs_username}/.resizerootfs
 
 	if [ "${MMC0extlinux}" ];then
 		mkdir ${TEMPDIR}/disk/boot/mmc0_extlinux
