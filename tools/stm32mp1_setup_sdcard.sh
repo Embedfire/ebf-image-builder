@@ -42,6 +42,7 @@ ROOTFS_LABEL=rootfs
 
 DIR="$PWD"
 
+
 . ${DIR}/../../scripts/common.sh
 
 TEMPDIR=$(mktemp -d)
@@ -1352,7 +1353,7 @@ populate_rootfs () {
 	cd ${TEMPDIR}/disk/
 
 	if [ -f ./opt/scripts/mods/debian-add-sbin-usr-sbin-to-default-path.diff ] ; then
-		if [ -f /usr/bin/patch ] ; then
+		if [ -f /usr/bin/patch -a $DISTRIBUTION == "Debian" ] ; then
 			echo "Patching: /etc/profile"
 			patch -p1 < ./opt/scripts/mods/debian-add-sbin-usr-sbin-to-default-path.diff
 		fi
