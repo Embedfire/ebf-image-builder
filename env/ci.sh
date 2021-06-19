@@ -227,3 +227,10 @@ cp -ur ${IMAGE_BUILDER_DIR}/history/*  ${TARGET_DIR}/
 end_time=`date +%s`
 time_cal $(($end_time - $start_time))
 
+rm -rf ${IMAGE_BUILDER_DIR}/deploy/
+rm -rf ${IMAGE_BUILDER_DIR}/ignore/
+rm -rf ${IMAGE_BUILDER_DIR}/history/imx6ull/
+rm -rf ${IMAGE_BUILDER_DIR}/history/stm32mp157/
+rm -rf ${IMAGE_BUILDER_DIR}/history/rockchip-3328/
+
+
