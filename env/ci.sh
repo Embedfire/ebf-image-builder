@@ -27,7 +27,7 @@ export DISTRIB_RELEASE=
 export DISTRIB_TYPE=
 export INSTALL_TYPE=
 export SUPPORTED_TFA=
-
+export TFA=
 
 imx6ull_build_img(){
 
@@ -100,6 +100,7 @@ stm32mp157_build_img(){
     DISTRIB_TYPE=qt
     INSTALL_TYPE=ALL
     make  DOWNLOAD_MIRROR=china 
+
 
     #ubuntu18.04  console
     FIRE_BOARD=ebf_stm_mp157_star
