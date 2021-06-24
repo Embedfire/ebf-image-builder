@@ -26,7 +26,8 @@ export DISTRIBUTION=
 export DISTRIB_RELEASE=
 export DISTRIB_TYPE=
 export INSTALL_TYPE=
-
+export SUPPORTED_TFA=
+export TFA=
 
 imx6ull_build_img(){
 
@@ -80,6 +81,7 @@ stm32mp157_build_img(){
     rebuild=$1
 
     FIRE_BOARD=ebf_stm_mp157_star
+    TFA=v2.0  
     LINUX=4.19.94
     UBOOT=2018.11
     DISTRIBUTION=Debian
@@ -90,6 +92,7 @@ stm32mp157_build_img(){
 
     #编译镜像 debian qt
     FIRE_BOARD=ebf_stm_mp157_star
+    TFA=v2.0  
     LINUX=4.19.94
     UBOOT=2018.11
     DISTRIBUTION=Debian
@@ -98,8 +101,10 @@ stm32mp157_build_img(){
     INSTALL_TYPE=ALL
     make  DOWNLOAD_MIRROR=china 
 
+
     #ubuntu18.04  console
     FIRE_BOARD=ebf_stm_mp157_star
+    TFA=v2.0  
     LINUX=4.19.94
     UBOOT=2018.11
     DISTRIBUTION=Ubuntu
@@ -110,6 +115,7 @@ stm32mp157_build_img(){
 
     #ubuntu20.04  console
     FIRE_BOARD=ebf_stm_mp157_star
+    TFA=v2.0  
     LINUX=4.19.94
     UBOOT=2018.11
     DISTRIBUTION=Ubuntu
@@ -134,6 +140,7 @@ rk3328_build_img(){
     INSTALL_TYPE=ALL
     make  DOWNLOAD_MIRROR=china  FORCE_UPDATE=$rebuild
 
+:<<qt
     #编译镜像 debian qt
     FIRE_BOARD=ebf_rockchip_3328
     LINUX=5.10.25
@@ -143,7 +150,7 @@ rk3328_build_img(){
     DISTRIB_TYPE=qt
     INSTALL_TYPE=ALL
     make  DOWNLOAD_MIRROR=china 
-
+qt
     #ubuntu18.04  console
     FIRE_BOARD=ebf_rockchip_3328
     LINUX=5.10.25
@@ -170,13 +177,10 @@ rk3328_build_img(){
 if [ ! -d ${IMAGE_BUILDER_DIR}/.git ]; then
     info_msg "Image-builder  repository does not exist, clone image-builder repository('$1') from '$IMAGE_BUILDER_SOURCE_URL'..."
     ## Clone u-boot from Khadas GitHub
-    if [ "$1" == "" ]; then
-        git clone $GIT_CLONE_OPTIONS $IMAGE_BUILDER_SOURCE_URL -b $IMAGE_BUILDER_GIT_TAGS $IMAGE_BUILDER_DIR
-        [ $? != 0 ] && error_msg "Failed to clone 'image-builder'" && return -1
-    else
-        git clone $GIT_CLONE_OPTIONS $IMAGE_BUILDER_SOURCE_URL -b $1 $IMAGE_BUILDER_DIR
-        [ $? != 0 ] && error_msg "Failed to clone 'image-builder'" && return -1
-    fi
+
+    git clone $GIT_CLONE_OPTIONS $IMAGE_BUILDER_SOURCE_URL -b $IMAGE_BUILDER_GIT_TAGS $IMAGE_BUILDER_DIR
+    [ $? != 0 ] && error_msg "Failed to clone 'image-builder'" && return -1
+
 fi
 
 cd $IMAGE_BUILDER_DIR
@@ -222,4 +226,11 @@ cp -ur ${IMAGE_BUILDER_DIR}/history/*  ${TARGET_DIR}/
 
 end_time=`date +%s`
 time_cal $(($end_time - $start_time))
+
+rm -rf ${IMAGE_BUILDER_DIR}/deploy/
+rm -rf ${IMAGE_BUILDER_DIR}/ignore/
+rm -rf ${IMAGE_BUILDER_DIR}/history/imx6ull/
+rm -rf ${IMAGE_BUILDER_DIR}/history/stm32mp157/
+rm -rf ${IMAGE_BUILDER_DIR}/history/rockchip-3328/
+
 

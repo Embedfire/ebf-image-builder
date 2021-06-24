@@ -79,6 +79,6 @@ mkdir -p /boot/kernel
 
 mv  /boot/*${version}* /boot/kernel
 
-mv /boot/dtbs/${version}/*.dtb /boot/dtbs/
+mv /boot/dtbs/${version}/*.dtb /boot/dtbs/ 2>/dev/null || true
 
-rm -rf /boot/dtbs/${version}
+rm -rf /boot/dtbs/${version} 2>/dev/null || true

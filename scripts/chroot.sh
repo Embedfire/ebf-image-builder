@@ -138,6 +138,11 @@ check_defines () {
 		deb_additional_pkgs="${deb_additional_pkgs} ${include}"
 	fi
 
+	if [ ! "x${board_deb_include}" = "x" ] ; then
+		include=$(echo ${board_deb_include} | sed 's/,/ /g' | sed 's/\t/,/g')
+		deb_additional_pkgs="${deb_additional_pkgs} ${include}"
+	fi
+
 	if [ "x${repo_rcnee}" = "xenable" ] ; then
 		if [ ! "x${repo_rcnee_pkg_list}" = "x" ] ; then
 			include=$(echo ${repo_rcnee_pkg_list} | sed 's/,/ /g' | sed 's/\t/,/g')
@@ -252,7 +257,7 @@ if [ "x${host_arch}" != "xarmv7l" ] && [ "x${host_arch}" != "xaarch64" ] ; then
 	fi
 fi
 
-if [ ! -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/basefs.tar" ] ;then
+if [ ! -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/basefs.tar" ] ;then
 
 	chroot_mount_run
 	echo "Log: Running: debootstrap second-stage in [${tempdir}]"
@@ -264,8 +269,8 @@ if [ ! -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEA
 	echo "....................................................."
 	echo "packing base rootfs......"
 	cd "$tempdir"
-	mkdir -p ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}
-	sudo tar  -cf ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/basefs.tar .  #压缩基本的根文件系统
+	mkdir -p ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}
+	sudo tar  -cf ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/basefs.tar .  #压缩基本的根文件系统
 	cd "$DIR" 
 	echo "....................................................."
 
@@ -412,7 +417,7 @@ if [ "x${repo_external}" = "xenable" ] ; then
 	echo "#deb ${repo_external_server_backup1} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 	echo "#deb ${repo_external_server_backup2} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 	echo "deb [arch=${repo_external_arch}] ${repo_external_server} buster ${repo_external_components}" >> ${wfile}
-	echo "deb [arch=${repo_external_arch}] ${repo_external_server} carp-imx6 ${repo_external_components}" >> ${wfile}
+	echo "deb [arch=${repo_external_arch}] ${repo_external_server} ${ebf_repo_dist} ${repo_external_components}" >> ${wfile}
 	echo "#deb-src [arch=${repo_external_arch}] ${repo_external_server} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 fi
 
