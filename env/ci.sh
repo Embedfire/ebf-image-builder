@@ -138,8 +138,7 @@ rk3328_build_img(){
     DISTRIB_RELEASE=buster
     DISTRIB_TYPE=console
     INSTALL_TYPE=ALL
-    #make  DOWNLOAD_MIRROR=china FORCE_UPDATE=$rebuild
-    make   FORCE_UPDATE=$rebuild
+    make  DOWNLOAD_MIRROR=china FORCE_UPDATE=$rebuild
 
 :<<qt
     #编译镜像 debian qt
@@ -160,8 +159,7 @@ qt
     DISTRIB_RELEASE=bionic
     DISTRIB_TYPE=console
     INSTALL_TYPE=ALL
-    #make  DOWNLOAD_MIRROR=china 
-    make  
+    make  DOWNLOAD_MIRROR=china 
 
     #ubuntu20.04  console
     FIRE_BOARD=ebf_rockchip_3328
@@ -171,21 +169,10 @@ qt
     DISTRIB_RELEASE=focal
     DISTRIB_TYPE=console
     INSTALL_TYPE=ALL
-    #make  DOWNLOAD_MIRROR=china 
-    make
+    make  DOWNLOAD_MIRROR=china 
 }  
 
-move_img(){
 
-    cp -ur ${IMAGE_BUILDER_DIR}/history/*  ${TARGET_DIR}/
-
-    rm -rf ${IMAGE_BUILDER_DIR}/deploy/
-    #rm -rf ${IMAGE_BUILDER_DIR}/ignore/
-    rm -rf ${IMAGE_BUILDER_DIR}/history/imx6ull/
-    rm -rf ${IMAGE_BUILDER_DIR}/history/stm32mp157/
-    rm -rf ${IMAGE_BUILDER_DIR}/history/rockchip-3328/
-
-}
 
 
 if [ ! -d ${IMAGE_BUILDER_DIR}/.git ]; then
@@ -212,29 +199,23 @@ if [  $build_cpu ]; then
 
     case $build_cpu in
         imx6ull)  
-            imx6ull_build_img enable
-            move_img
+            imx6ull_build_img enable         
             ;;
 
         stm32mp157)
             stm32mp157_build_img enable
-            move_img
             ;;
 
         rk3328)
             rk3328_build_img enable
-            move_img
             ;;  
     esac
 
 else
     echo "只默认更新根文件系统"
     imx6ull_build_img
-    move_img
     stm32mp157_build_img
-    move_img
-    rk3328_build_img
-    move_img
+    #rk3328_build_img
 fi
 
 
@@ -246,4 +227,11 @@ end_time=`date +%s`
 time_cal $(($end_time - $start_time))
 
 
+cp -ur ${IMAGE_BUILDER_DIR}/history/*  ${TARGET_DIR}/
+
+rm -rf ${IMAGE_BUILDER_DIR}/deploy/
+#rm -rf ${IMAGE_BUILDER_DIR}/ignore/
+rm -rf ${IMAGE_BUILDER_DIR}/history/imx6ull/
+rm -rf ${IMAGE_BUILDER_DIR}/history/stm32mp157/
+rm -rf ${IMAGE_BUILDER_DIR}/history/rockchip-3328/
 
