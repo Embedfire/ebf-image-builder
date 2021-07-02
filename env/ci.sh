@@ -138,7 +138,8 @@ rk3328_build_img(){
     DISTRIB_RELEASE=buster
     DISTRIB_TYPE=console
     INSTALL_TYPE=ALL
-    make  DOWNLOAD_MIRROR=china  FORCE_UPDATE=$rebuild
+    #make  DOWNLOAD_MIRROR=china FORCE_UPDATE=$rebuild
+    make   FORCE_UPDATE=$rebuild
 
 :<<qt
     #编译镜像 debian qt
@@ -159,7 +160,8 @@ qt
     DISTRIB_RELEASE=bionic
     DISTRIB_TYPE=console
     INSTALL_TYPE=ALL
-    make  DOWNLOAD_MIRROR=china 
+    #make  DOWNLOAD_MIRROR=china 
+    make  
 
     #ubuntu20.04  console
     FIRE_BOARD=ebf_rockchip_3328
@@ -169,8 +171,8 @@ qt
     DISTRIB_RELEASE=focal
     DISTRIB_TYPE=console
     INSTALL_TYPE=ALL
-    make  DOWNLOAD_MIRROR=china 
-
+    #make  DOWNLOAD_MIRROR=china 
+    make
 }  
 
 
