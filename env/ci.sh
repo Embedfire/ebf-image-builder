@@ -175,6 +175,18 @@ qt
     make
 }  
 
+move_img(){
+
+    cp -ur ${IMAGE_BUILDER_DIR}/history/*  ${TARGET_DIR}/
+
+    rm -rf ${IMAGE_BUILDER_DIR}/deploy/
+    #rm -rf ${IMAGE_BUILDER_DIR}/ignore/
+    rm -rf ${IMAGE_BUILDER_DIR}/history/imx6ull/
+    rm -rf ${IMAGE_BUILDER_DIR}/history/stm32mp157/
+    rm -rf ${IMAGE_BUILDER_DIR}/history/rockchip-3328/
+
+}
+
 
 if [ ! -d ${IMAGE_BUILDER_DIR}/.git ]; then
     info_msg "Image-builder  repository does not exist, clone image-builder repository('$1') from '$IMAGE_BUILDER_SOURCE_URL'..."
@@ -201,22 +213,28 @@ if [  $build_cpu ]; then
     case $build_cpu in
         imx6ull)  
             imx6ull_build_img enable
+            move_img
             ;;
 
         stm32mp157)
             stm32mp157_build_img enable
+            move_img
             ;;
 
         rk3328)
             rk3328_build_img enable
+            move_img
             ;;  
     esac
 
 else
     echo "只默认更新根文件系统"
     imx6ull_build_img
+    move_img
     stm32mp157_build_img
+    move_img
     rk3328_build_img
+    move_img
 fi
 
 
@@ -224,15 +242,8 @@ fi
 
 #cope to target_dir
 
-cp -ur ${IMAGE_BUILDER_DIR}/history/*  ${TARGET_DIR}/
-
 end_time=`date +%s`
 time_cal $(($end_time - $start_time))
 
-rm -rf ${IMAGE_BUILDER_DIR}/deploy/
-#rm -rf ${IMAGE_BUILDER_DIR}/ignore/
-rm -rf ${IMAGE_BUILDER_DIR}/history/imx6ull/
-rm -rf ${IMAGE_BUILDER_DIR}/history/stm32mp157/
-rm -rf ${IMAGE_BUILDER_DIR}/history/rockchip-3328/
 
 
