@@ -40,6 +40,6 @@ build_image_job:
 
 
   when: delayed
-  start_in: 60 minutes
+  start_in: 180 minutes
   #start_in: 10 sec
 

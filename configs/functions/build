@@ -6,7 +6,7 @@
 ## Build TF-A
 build_tfa() {
 	ret=0
-	echo "$TFA_GIT_BRANCH"
+
 	if [ "$TFA_GIT_BRANCH" == "" ]; then
 		error_msg "'TFA_GIT_BRANCH' is empty!"
 		return -1
@@ -139,7 +139,7 @@ build_uboot() {
 			make distclean
 			make $UBOOT_MMC_DEFCONFIG CROSS_COMPILE="${UBOOT_COMPILER}" ARCH=arm
 			make -j${NR_JOBS} CROSS_COMPILE="${UBOOT_COMPILER}" ${UBOOT_EXTRA_ARGS}
-			mkdir -p ${BUILD}
+			
 			cp ${UBOOT_BUILD_FILE} ${BUILD}/${MUBOOT_FILE}
 			if [ "${SPL_BUILD_FILE}" ]; then
 				cp ${SPL_BUILD_FILE} ${BUILD}
@@ -150,7 +150,7 @@ build_uboot() {
 			make distclean
 			make $UBOOT_NAND_DEFCONFIG  CROSS_COMPILE="${UBOOT_COMPILER}" ARCH=arm
 			make -j${NR_JOBS}  ARCH=arm CROSS_COMPILE="${UBOOT_COMPILER}" ${UBOOT_EXTRA_ARGS}
-			mkdir -p ${BUILD}
+			
 			cp ${UBOOT_BUILD_FILE} ${BUILD}/${NUBOOT_FILE}
 			if [ "${SPL_BUILD_FILE}" ] ; then
 				cp ${SPL_BUILD_FILE} ${BUILD}
