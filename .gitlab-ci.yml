@@ -1,4 +1,3 @@
-
 variables:
   #git 邮箱
   GIT_USEREMAIL: 1442190496@qq.com
@@ -20,8 +19,8 @@ build_image_job:
 
   #指定分支更新进行编译
   only:
-    - image-builder_2.0
-    #- master
+    #- image-builder_2.0
+    - master
 
   before_script:
  
