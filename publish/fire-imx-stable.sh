@@ -52,19 +52,31 @@ build_fire_image () {
 		exit -1
 	fi
 
-	if [ -n "${NEED_EXT4_IMG}" ]; then
-		info_msg "debug: do_ext4_img"
-
+	if ${NEED_EXT4_IMG}; then
+		info_msg "debug: do_ext4_img "
+		
 		cd ${ROOT}/deploy/${image_name}/
+		ROOTFS=$(ls $PWD | grep *rootfs*.tar)
 		tmp_dir=$(mktemp -d  tmp.XXXXXXXXXX)
 		rootfs_dir=$(mktemp -d  tmp.XXXXXXXXXX)
-		sudo tar -xvf armhf-rootfs-lubancat-buster.tar -C ${tmp_dir}
+		sudo tar -xvf ${ROOTFS} -C ${tmp_dir}
 
-		file_size=$(du -sb ${tmp_dir} | awk '{print $1}')
-		file_size_b=$(($file_size+52428800+52428800+52428800+52428800+52428800+52428800+52428800))
+		#file_size=$(sudo du -sb ${tmp_dir} | awk '{print $1}')
+		#ssss
+		#file_size_b=$(($file_size+52428800+52428800+52428800+52428800+52428800+52428800+52428800))
 #		sudo rm -rf ${tmp_dir}/dev/*
 #		sudo make_ext4fs -l 512M rootfs.ext4 ${tmp_dir}
-		sudo dd if=/dev/zero of=rootfs.img bs=${file_size_b} count=1
+		sys_size="$(du -sh ${tmp_dir} 2>/dev/null | awk '{print $1}')"
+		echo "Log: sys_size:${sys_size}"
+		echo "NEED_EXT4_IMG : ${NEED_EXT4_IMG}"
+		lastchar=${sys_size#${sys_size%?}}
+		num=${sys_size%${lastchar}}
+		
+		rootfs_size=$(bc -l <<< "scale=0; ((($num * 1.4) / 1 + 0) / 4 + 1) * 4")
+		
+		echo "Log: sys_size:${rootfs_size}"
+		
+		sudo dd if=/dev/zero of=rootfs.img bs=${rootfs_size}M count=1
 		sudo mkfs.ext4 rootfs.img
 		
 		sudo mount rootfs.img ${rootfs_dir}
@@ -76,8 +88,8 @@ build_fire_image () {
 		sudo echo "/dev/mmcblk1p4 /  ext4  noatime,errors=remount-ro  0  1" >> ${rootfs_dir}/etc/fstab
 		sudo echo "debugfs  /sys/kernel/debug  debugfs  defaults  0  0" >> ${rootfs_dir}/etc/fstab
 
-		sudo rm -rf ${rootfs_dir}/home/debian/.resizerootfs
-		sudo touch ${rootfs_dir}/home/debian/.resizerootfs
+		sudo rm -rf ${rootfs_dir}/home/${rfs_username}/.resizerootfs
+		sudo mkdir ${rootfs_dir}/home/${rfs_username}/.resizerootfs
 		sudo umount ${rootfs_dir}
 
 		sudo dd if=/dev/zero of=bootfs.img bs=1024 count=102400
