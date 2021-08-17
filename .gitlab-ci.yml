@@ -1,8 +1,8 @@
 variables:
   #git 邮箱
-  GIT_USEREMAIL: 1442190496@qq.com
+  GIT_USEREMAIL: hjw0415@outlook.com
   #git 用户名
-  GIT_USERNAME: zhanqinghui
+  GIT_USERNAME: hejiawen
 
 # 定义 stages
 stages:
