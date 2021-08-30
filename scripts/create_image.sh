@@ -127,6 +127,11 @@ echo " " >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.
 #压缩
 xz -zf ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/image/${target_name}*.img
 
+# Generate sha256sum
+cd ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/image/
+sha256sum  ${target_name}*.xz >> SHA256SUMS.txt
+cd -
+
 #target_name
 
 echo -e "\nDone."
