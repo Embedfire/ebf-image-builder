@@ -1342,6 +1342,53 @@ populate_rootfs () {
 
 	tar -cf "${DIR}/boot.tar" .
 
+        # create fatboot.img
+        if [ "${imagename%%-*}" == "imx6ull" ]; then
+ 
+                echo ""
+                echo "Creating fatboot.img"
+                echo "-----------------------------"
+ 
+                fatboot=${DIR}/fatboot.img
+ 
+                # stat the boot directory size
+                fatbootsize="$(du -s . 2>/dev/null | awk '{print $1}')"
+ 
+                # reserve 5MB free space
+                fatbootsize=$(bc -l <<< "scale=0; (($((fatbootsize)) + 1023) / 1024 * 1024 + 5 * 1024)")
+ 
+                dd if=/dev/zero of=${fatboot} bs=1024 count=$((fatbootsize))
+                sudo mkfs.vfat ${fatboot}
+                echo -e "n \np \n1\n\n\nt \ne\nw \nq \n" | fdisk ${fatboot}
+                fat_loop=$(sudo losetup -f || true)
+                sudo losetup ${fat_loop} ${fatboot}
+                sudo kpartx -va ${fat_loop}
+                testloop=$(echo ${fat_loop} | awk -F'/' '{print $3}')
+ 
+                sudo mkfs.vfat -F 16 /dev/mapper/${testloop}p1 -n ${BOOT_LABEL}
+
+                temp_dir=$(mktemp -d ${DIR}/../../ignore/tmp.XXXXXXXXXX)
+                sudo mount /dev/mapper/${testloop}p1 ${temp_dir}
+                echo "-----------------------------"
+
+                echo "Populating fatboot.img"
+                echo "-----------------------------"
+ 
+                lsblk | grep -v sr0
+                sudo cp -r ./* ${temp_dir}
+                sudo umount ${temp_dir}
+                sync
+ 
+                sudo kpartx -d ${fat_loop} || true
+                sudo losetup -d ${fat_loop} || true
+ 
+                rm -rf ${temp_dir}
+ 
+                echo "fatboot.img size: $(du -sh ${fatboot} 2>/dev/null | awk '{print $1}')"
+                echo "Finished populating fatboot.img"
+                echo "-----------------------------"
+        fi
+
 	cd "${DIR}/"
 
 	if [ ! "x${media_boot_partition}" = "x${media_rootfs_partition}" ] ; then

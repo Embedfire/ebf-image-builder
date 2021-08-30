@@ -84,6 +84,11 @@ else
 
 	cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/boot.tar \
 		${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
+
+        if [ -f deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/fatboot.img ]; then
+                cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/fatboot.img \
+                        ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
+        fi
 fi
 
 
