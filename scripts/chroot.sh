@@ -1682,15 +1682,15 @@ if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
 fi
 
 if [ "x${chroot_directory}" = "xenable" ]; then
-	echo "Log: moving rootfs to directory: [${deb_arch}-rootfs-${deb_distribution}-${deb_codename}]"
-	sudo mv -v "${tempdir}" "${DIR}/deploy/${export_filename}/${deb_arch}-rootfs-${deb_distribution}-${deb_codename}"
-	du -h --max-depth=0 "${DIR}/deploy/${export_filename}/${deb_arch}-rootfs-${deb_distribution}-${deb_codename}"
+	echo "Log: moving rootfs to directory: [${DISTRIB_TYPE}-${deb_arch}-rootfs-${deb_distribution}-${deb_codename}]"
+	sudo mv -v "${tempdir}" "${DIR}/deploy/${export_filename}/${DISTRIB_TYPE}-${deb_arch}-rootfs-${deb_distribution}-${deb_codename}"
+	du -h --max-depth=0 "${DIR}/deploy/${export_filename}/${DISTRIB_TYPE}-${deb_arch}-rootfs-${deb_distribution}-${deb_codename}"
 else
 	cd "${tempdir}" || true
-	echo "Log: packaging rootfs: [${deb_arch}-rootfs-${deb_distribution}-${deb_codename}.tar]"
-	sudo LANG=C tar --numeric-owner -cf "${DIR}/deploy/${export_filename}/${deb_arch}-rootfs-${deb_distribution}-${deb_codename}.tar" .
+	echo "Log: packaging rootfs: [${DISTRIB_TYPE}-${deb_arch}-rootfs-${deb_distribution}-${deb_codename}.tar]"
+	sudo LANG=C tar --numeric-owner -cf "${DIR}/deploy/${export_filename}/${DISTRIB_TYPE}-${deb_arch}-rootfs-${deb_distribution}-${deb_codename}.tar" .
 	cd "${DIR}/" || true
-	ls -lh "${DIR}/deploy/${export_filename}/${deb_arch}-rootfs-${deb_distribution}-${deb_codename}.tar"
+	ls -lh "${DIR}/deploy/${export_filename}/${DISTRIB_TYPE}-${deb_arch}-rootfs-${deb_distribution}-${deb_codename}.tar"
 	sudo chown -R ${USER}:${USER} "${DIR}/deploy/${export_filename}/"
 fi
 
