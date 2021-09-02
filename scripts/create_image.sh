@@ -129,7 +129,7 @@ xz -zf ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/image/${target_nam
 
 # Generate sha256sum
 cd ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/image/
-sha256sum  ${target_name}*.xz >> SHA256SUMS.txt
+sha256sum  ${target_name}*.xz > SHA256SUMS.txt
 cd -
 
 #target_name
