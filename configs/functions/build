@@ -142,7 +142,11 @@ build_uboot() {
 			
 			cp ${UBOOT_BUILD_FILE} ${BUILD}/${MUBOOT_FILE}
 			if [ "${SPL_BUILD_FILE}" ]; then
-				cp ${SPL_BUILD_FILE} ${BUILD}
+				if [ "${target_name}" == "imx8m-mini" ]; then
+					cp spl/${SPL_BUILD_FILE} ${BUILD}
+				else
+					cp ${SPL_BUILD_FILE} ${BUILD}
+				fi
 			fi
 		fi
 
@@ -153,7 +157,11 @@ build_uboot() {
 			
 			cp ${UBOOT_BUILD_FILE} ${BUILD}/${NUBOOT_FILE}
 			if [ "${SPL_BUILD_FILE}" ] ; then
-				cp ${SPL_BUILD_FILE} ${BUILD}
+				if [ "${target_name}" == "imx8m-mini" ]; then
+					cp spl/${SPL_BUILD_FILE} ${BUILD}
+				else
+					cp ${SPL_BUILD_FILE} ${BUILD}
+				fi
 			fi		
 		fi
 	fi
