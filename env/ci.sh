@@ -213,6 +213,7 @@ if [  $build_cpu ]; then
 
 else
     echo "只默认更新根文件系统"
+    ls /usr/share/keyrings/debian-archive-keyring.gpg
     imx6ull_build_img
     stm32mp157_build_img
     #rk3328_build_img
