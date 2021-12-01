@@ -21,10 +21,10 @@ $ sudo apt install make gcc-arm-linux-gnueabihf gcc bison flex libssl-dev dpkg-d
 ```
 $ mkdir -p ~/project/embedfire
 $ cd ~/project/embedfire
-$ git clone --depth 1  xxx -b image-builder_2.0
+$ git clone --depth 1  xxx 
 $ cd ebf-image-builder
 ```
-**注意**：本文档只适用image-builder_2.0分支
+
 
 ### 3.设置编译环境
 
