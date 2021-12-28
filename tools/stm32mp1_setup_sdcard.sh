@@ -1135,6 +1135,7 @@ populate_rootfs () {
 			echo "" >> ${wfile}
 		fi
 
+		echo "#flash_firmware=continued" >> ${wfile}
 		echo "#flash_firmware=once" >> ${wfile}
 		
 		echo "" >> ${wfile}
