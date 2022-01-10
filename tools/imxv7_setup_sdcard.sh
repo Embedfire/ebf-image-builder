@@ -1151,7 +1151,11 @@ populate_rootfs () {
 			if [ "${BTRFS_FSTAB}" ] ; then
 				echo "${rootfs_drive}  /  btrfs  defaults,noatime  0  1" >> ${wfile}
 			else
-				echo "${rootfs_drive}  /  ${ROOTFS_TYPE}  noatime,errors=remount-ro  0  1" >> ${wfile}
+				if [ "x${ROOT_DEVICE_LABEL}" = "xenable" ] ; then
+					echo "${conf_root_label}  /  ${ROOTFS_TYPE}  noatime,errors=remount-ro  0  1" >> ${wfile}
+				else
+					echo "${rootfs_drive}  /  ${ROOTFS_TYPE}  noatime,errors=remount-ro  0  1" >> ${wfile}
+				fi
 			fi
 		fi
 		
@@ -1406,7 +1410,11 @@ populate_rootfs () {
 		echo "${boot_drive}  /boot/efi vfat defaults 0 0" >> ${wfile}
 	fi
 	if [ ! "x${boot_drive}" = "x${rootfs_drive}" ] ; then
-		echo "${boot_drive}  /boot vfat defaults 0 0" >> ${wfile}
+		if [ "x${ROOT_DEVICE_LABEL}" = "xenable" ] ; then
+			echo "${conf_boot_label}  /boot vfat defaults 0 0" >> ${wfile}
+		else
+			echo "${boot_drive}  /boot vfat defaults 0 0" >> ${wfile}
+		fi
 	fi
 
 	rm -rf ${TEMPDIR}/disk/boot/*
