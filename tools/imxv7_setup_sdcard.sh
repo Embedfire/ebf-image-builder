@@ -1269,17 +1269,27 @@ populate_rootfs () {
 		sed -i 's/GOVERNOR="ondemand"/GOVERNOR="performance"/g' ${TEMPDIR}/disk/etc/init.d/cpufrequtils
 	fi
 
-	if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
-		#sudo git clone https://gitee.com/wildfireteam/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts-bak/ --depth 1
-		#if [ -f ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh ] ; then
-		#	cp ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh  ${TEMPDIR}/disk/opt/scripts-bak/boot
-		#	rm -r ${TEMPDIR}/disk/opt/scripts/
-		#fi
-		#mv ${TEMPDIR}/disk/opt/scripts-bak ${TEMPDIR}/disk/opt/scripts/
-		sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1
-		sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
-	fi
 
+	# if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
+	# 	#sudo git clone https://gitee.com/wildfireteam/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts-bak/ --depth 1
+	# 	#if [ -f ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh ] ; then
+	# 	#	cp ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh  ${TEMPDIR}/disk/opt/scripts-bak/boot
+	# 	#	rm -r ${TEMPDIR}/disk/opt/scripts/
+	# 	#fi
+	# 	#mv ${TEMPDIR}/disk/opt/scripts-bak ${TEMPDIR}/disk/opt/scripts/
+	# 	sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1
+	# 	sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
+	# fi
+
+	if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
+			if [ "x${conf_board}" = "xfire-rockchip-3399" ]; then
+			sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git --branch=dev_rockchip ${TEMPDIR}/disk/opt/scripts/ --depth 1
+			sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
+		else
+			sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1
+			sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
+		fi
+	fi
 
 
 	if [ "x${drm}" = "xetnaviv" ] ; then
