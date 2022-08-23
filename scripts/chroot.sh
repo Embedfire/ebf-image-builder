@@ -323,6 +323,12 @@ sudo mkdir -p "${tempdir}/etc/dpkg/dpkg.cfg.d/" || true
 #generic apt.conf tweaks for flash/mmc devices to save on wasted space...
 sudo mkdir -p "${tempdir}/etc/apt/apt.conf.d/" || true
 
+#ubuntu apt verify
+if [ "x${deb_distribution}" = "xubuntu" ] ; then 
+	sudo touch "${tempdir}/etc/apt/apt.conf.d/99verify-peer.conf"
+	echo  "Acquire { https::Verify-Peer false }" > "${tempdir}/etc/apt/apt.conf.d/99verify-peer.conf"
+fi
+
 #apt: emulate apt-get clean:
 echo '#Custom apt-get clean' > /tmp/02apt-get-clean
 echo 'DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb || true"; };' >> /tmp/02apt-get-clean
