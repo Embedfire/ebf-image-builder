@@ -11,8 +11,8 @@ unset SUPPORTED_LINUX_TAGS
 DISTRIBUTION_ARRAY=("Debian" "Ubuntu")
 Ubuntu_RELEASE_ARRAY=("bionic" "focal")
 Debian_RELEASE_ARRAY=("buster")
-Ubuntu_TYPE_ARRAY=("console" "qt" "desktop")
-Debian_TYPE_ARRAY=("console" "qt" "desktop")
+Ubuntu_TYPE_ARRAY=("console" "qt" "xfce")
+Debian_TYPE_ARRAY=("console" "qt" "xfce")
 INSTALL_TYPE_ARRAY=("ALL" "NAND" "eMMC/SD")
 
 DISTRIBUTION_ARRAY_LEN=${#DISTRIBUTION_ARRAY[@]}

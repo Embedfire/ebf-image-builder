@@ -14,10 +14,7 @@ build_cpu=$1
 
 source configs/functions/functions
 
-
 start_time=`date +%s`
-
-
 
 export FIRE_BOARD=
 export LINUX=
@@ -172,8 +169,28 @@ qt
     make  DOWNLOAD_MIRROR=china 
 }  
 
+imx8mmini_build_img(){
 
+    # imx8mmini debian10 console
+    FIRE_BOARD=ebf_imx_8m_mini
+    LINUX=5.4.47
+    UBOOT=2020.04
+    DISTRIBUTION=Debian
+    DISTRIB_RELEASE=buster
+    DISTRIB_TYPE=console
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china
 
+    # imx8mmini debian10 xfce
+    FIRE_BOARD=ebf_imx_8m_mini
+    LINUX=5.4.47
+    UBOOT=2020.04
+    DISTRIBUTION=Debian
+    DISTRIB_RELEASE=buster
+    DISTRIB_TYPE=xfce
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china
+}
 
 if [ ! -d ${IMAGE_BUILDER_DIR}/.git ]; then
     info_msg "Image-builder  repository does not exist, clone image-builder repository('$1') from '$IMAGE_BUILDER_SOURCE_URL'..."
@@ -191,12 +208,9 @@ git fetch --all
 git reset --hard $IMAGE_BUILDER_GIT_TAGS
 git pull
 
-
-
 if [  $build_cpu ]; then
 
     echo "需要编译的芯片为$build_cpu"
-
     case $build_cpu in
         imx6ull)  
             imx6ull_build_img enable         
@@ -213,19 +227,15 @@ if [  $build_cpu ]; then
 
 else
     echo "只默认更新根文件系统"
-    imx6ull_build_img
-    stm32mp157_build_img
+    #imx6ull_build_img
+    #stm32mp157_build_img
+    imx8mmini_build_img
     #rk3328_build_img
 fi
 
-
-
-
-#cope to target_dir
-
+# copy and rm file
 end_time=`date +%s`
 time_cal $(($end_time - $start_time))
-
 
 cp -ur ${IMAGE_BUILDER_DIR}/history/*  ${TARGET_DIR}/
 

@@ -422,7 +422,7 @@ if [ "x${repo_external}" = "xenable" ] ; then
 	echo "" >> ${wfile}
 	echo "#deb ${repo_external_server_backup1} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 	echo "#deb ${repo_external_server_backup2} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
-	echo "deb [arch=${repo_external_arch}] ${repo_external_server} buster ${repo_external_components}" >> ${wfile}
+	echo "#deb [arch=${repo_external_arch}] ${repo_external_server} buster ${repo_external_components}" >> ${wfile}
 	echo "deb [arch=${repo_external_arch}] ${repo_external_server} ${ebf_repo_dist} ${repo_external_components}" >> ${wfile}
 	echo "#deb-src [arch=${repo_external_arch}] ${repo_external_server} ${repo_external_dist} ${repo_external_components}" >> ${wfile}
 fi
@@ -834,6 +834,17 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			update-initramfs -u -k ${repo_rcnee_pkg_version}
 		fi
 	}
+	
+	install_python_pkgs () {
+		if [ ! "x${python3_pkgs}" = "x" ] ; then
+			if [ ! "x${python3_extra_index}" = "x" ] ; then
+				python3 -m pip install --extra-index-url ${python3_extra_index} ${python3_pkgs}
+			else
+				echo "Log: (chroot) Installing [python3 -m pip install ${python3_pkgs}]"
+				python3 -m pip install ${python3_pkgs}
+			fi
+		fi
+	}
 
 	system_tweaks () {
 		echo "Log: (chroot): system_tweaks"
@@ -843,6 +854,21 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 		if [ ! "x${rfs_ssh_banner}" = "x" ] || [ ! "x${rfs_ssh_user_pass}" = "x" ] ; then
 			if [ -f /etc/ssh/sshd_config ] ; then
 				sed -i -e 's:#Banner none:Banner /etc/issue.net:g' /etc/ssh/sshd_config
+			fi
+		fi
+
+		# system desktop autologin
+		if [ ! "x${rfs_default_desktop}" = "x" ] ; then
+			if [ -d /etc/lightdm/lightdm.conf.d/ ] ; then
+				echo "[Seat:*]" > /etc/lightdm/lightdm.conf.d/${rfs_username}.conf
+				echo "autologin-user=${rfs_username}" >> /etc/lightdm/lightdm.conf.d/${rfs_username}.conf
+				echo "autologin-session=${rfs_default_desktop}" >> /etc/lightdm/lightdm.conf.d/${rfs_username}.conf
+				echo "Log: (chroot): Configured /etc/lightdm/lightdm.conf.d/${rfs_username}.conf"
+				cat /etc/lightdm/lightdm.conf.d/${rfs_username}.conf
+			elif [ -f /etc/lightdm/lightdm.conf ] ; then
+				sed -i -e 's:#autologin-user=:autologin-user='$rfs_username':g' /etc/lightdm/lightdm.conf
+				sed -i -e 's:#autologin-session=:autologin-session='$rfs_default_desktop':g' /etc/lightdm/lightdm.conf
+				cat /etc/lightdm/lightdm.conf | grep autologin
 			fi
 		fi
 	}
@@ -1090,9 +1116,9 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			systemctl enable rng-tools.service || true
 		fi
 
-#		if [ -f /lib/systemd/system/actlogo.service ] ; then
-#			systemctl enable actlogo.service || true
-#		fi
+		#if [ -f /lib/systemd/system/actlogo.service ] ; then
+		#	systemctl enable actlogo.service || true
+		#fi
 
 		systemctl mask getty@tty1.service || true
 
@@ -1196,6 +1222,20 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			systemctl disable systemd-resolved.service || true
 		fi
 
+		if [ ! "x${rfs_use_systemdnetworkd}" = "x" ] ; then
+			if [ -f /lib/systemd/system/systemd-networkd.service ] ; then
+				systemctl enable systemd-networkd.service || true
+			fi
+
+			if [ -f /lib/systemd/system/systemd-networkd-wait-online.service ] ; then
+				systemctl disable systemd-networkd-wait-online.service || true
+			fi
+
+			if [ -f /lib/systemd/system/systemd-resolved.service ] ; then
+				systemctl enable systemd-resolved.service || true
+			fi
+		fi
+
 		#Kill man-db
 		#debian@beaglebone:~$ sudo systemd-analyze blame | grep man-db.service
 		#    4min 10.587s man-db.service
@@ -1248,6 +1288,7 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 
 	install_pkg_updates
 	install_pkgs
+	install_python_pkgs
 	system_tweaks
 	set_locale
 	if [ "x${chroot_not_reliable_deborphan}" = "xenable" ] ; then
@@ -1306,6 +1347,9 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			rm -f "/tmp/cacert.pem"
 	fi
 
+	echo "[global]" > /etc/pip.conf
+	echo "extra-index-url=https://pypi.tuna.tsinghua.edu.cn/simple" >> /etc/pip.conf
+
 	rm -f /chroot_script.sh || true
 __EOF__
 
@@ -1315,9 +1359,9 @@ if [ -d "${BUILD_DEBS}" ] ; then
 	sudo cp ${BUILD_DEBS}/${KERNEL_DEB} ${tempdir}/tmp
 fi
 
-if [ ! "x${repo_external_key}" = "x" ] ; then
-		sudo cp -v "${OIB_DIR}/target/keyring/${repo_external_key}" "${tempdir}/tmp/${repo_external_key}"
-	fi
+#if [ ! "x${repo_external_key}" = "x" ] ; then
+#		sudo cp -v "${OIB_DIR}/target/keyring/${repo_external_key}" "${tempdir}/tmp/${repo_external_key}"
+#	fi
 
 if [ -f "${OIB_DIR}/target/keyring/cacert.pem" ] ; then
 	sudo cp -v "${OIB_DIR}/target/keyring/cacert.pem" "${tempdir}/tmp"
@@ -1592,6 +1636,12 @@ cat > "${DIR}/cleanup_script.sh" <<-__EOF__
 		ln -s /run/connman/resolv.conf /etc/resolv.conf
 	fi
 
+	if [ -f /etc/systemd/system/multi-user.target.wants/systemd-resolved.service ] ; then
+		rm -rf /etc/resolv.conf.bak || true
+		rm -rf /etc/resolv.conf || true
+		ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+	fi
+
 	rm -f /cleanup_script.sh || true
 __EOF__
 
@@ -1631,6 +1681,8 @@ if [ -d "${tempdir}/etc/ssh/" -a "x${keep_ssh_keys}" = "x" ] ; then
 	#Remove pre-generated ssh keys, these will be regenerated on first bootup...
 	sudo rm -rf "${tempdir}"/etc/ssh/ssh_host_* || true
 	sudo touch "${tempdir}/etc/ssh/ssh.regenerate" || true
+	#Remove machine-id, this will be regenerated on first bootup...
+	sudo rm -f "${tempdir}"/etc/machine-id || true
 fi
 
 #ID.txt:

@@ -119,7 +119,7 @@ echo " " >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.
 
 cd $ROOT
 echo "image-builder仓库：https://gitee.com/Embedfire/ebf-image-builder" >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
-echo "image-builder分支：image-builder_2.0" >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo "image-builder分支：master" >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
 echo "image-builder提交ID: $(git log | grep commit | head -n 1 |  awk '{print $2}')"  >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
 echo " " >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
 

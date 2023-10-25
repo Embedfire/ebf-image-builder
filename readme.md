@@ -125,6 +125,7 @@ $ make
 **编译选项**：
 - DOWNLOAD_MIRROR：如果是国内用户，可加入**DOWNLOAD_MIRROR=china**选项，以提高文件下载速度。
 - FORCE_UPDATE：当重复多次编译镜像时，uboot、内核并不会反复编译。如果需要重新编译uboot、内核，可加入**FORCE_UPDATE=enable**选项。
+- SOURCE_URL: 内部编译测试使用命令**make SOURCE_URL=gitlab**，提高文件下载速度。
 
 在设置好环境执行make就会开始编译，如果编译过程会用到root权限，将提示你要输入密码才能继续编译。
 
