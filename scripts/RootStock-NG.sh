@@ -159,14 +159,15 @@ run_roostock_ng () {
 
 	/bin/bash -e "${BUILD_SCRIPT}/install_dependencies.sh" || { exit 1 ; }
 
-	if [ -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/basefs.tar" ] ;then
-		cd $tempdir
-		sudo tar -xvf "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/basefs.tar"
-		cd $DIR 
-	else
-		/bin/bash -e "${BUILD_SCRIPT}/debootstrap.sh" || { exit 1 ; }	#创建基本根文件系统
-	fi
-	
+	# if [ -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/basefs.tar" ] ;then
+	# 	cd $tempdir
+	# 	sudo tar -xvf "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/basefs.tar"
+	# 	cd $DIR 
+	# else
+	# 	/bin/bash -e "${BUILD_SCRIPT}/debootstrap.sh" || { exit 1 ; }	#创建基本根文件系统
+	# fi
+	/bin/bash -e "${BUILD_SCRIPT}/debootstrap.sh" || { exit 1 ; }	#创建基本根文件系统
+
 	/bin/bash -e "${BUILD_SCRIPT}/chroot.sh" || { exit $? ; }
 	#sudo rm -rf ${tempdir}/ || true
 }

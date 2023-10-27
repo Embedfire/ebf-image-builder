@@ -7,7 +7,8 @@ IMAGE_BUILDER_DIR=/opt/ebf-image-builder
 TARGET_DIR=/mnt/share
 
 GIT_CLONE_OPTIONS="--depth=1"
-IMAGE_BUILDER_GIT_TAGS=master
+#IMAGE_BUILDER_GIT_TAGS=master
+IMAGE_BUILDER_GIT_TAGS=origin/image-builder-imx8mmini
 IMAGE_BUILDER_SOURCE_URL="git@gitlab.embedfire.local:i.mx6/ebf-image-builder.git"
 
 build_cpu=$1
@@ -179,7 +180,7 @@ imx8mmini_build_img(){
     DISTRIB_RELEASE=buster
     DISTRIB_TYPE=console
     INSTALL_TYPE=ALL
-    make  DOWNLOAD_MIRROR=china
+    make  DOWNLOAD_MIRROR=china SOURCE_URL=gitlab
 
     # imx8mmini debian10 xfce
     FIRE_BOARD=ebf_imx_8m_mini
@@ -189,7 +190,7 @@ imx8mmini_build_img(){
     DISTRIB_RELEASE=buster
     DISTRIB_TYPE=xfce
     INSTALL_TYPE=ALL
-    make  DOWNLOAD_MIRROR=china
+    make  DOWNLOAD_MIRROR=china SOURCE_URL=gitlab
 }
 
 if [ ! -d ${IMAGE_BUILDER_DIR}/.git ]; then
