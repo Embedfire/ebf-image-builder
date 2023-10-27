@@ -1020,7 +1020,7 @@ populate_rootfs () {
 	fi
 
 	wfile="${TEMPDIR}/disk/boot/uEnv.txt"
-	echo "#Docs: https://embed-linux-tutorial.readthedocs.io/zh_CN/latest/README.html" > ${wfile}
+	echo "#Docs: https://doc.embedfire.com/products/link/zh/latest/linux/ebf_i.mx6ull.html" > ${wfile}
 	echo "" >> ${wfile}
 
 	if [ "x${kernel_override}" = "x" ] ; then
@@ -1054,7 +1054,7 @@ populate_rootfs () {
 		if [ "x${conf_board}" != "x" ] ; then
 			echo "" >> ${wfile}
 			echo "###U-Boot Overlays###" >> ${wfile}
-			echo "###Documentation: https://embed-linux-tutorial.readthedocs.io/zh_CN/latest/linux_driver/device_tree_rgb_led.html" >> ${wfile}
+			echo "###Documentation: https://doc.embedfire.com/products/link/zh/latest/linux/ebf_i.mx6ull.html" >> ${wfile}
 			echo "###Master Enable" >> ${wfile}
 			if [ "x${uboot_cape_overlays}" = "xenable" ] ; then
 				echo "enable_uboot_overlays=1" >> ${wfile}
@@ -1114,7 +1114,7 @@ populate_rootfs () {
 	echo "-----------------------------"
 
 	wfile="${TEMPDIR}/disk/boot/SOC.sh"
-	generate_soc
+	#generate_soc
 
 	if [ -f ${TEMPDIR}/disk/etc/systemd/logind.conf ] ; then
 		
@@ -1282,7 +1282,7 @@ populate_rootfs () {
 	# fi
 
 	if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
-			if [ "x${conf_board}" = "xfire-rockchip-3399" ]; then
+		if [ "x${conf_board}" = "xfire-rockchip-3399" ]; then
 			sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git --branch=dev_rockchip ${TEMPDIR}/disk/opt/scripts/ --depth 1
 			sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
 		else

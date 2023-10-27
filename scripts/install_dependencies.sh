@@ -46,8 +46,6 @@ debootstrap_is_installed () {
 		fi
 	fi
 
-
-
 	if [ "${deb_pkgs}" ] ; then
 		echo "Installing: ${deb_pkgs}"
 		sudo apt-get update

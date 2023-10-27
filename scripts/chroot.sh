@@ -885,8 +885,8 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 				case "\${distro}" in
 				Debian)
 					echo "Log: (chroot) Debian: setting up locales: [${rfs_default_locale}]"
-					sed -i -e 's:# ${rfs_default_locale} UTF-8:${rfs_default_locale} UTF-8:g' /etc/locale.gen
-					locale-gen
+					#sed -i -e 's:# ${rfs_default_locale} UTF-8:${rfs_default_locale} UTF-8:g' /etc/locale.gen
+					locale-gen ${rfs_default_locale}
 					;;
 				Ubuntu)
 					echo "Log: (chroot) Ubuntu: setting up locales: [${rfs_default_locale}]"
@@ -1043,6 +1043,7 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 		grep ${rfs_username} /etc/passwd
 
 		mkdir -p /home/${rfs_username}/bin
+		touch /home/${rfs_username}/bin/update-cache
 		chown ${rfs_username}:${rfs_username} /home/${rfs_username}/bin
 		case "\${distro}" in
 		Debian)
@@ -1233,6 +1234,30 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 
 			if [ -f /lib/systemd/system/systemd-resolved.service ] ; then
 				systemctl enable systemd-resolved.service || true
+			fi
+
+			if [ -f /etc/systemd/system/multi-user.target.wants/autowifi.service ] ; then
+				systemctl disable autowifi.service || true
+			fi
+
+			if [ -f /etc/systemd/system/multi-user.target.wants/ModemManager.service ] ; then
+				systemctl disable ModemManager.service || true
+			fi
+
+			if [ -f /etc/systemd/system/multi-user.target.wants/NetworkManager.service ] ; then
+				systemctl disable NetworkManager.service || true
+			fi
+
+			if [ -f /etc/systemd/system/multi-user.target.wants/wpa_supplicant@.service ] ; then
+				systemctl disable wpa_supplicant@.service || true
+			fi
+
+			if [ -f /etc/systemd/system/multi-user.target.wants/wpa_supplicant-wired@.service] ; then
+				systemctl disable  wpa_supplicant-wired@.service || true
+			fi
+
+			if [ -f /etc/systemd/system/multi-user.target.wants/wpa_supplicant-nl80211@.service ] ; then
+				systemctl disable  wpa_supplicant-nl80211@.service || true
 			fi
 		fi
 
@@ -1615,8 +1640,12 @@ cat > "${DIR}/cleanup_script.sh" <<-__EOF__
 		#update time stamp before final cleanup...
 		if [ -f /lib/systemd/system/systemd-timesyncd.service ] ; then
 			touch /var/lib/systemd/clock
-
 			cat /etc/group | grep ^systemd-timesync && chown systemd-timesync:systemd-timesync /var/lib/systemd/clock || true
+
+			#systemd v235+: (Debian Buster/Bullseye)
+			mkdir -p /var/lib/systemd/timesync/ || true
+			touch /var/lib/systemd/timesync/clock
+			cat /etc/group | grep ^systemd-timesync && chown systemd-timesync:systemd-timesync /var/lib/systemd/timesync/clock || true
 		fi
 
 #		#This is tmpfs, clear out any left overs...
@@ -1698,6 +1727,16 @@ if [ -f "${tempdir}/etc/resolv.conf" ] ; then
 	sudo sh -c "echo 'nameserver 8.8.4.4' >> ${wfile}"
 fi
 
+#add eth0.network
+if [ ! "x${rfs_use_systemdnetworkd}" = "x" ] ; then
+	wfile="${tempdir}/etc/systemd/network/eth0.network"
+	sudo sh -c "echo '[Match]' > ${wfile}"
+	sudo sh -c "echo 'Name=eth0' >> ${wfile}"
+	sudo sh -c "echo '' >> ${wfile}"
+	sudo sh -c "echo '[Network]' >> ${wfile}"
+	sudo sh -c "echo 'DHCP=yes' >> ${wfile}"
+fi
+
 report_size
 chroot_umount
 
@@ -1728,16 +1767,16 @@ if [ "x${chroot_COPY_SETUP_SDCARD}" = "xenable" ] ; then
 	fi
 fi
 
-if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
+#if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
 	#sudo git clone https://gitee.com/wildfireteam/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts-bak/ --depth 1
 	#if [ -f ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh ] ; then
 	#	cp ${TEMPDIR}/disk/opt/scripts/boot/ebf-build.sh  ${TEMPDIR}/disk/opt/scripts-bak/boot
 	#	rm -r ${TEMPDIR}/disk/opt/scripts/
 	#fi
 	#mv ${TEMPDIR}/disk/opt/scripts-bak ${TEMPDIR}/disk/opt/scripts/
-	sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1
-	sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
-fi
+#	sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1
+#	sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
+#fi
 
 if [ "x${chroot_directory}" = "xenable" ]; then
 	echo "Log: moving rootfs to directory: [${DISTRIB_TYPE}-${deb_arch}-rootfs-${deb_distribution}-${deb_codename}]"
@@ -1752,29 +1791,18 @@ else
 	sudo chown -R ${USER}:${USER} "${DIR}/deploy/${export_filename}/"
 fi
 
-echo "Log: USER:${USER}"
-sys_size="$(du -sh ${DIR}/deploy/${export_filename} 2>/dev/null | awk '{print $1}')"
-echo "Log: sys_size:${sys_size}"
-lastchar=${sys_size#${sys_size%?}}
-num=${sys_size%${lastchar}}
-case $lastchar in
-    K|k)
-    value=$(($num / 1024))
-    ;;
-    m|M)
-    value=$num
-    ;;
-    g|G)
-    value=$(($num * 1024))
-    ;;
-    *)
-    echo "Wrong unit"
-    exit 1
-    ;;
-esac
-
+value=$(du -sm "${DIR}/deploy/${export_filename}" | awk '{print $1}')
 image_size=$(bc -l <<< "scale=0; ((($value * 1.2) / 1 + 0) / 4 + 1) * 4")
 image_size=$(($image_size + $conf_boot_endmb + $conf_boot_startmb)) 
+echo "Log: fiel_size:${value}M image_size:${image_size}M"
+if [ -e /tmp/npipe ] ; then
+	rm /tmp/npipe
+fi
+mkfifo -m 777 /tmp/npipe
+echo "$image_size" > /tmp/npipe &
+
+echo "Log: USER:${USER}"
+
 if [ "x${chroot_tarball}" = "xenable" ] ; then
 	echo "Creating: ${export_filename}.tar"
 	cd "${DIR}/deploy/" || true
@@ -1782,12 +1810,7 @@ if [ "x${chroot_tarball}" = "xenable" ] ; then
 	sudo chown -R ${USER}:${USER} "${export_filename}.tar"
 	cd "${DIR}/" || true
 fi
-echo "Log: image_size:${image_size}M"
+
 chroot_completed="true"
-if [ -e /tmp/npipe ] ; then
-	rm /tmp/npipe
-fi
-mkfifo -m 777 /tmp/npipe
-echo "$image_size" > /tmp/npipe &
 #
 #

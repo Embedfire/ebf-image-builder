@@ -12,7 +12,7 @@ DISTRIBUTION_ARRAY=("Debian" "Ubuntu")
 Ubuntu_RELEASE_ARRAY=("bionic" "focal")
 Debian_RELEASE_ARRAY=("buster")
 Ubuntu_TYPE_ARRAY=("console" "qt" "xfce")
-Debian_TYPE_ARRAY=("console" "qt" "xfce")
+Debian_TYPE_ARRAY=("tiny" "console" "qt" "xfce")
 INSTALL_TYPE_ARRAY=("ALL" "NAND" "eMMC/SD")
 
 DISTRIBUTION_ARRAY_LEN=${#DISTRIBUTION_ARRAY[@]}
@@ -621,7 +621,7 @@ function choose_install_type() {
 	echo ""
 
 	local DEFAULT_NUM
-	DEFAULT_NUM=1
+	DEFAULT_NUM=3
 
 	export INSTALL_TYPE=
 	local ANSWER
