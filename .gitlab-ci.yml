@@ -20,8 +20,9 @@ build_image_job:
   #指定分支更新进行编译
   only:
     #- image-builder_2.0
-    - master
-
+    #- master
+    - image-builder-imx8mmini
+  
   before_script:
  
     - git config --global user.email "$GIT_USEREMAIL"
