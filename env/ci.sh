@@ -8,7 +8,7 @@ TARGET_DIR=/mnt/share
 
 GIT_CLONE_OPTIONS="--depth=1"
 #IMAGE_BUILDER_GIT_TAGS=master
-IMAGE_BUILDER_GIT_TAGS=image-builder-imx8mmini
+IMAGE_BUILDER_GIT_TAGS=origin/image-builder-imx8mmini
 IMAGE_BUILDER_SOURCE_URL="git@gitlab.embedfire.local:i.mx6/ebf-image-builder.git"
 
 build_cpu=$1
