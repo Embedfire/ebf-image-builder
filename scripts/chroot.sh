@@ -512,8 +512,14 @@ echo "ff02::2 ip6-allrouters" >> /tmp/hosts
 sudo mv /tmp/hosts "${tempdir}/etc/hosts"
 sudo chown root:root "${tempdir}/etc/hosts"
 
-sudo echo "Defaults lecture = never" > /tmp/privacy
-sudo mv /tmp/privacy "${tempdir}/etc/sudoers.d/privacy"
+# 为sudo用户提示命令的用法,never为从不提示
+if [ -f ${tempdir}/etc/sudoers.d/README ] ; then
+	sudo echo "Defaults lecture = never" > /tmp/privacy
+	sudo mv /tmp/privacy "${tempdir}/etc/sudoers.d/privacy"
+else
+	echo "Log: add Defaults lecture to /etc/sudoers"
+	echo "Defaults lecture = never" >> /etc/sudoers
+fi
 
 echo "${rfs_hostname}" > /tmp/hostname
 sudo mv /tmp/hostname "${tempdir}/etc/hostname"
