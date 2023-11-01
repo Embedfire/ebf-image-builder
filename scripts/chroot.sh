@@ -890,7 +890,10 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 				case "\${distro}" in
 				Debian)
 					echo "Log: (chroot) Debian: setting up locales: [${rfs_default_locale}]"
-					#sed -i -e 's:# ${rfs_default_locale} UTF-8:${rfs_default_locale} UTF-8:g' /etc/locale.gen
+					echo "locales locales/default_environment_locale select ${rfs_default_locale}" | debconf-set-selections
+					echo "locales locales/locales_to_be_generated multiselect ${rfs_default_locale} UTF-8" | debconf-set-selections
+					rm /etc/locale.gen || true
+					dpkg-reconfigure --frontend noninteractive locales
 					locale-gen ${rfs_default_locale}
 					;;
 				Ubuntu)
@@ -899,8 +902,7 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 					;;
 				esac
 
-				echo "LANG=${rfs_default_locale}" > /etc/default/locale
-
+				#echo "LANG=${rfs_default_locale}" > /etc/default/locale
 				echo "Log: (chroot): [locale -a]"
 				locale -a
 			fi
@@ -1254,15 +1256,15 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			fi
 
 			if [ -f /etc/systemd/system/multi-user.target.wants/wpa_supplicant@.service ] ; then
-				systemctl disable wpa_supplicant@.service || true
+				systemctl mask wpa_supplicant@.service || true
 			fi
 
 			if [ -f /etc/systemd/system/multi-user.target.wants/wpa_supplicant-wired@.service] ; then
-				systemctl disable  wpa_supplicant-wired@.service || true
+				systemctl mask  wpa_supplicant-wired@.service || true
 			fi
 
 			if [ -f /etc/systemd/system/multi-user.target.wants/wpa_supplicant-nl80211@.service ] ; then
-				systemctl disable  wpa_supplicant-nl80211@.service || true
+				systemctl mask  wpa_supplicant-nl80211@.service || true
 			fi
 		fi
 

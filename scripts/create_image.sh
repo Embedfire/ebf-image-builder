@@ -8,8 +8,8 @@ time=$(date +%Y-%m-%d)
 source configs/common.conf
 
 ## Board configuraions
-source ${BOARD_CONFIG}/${FIRE_BOARD}.conf
 source configs/user.conf
+source ${BOARD_CONFIG}/${FIRE_BOARD}.conf
 
 
 ##common functions
