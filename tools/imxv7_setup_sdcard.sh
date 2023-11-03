@@ -1123,11 +1123,11 @@ populate_rootfs () {
 	fi
 
 	# 不建议开启DefaultTimeoutStartSec
-	if [ -f ${TEMPDIR}/disk/etc/systemd/system.conf ] ; then
-		
-		sed ${TEMPDIR}/disk/etc/systemd/system.conf -i -e "s/^#DefaultTimeoutStartSec=90s/DefaultTimeoutStartSec=5s/"
-
-	fi
+	#if [ -f ${TEMPDIR}/disk/etc/systemd/system.conf ] ; then
+	#	
+	#	sed ${TEMPDIR}/disk/etc/systemd/system.conf -i -e "s/^#DefaultTimeoutStartSec=90s/DefaultTimeoutStartSec=5s/"
+	#
+	#fi
 
 	#RootStock-NG
 	if [ -f ${TEMPDIR}/disk/etc/rcn-ee.conf ] ; then

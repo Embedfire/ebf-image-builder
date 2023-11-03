@@ -1222,6 +1222,7 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 
 		#We use connman...
 		if [ -f /lib/systemd/system/systemd-networkd.service ] ; then
+			echo "Log: (chroot): disable systemd-networkd.service "
 			systemctl disable systemd-networkd.service || true
 		fi
 
@@ -1235,16 +1236,8 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 				systemctl enable systemd-networkd.service || true
 			fi
 
-			if [ -f /lib/systemd/system/systemd-networkd-wait-online.service ] ; then
-				systemctl disable systemd-networkd-wait-online.service || true
-			fi
-
 			if [ -f /lib/systemd/system/systemd-resolved.service ] ; then
 				systemctl enable systemd-resolved.service || true
-			fi
-
-			if [ -f /etc/systemd/system/multi-user.target.wants/autowifi.service ] ; then
-				systemctl disable autowifi.service || true
 			fi
 
 			if [ -f /etc/systemd/system/multi-user.target.wants/ModemManager.service ] ; then
@@ -1253,18 +1246,6 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 
 			if [ -f /etc/systemd/system/multi-user.target.wants/NetworkManager.service ] ; then
 				systemctl disable NetworkManager.service || true
-			fi
-
-			if [ -f /etc/systemd/system/multi-user.target.wants/wpa_supplicant@.service ] ; then
-				systemctl mask wpa_supplicant@.service || true
-			fi
-
-			if [ -f /etc/systemd/system/multi-user.target.wants/wpa_supplicant-wired@.service] ; then
-				systemctl mask  wpa_supplicant-wired@.service || true
-			fi
-
-			if [ -f /etc/systemd/system/multi-user.target.wants/wpa_supplicant-nl80211@.service ] ; then
-				systemctl mask  wpa_supplicant-nl80211@.service || true
 			fi
 		fi
 
@@ -1281,10 +1262,25 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			systemctl disable pppd-dns.service || true
 		fi
 
-		if [ -f /lib/systemd/system/hostapd.service ] ; then
-			systemctl disable hostapd.service || true
-		fi
+		#if [ -f /lib/systemd/system/hostapd.service ] ; then
+		#	systemctl mask hostapd.service || true
+		#fi
 
+		#if [ -f /lib/systemd/system/systemd-networkd-wait-online.service ] ; then
+		#	systemctl mask systemd-networkd-wait-online.service || true
+		#fi
+
+		#if [ -f /etc/systemd/system/multi-user.target.wants/autowifi.service ] ; then
+		#	systemctl disable autowifi.service || true
+		#fi
+
+		# wpa_supplicant
+		if [ -f /etc/systemd/system/multi-user.target.wants/wpa_supplicant.service ] ; then
+			echo "Log: (chroot): disable wpa_supplicant service "
+			ln -s /dev/null /etc/systemd/system/wpa_supplicant-wired@.service
+			ln -s /dev/null /etc/systemd/system/wpa_supplicant@.service
+			ln -s /dev/null /etc/systemd/system/wpa_supplicant-nl80211@.service
+		fi
 	}
 
 	grub_tweaks () {

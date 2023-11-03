@@ -675,7 +675,7 @@ function lunch() {
 	echo "==========================================="
 	echo ""
 	echo "Environment setup done."
-	echo "Type 'make' to build."
+	echo "Type 'make' or 'make DOWNLOAD_MIRROR=china' to build."
 	echo ""
 }
 
