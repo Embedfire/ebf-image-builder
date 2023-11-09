@@ -24,10 +24,10 @@ build_image_job:
     #- master
     - image-builder-imx8mmini
   
-  before_script:
+  #before_script:
  
-    - git config --global user.email "$GIT_USEREMAIL"
-    - git config --global user.name "$GIT_USERNAME"
+  #  - git config --global user.email "$GIT_USEREMAIL"
+  #  - git config --global user.name "$GIT_USERNAME"
 
   script:
 
