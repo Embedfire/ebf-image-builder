@@ -13,7 +13,8 @@ stages:
 build_image_job:
 
   tags: 
-    - ENABLE
+    #- ENABLE
+    - imx8mm
 
   stage: build_image
 
