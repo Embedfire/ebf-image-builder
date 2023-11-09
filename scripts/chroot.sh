@@ -349,10 +349,11 @@ if [ "x${deb_distribution}" = "xdebian" -o "x${deb_distribution}" = "lubancat" ]
 		echo 'Acquire::GzipIndexes "true"; APT::Compressor::xz::Cost "40";' > /tmp/02compress-indexes
 		sudo mv /tmp/02compress-indexes "${tempdir}/etc/apt/apt.conf.d/02compress-indexes"
 		;;
-	buster|sid)
+	buster|bullseye|bookworm|sid)
 		###FIXME: close to release switch to ^ xz, right now buster is slow on apt...
 		echo 'Acquire::GzipIndexes "true"; APT::Compressor::gzip::Cost "40";' > /tmp/02compress-indexes
 		sudo mv /tmp/02compress-indexes "${tempdir}/etc/apt/apt.conf.d/02compress-indexes"
+		sudo chown root:root "${tempdir}/etc/apt/apt.conf.d/02compress-indexes"
 		;;
 	esac
 
@@ -377,16 +378,13 @@ echo "" >> ${wfile}
 
 #https://wiki.debian.org/StableUpdates
 case "${deb_codename}" in
-buster|sid)
-	echo "#deb http://${deb_mirror} ${deb_codename}-updates ${deb_components}" >> ${wfile}
+stretch|buster|bullseye|bookworm)
+	echo "deb http://${deb_mirror} ${deb_codename}-updates ${deb_components}" >> ${wfile}
 	echo "##deb-src http://${deb_mirror} ${deb_codename}-updates ${deb_components}" >> ${wfile}
 	echo "" >> ${wfile}
 	;;
-jessie)
-	echo "###For Debian 8 Jessie, jessie-updates no longer exists as this suite no longer receives updates since 2018-05-17." >> ${wfile}
-	;;
-*)
-	echo "deb http://${deb_mirror} ${deb_codename}-updates ${deb_components}" >> ${wfile}
+sid)
+	echo "#deb http://${deb_mirror} ${deb_codename}-updates ${deb_components}" >> ${wfile}
 	echo "#deb-src http://${deb_mirror} ${deb_codename}-updates ${deb_components}" >> ${wfile}
 	echo "" >> ${wfile}
 	;;
@@ -394,14 +392,19 @@ esac
 
 #https://wiki.debian.org/LTS/Using
 case "${deb_codename}" in
-jessie|stretch)
-	echo "deb http://deb.debian.org/debian-security ${deb_codename}/updates ${deb_components}" >> ${wfile}
-	echo "#deb-src http://deb.debian.org/debian-security ${deb_codename}/updates ${deb_components}" >> ${wfile}
+buster|stretch)
+	echo "#deb http://security.debian.org/debian-security ${deb_codename}/updates ${deb_components}" >> ${wfile}
+	echo "#deb-src http://security.debian.org/debian-security ${deb_codename}/updates ${deb_components}" >> ${wfile}
 	echo "" >> ${wfile}
 	;;
-buster|sid)
-	echo "#deb http://deb.debian.org/debian-security ${deb_codename}/updates ${deb_components}" >> ${wfile}
-	echo "##deb-src http://deb.debian.org/debian-security ${deb_codename}/updates ${deb_components}" >> ${wfile}
+bullseye|bookworm)
+	echo "deb http://security.debian.org/debian-security ${deb_codename}-security ${deb_components}" >> ${wfile}
+	echo "#deb-src http://security.debian.org/debian-security ${deb_codename}-security ${deb_components}" >> ${wfile}
+	echo "" >> ${wfile}
+	;;
+sid)
+	echo "#deb http://security.debian.org/debian-security ${deb_codename}-security ${deb_components}" >> ${wfile}
+	echo "##deb-src http://security.debian.org/debian-security ${deb_codename}-security ${deb_components}" >> ${wfile}
 	echo "" >> ${wfile}
 	;;
 esac
@@ -409,8 +412,8 @@ esac
 #https://wiki.debian.org/Backports
 if [ "x${chroot_enable_debian_backports}" = "xenable" ] ; then
 	case "${deb_codename}" in
-	jessie|stretch)
-		echo "deb http://deb.debian.org/debian ${deb_codename}-backports ${deb_components}" >> ${wfile}
+	stretch|buster|bullseye|bookworm)
+		echo "#deb http://deb.debian.org/debian ${deb_codename}-backports ${deb_components}" >> ${wfile}
 		echo "#deb-src http://deb.debian.org/debian ${deb_codename}-backports ${deb_components}" >> ${wfile}
 		echo "" >> ${wfile}
 		;;
@@ -1711,8 +1714,8 @@ sudo mv /tmp/user_password.list "${DIR}/deploy/${export_filename}/user_password.
 #Fixes:
 if [ -d "${tempdir}/etc/ssh/" -a "x${keep_ssh_keys}" = "x" ] ; then
 	#Remove pre-generated ssh keys, these will be regenerated on first bootup...
-	sudo rm -rf "${tempdir}"/etc/ssh/ssh_host_* || true
-	sudo touch "${tempdir}/etc/ssh/ssh.regenerate" || true
+	#sudo rm -rf "${tempdir}"/etc/ssh/ssh_host_* || true
+	#sudo touch "${tempdir}/etc/ssh/ssh.regenerate" || true
 	#Remove machine-id, this will be regenerated on first bootup...
 	sudo rm -f "${tempdir}"/etc/machine-id || true
 fi
