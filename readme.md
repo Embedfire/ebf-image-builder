@@ -2,8 +2,8 @@
  
 ## Ubuntu/Debian镜像构建工具
 
-- 适用对象：野火linux系列开发板
-- 运行环境：Ubuntu 18.04 LTS
+- 适用对象：野火linux imx8mm开发板
+- 运行环境：Ubuntu 20.04
 
 你可以使用ebf-image-builder脚本来编译Ubuntu/Debian固件。
 
@@ -13,7 +13,7 @@
 
 ```
 $ sudo apt-get update
-$ sudo apt install make gcc-arm-linux-gnueabihf gcc bison flex libssl-dev dpkg-dev lzop
+$ sudo apt install make gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu device-tree-compiler gcc bison flex libssl-dev dpkg-dev lzop
 
 ```
 ### 2.克隆ebf-image-builder仓库
@@ -24,7 +24,6 @@ $ cd ~/project/embedfire
 $ git clone --depth 1  xxx 
 $ cd ebf-image-builder
 ```
-
 
 ### 3.设置编译环境
 
@@ -37,13 +36,13 @@ $ source env/setenv.sh
 **注意**：每个选项的后面通过类似"[x]"的标志来表明默认选中第x项。
 具体说明如下：
 
-#### 选择安装方式
+#### 选择安装方式（默认）
 
 ```
 $ Choose install type:
   1.xxx
 ```
-针对不同flash介质，需要使用不同版本uboot：
+只有编译imx6镜像时才会针对不同flash介质，需要使用不同版本uboot：
 - eMMC/SD:uboot从eMMC/SD加载并启动linux系统
 - nandflsh:uboot从nandflsh加载并启动linux系统
 - ALL:编译所有版本的uboot，以实现一个镜像适用所有介质
@@ -107,11 +106,9 @@ $ Choose xxx type:
 生成镜像有多种版本：
 - console：纯净版镜像，没有带桌面环境和野火的QT App。
 
-- full-qt-app：具有完整QT App功能的镜像,系统启动后会进入QT App的界面。但是该固件体积超过了Nandflash 512M的容量，因此不能烧录到Nandflash中，只可烧录于eMMC。
+- qt：具有完整QT App功能的镜像,系统启动后会进入QT App的界面。
 
-- part-qt-app：移除了音视频播放功能的QT App，系统启动后会进入QT App的界面。该固件体积小于Nandflash 512M的容量，可以分别烧录到Nandflash和eMMC中。
-
-- desktop：带有桌面环境的镜像，系统启动后会进入桌面环境。
+- xfce：xfce桌面环境的镜像，系统启动后会进入桌面环境。
 
 请根据实际需求选择不同版本镜像。
 

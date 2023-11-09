@@ -197,7 +197,7 @@ imx8mmini_build_img(){
     LINUX=5.4.47
     UBOOT=2020.04
     DISTRIBUTION=Debian
-    DISTRIB_RELEASE=buster
+    DISTRIB_RELEASE=bullseye
     DISTRIB_TYPE=xfce
     INSTALL_TYPE=ALL
     make  DOWNLOAD_MIRROR=china SOURCE_URL=gitlab
