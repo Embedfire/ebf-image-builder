@@ -533,7 +533,7 @@ if [ "x${deb_arch}" = "xarmhf" ] || [ "x${deb_arch}" = "xarm64" ]; then
 	case "${deb_distribution}" in
 	lubancat)
 		case "${deb_codename}" in
-		jessie|stretch|buster)
+		stretch|buster|bullseye)
 			#while bb-customizations installes "generic-board-startup.service" other boards/configs could use this default.
 			sudo cp "${OIB_DIR}/target/init_scripts/systemd-generic-board-startup.service" "${tempdir}/lib/systemd/system/generic-board-startup.service"
 			sudo chown root:root "${tempdir}/lib/systemd/system/generic-board-startup.service"
@@ -1183,6 +1183,13 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 			#if systemd-timesync user exits, use that instead. (this user was removed in later systemd's)
 			cat /etc/group | grep ^systemd-timesync && chown systemd-timesync:systemd-timesync /var/lib/systemd/clock || true
 
+			#systemd v235+: (Debian Buster/Bullseye)
+			mkdir -p /var/lib/systemd/timesync/ || true
+			touch /var/lib/systemd/timesync/clock
+
+			#if systemd-timesync user exits, use that instead. (this user was removed in later systemd's)
+			cat /etc/group | grep ^systemd-timesync && chown systemd-timesync:systemd-timesync /var/lib/systemd/timesync/clock || true
+			
 			#Remove ntpdate
 			if [ -f /usr/sbin/ntpdate ] ; then
 				apt-get remove -y ntpdate --purge || true
