@@ -257,14 +257,15 @@ if [ "x${host_arch}" != "xarmv7l" ] && [ "x${host_arch}" != "xaarch64" ] ; then
 	fi
 fi
 
-chroot_mount_run
-echo "Log: Running: debootstrap second-stage in [${tempdir}]"
-sudo chroot "${tempdir}" debootstrap/debootstrap --second-stage
-echo "Log: Complete: [sudo chroot ${tempdir} debootstrap/debootstrap --second-stage]"
-report_size
-
 # 打包保存基本的根文件系统
 if [ ! -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/${DISTRIB_TYPE}/basefs.tar" ] ;then
+
+	chroot_mount_run
+	echo "Log: Running: debootstrap second-stage in [${tempdir}]"
+	sudo chroot "${tempdir}" debootstrap/debootstrap --second-stage
+	echo "Log: Complete: [sudo chroot ${tempdir} debootstrap/debootstrap --second-stage]"
+	report_size
+
 	#打包文件系统
 	echo "....................................................."
 	echo "packing base rootfs......"
