@@ -398,7 +398,7 @@ buster|stretch)
 	echo "" >> ${wfile}
 	;;
 bullseye|bookworm)
-	echo "deb http://security.debian.org/debian-security ${deb_codename}-security ${deb_components}" >> ${wfile}
+	echo "#deb http://security.debian.org/debian-security ${deb_codename}-security ${deb_components}" >> ${wfile}
 	echo "#deb-src http://security.debian.org/debian-security ${deb_codename}-security ${deb_components}" >> ${wfile}
 	echo "" >> ${wfile}
 	;;

@@ -33,7 +33,7 @@ start_time=`date +%s`
 mkdir -p history/${target_name}/${DISTRIBUTION}/${time}/image
 mkdir -p history/${target_name}/${DISTRIBUTION}/${time}/uboot
 mkdir -p history/${target_name}/${DISTRIBUTION}/${time}/kernel_deb 
-mkdir -p history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
+mkdir -p history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_RELEASE}/${DISTRIB_TYPE}
 mkdir -p history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}
 
 echo "Log: USER:${USER}"
@@ -78,7 +78,7 @@ cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/${t
    ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/image
 
 cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/*rootfs* \
-   ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_TYPE}
+   ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/rootfs/${DISTRIB_RELEASE}/${DISTRIB_TYPE}
 
 if [ "${target_name}" == "stm32mp157" ]; then
 	cp deploy/${deb_distribution}-${release}-${DISTRIB_TYPE}-${deb_arch}-${time}/bootfs.img \
@@ -122,7 +122,7 @@ echo " " >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.
 
 cd $ROOT
 echo "image-builder仓库：https://gitee.com/Embedfire/ebf-image-builder" >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
-echo "image-builder分支：master" >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
+echo "image-builder分支：image-builder-imx8mmini" >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
 echo "image-builder提交ID: $(git log | grep commit | head -n 1 |  awk '{print $2}')"  >>  ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
 echo " " >> ${ROOT}/history/${target_name}/${DISTRIBUTION}/${time}/镜像日志.txt
 
