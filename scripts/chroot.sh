@@ -263,13 +263,14 @@ sudo chroot "${tempdir}" debootstrap/debootstrap --second-stage
 echo "Log: Complete: [sudo chroot ${tempdir} debootstrap/debootstrap --second-stage]"
 report_size
 
-if [ ! -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/basefs.tar" ] ;then
+# 打包保存基本的根文件系统
+if [ ! -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/${DISTRIB_TYPE}/basefs.tar" ] ;then
 	#打包文件系统
 	echo "....................................................."
 	echo "packing base rootfs......"
 	cd "$tempdir"
-	mkdir -p ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}
-	sudo tar  -cf ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/basefs.tar .  #压缩基本的根文件系统
+	mkdir -p ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/${DISTRIB_TYPE}
+	sudo tar  -cf ${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/${DISTRIB_TYPE}/basefs.tar .  #压缩基本的根文件系统
 	cd "$DIR" 
 	echo "....................................................."
 

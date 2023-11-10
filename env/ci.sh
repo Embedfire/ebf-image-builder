@@ -172,15 +172,15 @@ qt
 
 imx8mmini_build_img(){
 
-    # imx8mmini debian10 console
-    # FIRE_BOARD=ebf_imx_8m_mini
-    # LINUX=5.4.47
-    # UBOOT=2020.04
-    # DISTRIBUTION=Debian
-    # DISTRIB_RELEASE=buster
-    # DISTRIB_TYPE=console
-    # INSTALL_TYPE=ALL
-    # make  DOWNLOAD_MIRROR=china SOURCE_URL=gitlab
+    #imx8mmini debian10 console
+    FIRE_BOARD=ebf_imx_8m_mini
+    LINUX=5.4.47
+    UBOOT=2020.04
+    DISTRIBUTION=Debian
+    DISTRIB_RELEASE=buster
+    DISTRIB_TYPE=console
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china SOURCE_URL=gitlab
 
     # imx8mmini debian10 xfce
     FIRE_BOARD=ebf_imx_8m_mini
@@ -189,6 +189,16 @@ imx8mmini_build_img(){
     DISTRIBUTION=Debian
     DISTRIB_RELEASE=buster
     DISTRIB_TYPE=xfce
+    INSTALL_TYPE=ALL
+    make  DOWNLOAD_MIRROR=china SOURCE_URL=gitlab
+
+    #imx8mmini debian11 console
+    FIRE_BOARD=ebf_imx_8m_mini
+    LINUX=5.4.47
+    UBOOT=2020.04
+    DISTRIBUTION=Debian
+    DISTRIB_RELEASE=bullseye
+    DISTRIB_TYPE=console
     INSTALL_TYPE=ALL
     make  DOWNLOAD_MIRROR=china SOURCE_URL=gitlab
 

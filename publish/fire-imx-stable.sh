@@ -28,8 +28,7 @@ kill_net_alive() {
 	return 0;
 }
 
-echo "*****$deb_arch******"
-
+info_msg "********** Build Rootfs ***********"
 trap "kill_net_alive;" EXIT
 USE_LOCAL_BOOT="yes"
 build_fire_image () {

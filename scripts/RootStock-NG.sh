@@ -53,7 +53,7 @@ check_project_config () {
 		project_config=$(echo "${leading_slash##*/}")
 	fi
 
-	#${project_config}.conf
+	# 保存${project_config}.conf到.project
 	project_config=$(echo ${project_config} | awk -F ".conf" '{print $1}')
 	if [ -f ${DIR}/configs/boards/${project_config}.conf ] ; then
 		. <(m4 -P ${DIR}/configs/boards/${project_config}.conf)
@@ -157,19 +157,28 @@ run_roostock_ng () {
 		echo "tempdir=\"${tempdir}\"" >> ${DIR}/.project
 	fi
 
+	echo 'Log: /bin/bash -e "${BUILD_SCRIPT}/install_dependencies.sh"'
 	/bin/bash -e "${BUILD_SCRIPT}/install_dependencies.sh" || { exit 1 ; }
 
-	# if [ -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/basefs.tar" ] ;then
-	# 	cd $tempdir
-	# 	sudo tar -xvf "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/basefs.tar"
-	# 	cd $DIR 
-	# else
-	# 	/bin/bash -e "${BUILD_SCRIPT}/debootstrap.sh" || { exit 1 ; }	#创建基本根文件系统
-	# fi
-	/bin/bash -e "${BUILD_SCRIPT}/debootstrap.sh" || { exit 1 ; }	#创建基本根文件系统
+	# 使用保存的根文件系统，避免重复构建根文件系统(如果修改了deb_include指定的软件和库，需要重新构建)
+	if [ -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/${DISTRIB_TYPE}/basefs.tar" ] ;then
+		echo "Log: use basefs.tar"
+		cd $tempdir
+		sudo tar -xvf "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/${DISTRIB_TYPE}/basefs.tar"
+		cd $DIR 
+	else
+		echo 'Log: /bin/bash -e "${BUILD_SCRIPT}/debootstrap.sh"'
+		/bin/bash -e "${BUILD_SCRIPT}/debootstrap.sh" || { exit 1 ; }	#创建基本根文件系统
+	fi
 
+	#echo 'Log: /bin/bash -e "${BUILD_SCRIPT}/debootstrap.sh"'
+	#/bin/bash -e "${BUILD_SCRIPT}/debootstrap.sh" || { exit 1 ; }	#创建基本根文件系统
+
+	echo 'Log: /bin/bash -e "${BUILD_SCRIPT}/chroot.sh"'
 	/bin/bash -e "${BUILD_SCRIPT}/chroot.sh" || { exit $? ; }
-	#sudo rm -rf ${tempdir}/ || true
+
+	sudo rm -rf ${tempdir}/ || true
+	echo 'Log: RootStock-NG.sh complete'
 }
 
 git_trees
