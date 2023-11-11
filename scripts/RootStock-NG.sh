@@ -160,7 +160,7 @@ run_roostock_ng () {
 	echo 'Log: /bin/bash -e "${BUILD_SCRIPT}/install_dependencies.sh"'
 	/bin/bash -e "${BUILD_SCRIPT}/install_dependencies.sh" || { exit 1 ; }
 
-	# 优先使用保存的根文件系统，避免重复构建根文件系统(如果修改了deb_include指定的软件和库，需要手动删除basefs.tar重新构建)
+	# 优先使用保存的根文件系统，避免重复构建根文件系统
 	if [ -f "${DIR}/history/tempdir/$(date +%Y-%m)/${DISTRIBUTION}/${DISTRIB_RELEASE}/${ARCH}/${DISTRIB_TYPE}/basefs.tar" ] ;then
 		echo "Log: use basefs.tar"
 		cd $tempdir

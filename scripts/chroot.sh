@@ -156,6 +156,10 @@ check_defines () {
 			fi
 		fi
 	fi
+
+	if [ ! "x${deb_release_pkgs}" = "x" ] ; then
+		deb_release_pkgs="$(echo ${deb_release_pkgs} | sed 's/,/ /g' | sed 's/\t/,/g')"
+	fi
 }
 
 report_size () {
@@ -802,7 +806,13 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 
 		if [ ! "x${repo_external_pkg_list}" = "x" ] ; then
 			echo "Log: (chroot) Installing (from external repo): ${repo_external_pkg_list}"
-			apt-get -y install ${repo_external_pkg_list} ${other_pk}
+			apt-get -y install ${repo_external_pkg_list}
+		fi
+
+		if [ ! "x${deb_release_pkgs}" = "x" ] ; then
+			echo "Log: (chroot) Installing (deb_release_pkgs): ${deb_release_pkgs}"
+			echo "Log: (chroot): [apt-get install -y -q ${deb_release_pkgs}]"
+			apt-get install -y -q ${deb_release_pkgs}
 		fi
 
 		if [ ! "x${repo_ros_pkg_list}" = "x" ] ; then
@@ -1189,7 +1199,7 @@ cat > "${DIR}/chroot_script.sh" <<-__EOF__
 
 			#if systemd-timesync user exits, use that instead. (this user was removed in later systemd's)
 			cat /etc/group | grep ^systemd-timesync && chown systemd-timesync:systemd-timesync /var/lib/systemd/timesync/clock || true
-			
+
 			#Remove ntpdate
 			if [ -f /usr/sbin/ntpdate ] ; then
 				apt-get remove -y ntpdate --purge || true
