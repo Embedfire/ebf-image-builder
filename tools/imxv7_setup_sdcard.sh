@@ -1289,8 +1289,8 @@ populate_rootfs () {
 	# fi
 
 	if [ ! -f ${TEMPDIR}/disk/opt/scripts/boot/generic-startup.sh ] ; then
-		if [ "x${conf_board}" = "xfire-rockchip-3399" ]; then
-			sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git --branch=dev_rockchip ${TEMPDIR}/disk/opt/scripts/ --depth 1
+		if [ "x${conf_board}" = "xfire-imx8m-mini-npi" ]; then
+			sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git --branch=dev_imx8mm ${TEMPDIR}/disk/opt/scripts/ --depth 1
 			sudo chown -R 1000:1000 ${TEMPDIR}/disk/opt/scripts/
 		else
 			sudo git clone https://gitee.com/Embedfire/ebf_6ull_bootscripts.git ${TEMPDIR}/disk/opt/scripts/ --depth 1
