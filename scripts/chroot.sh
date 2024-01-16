@@ -1462,6 +1462,11 @@ if [ "x${include_firmware}" = "xenable" ] ; then
 		sudo cp "${DIR}"/git/linux-firmware/rtlwifi/* "${tempdir}/lib/firmware/rtlwifi"
 	fi
 
+	if [ -d "${DIR}/git/linux-firmware/rtw88/" ] ; then
+		sudo mkdir -p "${tempdir}/lib/firmware/rtw88"
+		sudo cp "${DIR}"/git/linux-firmware/rtw88/* "${tempdir}/lib/firmware/rtw88"
+	fi
+
 	if [ -d "${DIR}/git/linux-firmware/ti-connectivity/" ] ; then
 		sudo mkdir -p "${tempdir}/lib/firmware/ti-connectivity"
 		sudo cp "${DIR}/git/linux-firmware/LICENCE.ti-connectivity" "${tempdir}/lib/firmware/"
