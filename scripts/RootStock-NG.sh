@@ -136,7 +136,7 @@ git_trees () {
 	fi
 
 	git_project_name="linux-firmware"
-	git_clone_address="https://gitee.com/Embedfire/linux-firmware.git"
+	git_clone_address="https://mirrors.tuna.tsinghua.edu.cn/git/linux-firmware.git"
 	generic_git
 	update_git
 }
