@@ -707,3 +707,6 @@ else
 	load_config_from_file
 fi
 lunch
+
+LINUX_DIR=${LINUX_DIR}
+export LINUX_DIR
