@@ -38,7 +38,7 @@ build_image_job:
     - fi
 
 
-  when: delayed
-  start_in: 180 minutes
+  # when: delayed
+  # start_in: 180 minutes
   #start_in: 10 sec
 
