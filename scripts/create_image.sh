@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e -o pipefail
+[ -n "$BUILD_DEBUG" ] && set -x
 
 time=$(date +%Y-%m-%d)
 

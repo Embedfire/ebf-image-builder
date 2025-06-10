@@ -1,4 +1,5 @@
 #!/bin/bash -e
+[ -n "$BUILD_DEBUG" ] && set -x
 
 #global config
 source configs/common.conf
