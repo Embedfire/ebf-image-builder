@@ -6,36 +6,26 @@ variables:
 
 # 定义 stages
 stages:
-
   - build_image
 
 # 定义 build_image  job
 build_image_job:
-
   tags: 
     - ENABLE
   stage: build_image
   when: manual
   #指定分支更新进行编译
   only:
-    #- image-builder_2.0
-    #- master
     - image-builder-imx8mmini
-  
-  #before_script:
- 
-  #  - git config --global user.email "$GIT_USEREMAIL"
-  #  - git config --global user.name "$GIT_USERNAME"
-
+  before_script:
+    - git config --global user.email "$GIT_USEREMAIL"
+    - git config --global user.name "$GIT_USERNAME"
   script:
-
+    # 使用内部仓库
+    - export SOURCE_URL=gitlab
     #编译镜像 
-    - if [  $uboot_branch ];then
-    - ./env/ci.sh  $uboot_branch
-    - elif [  $kernel_branch ]; then
-    - ./env/ci.sh  $kernel_branch
-    - else ./env/ci.sh
-    - fi
+    - ./env/ci.sh imx8mmini
+
 
 
   # when: delayed
