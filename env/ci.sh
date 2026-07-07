@@ -3,7 +3,7 @@
 set -e -o pipefail
 [ -n "$BUILD_DEBUG" ] && set -x
 
-IMAGE_BUILDER_DIR=/opt/ebf-image-builder
+IMAGE_BUILDER_DIR=/opt/ebf-image-builder-imx8mmini
 TARGET_DIR=/mnt/share
 
 GIT_CLONE_OPTIONS="--depth=1"
