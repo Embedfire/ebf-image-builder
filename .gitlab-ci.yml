@@ -13,11 +13,9 @@ stages:
 build_image_job:
 
   tags: 
-    #- ENABLE
-    - imx8mm
-
+    - ENABLE
   stage: build_image
-
+  when: manual
   #指定分支更新进行编译
   only:
     #- image-builder_2.0
