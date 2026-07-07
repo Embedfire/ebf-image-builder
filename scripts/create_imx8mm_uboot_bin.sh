@@ -1,4 +1,5 @@
 #!/bin/bash -e
+[ -n "$BUILD_DEBUG" ] && set -x
 
 if [ ! "$SCRIPT_URL" == "" ]; then
     if [ ! -d ${SCRIPT_DIR}/.git ]; then

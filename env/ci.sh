@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e -o pipefail
-
+[ -n "$BUILD_DEBUG" ] && set -x
 
 IMAGE_BUILDER_DIR=/opt/ebf-image-builder
 TARGET_DIR=/mnt/share
