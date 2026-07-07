@@ -172,6 +172,8 @@ qt
 
 imx8mmini_build_img(){
 
+    rebuild=$1
+
     #imx8mmini debian10 console
     FIRE_BOARD=ebf_imx_8m_mini
     LINUX=5.4.47
@@ -241,6 +243,10 @@ if [  $build_cpu ]; then
             stm32mp157_build_img enable
             ;;
 
+        imx8mmini)
+            imx8mmini_build_img enable
+            ;;
+
         rk3328)
             rk3328_build_img enable
             ;;  
@@ -265,5 +271,5 @@ rm -rf ${IMAGE_BUILDER_DIR}/ignore/
 rm -rf ${IMAGE_BUILDER_DIR}/history/imx6ull/
 rm -rf ${IMAGE_BUILDER_DIR}/history/stm32mp157/
 rm -rf ${IMAGE_BUILDER_DIR}/history/rockchip-3328/
-#rm -rf ${IMAGE_BUILDER_DIR}/history/imx8m-mini/
+rm -rf ${IMAGE_BUILDER_DIR}/history/imx8m-mini/
 
